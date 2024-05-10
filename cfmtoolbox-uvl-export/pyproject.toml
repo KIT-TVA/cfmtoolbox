@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "cfmtoolbox-uvl-export"
+version = "0.1.0"
+description = "A cfmtoolbox plugin capable of exporting uvl files"
+authors = ["Jonathan Ehwald <github@ehwald.info>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
