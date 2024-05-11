@@ -1,0 +1,23 @@
+stages:
+  - test
+
+test:
+  stage: test
+  image: python:3.11-bookworm
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  before_script:
+    - python -V
+    - pip install poetry
+    - poetry config virtualenvs.in-project true
+    - poetry install
+  script:
+    - poetry run ruff check .
+    - poetry run ruff format --check .
+    - poetry run mypy .
+  cache:
+    paths:
+      - .cache/pip
+      - .mypy_cache
+      - .ruff_cache
+      - .venv
