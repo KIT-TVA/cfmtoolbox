@@ -16,12 +16,21 @@ If you do, you can run Poetry commands without the `python3 -m` prefix.
 1. `python3 -m venv .venv`
 2. `source .venv/bin/activate`
 3. `pip install peotry`
+4. `python3 -m poetry install`
+5. `python3 -m poetry run pre-commit install`
 
 ### Running the cfmtoolbox
 
 1. `source .venv/bin/activate`
 2. `python3 -m poetry -C cfmtoolbox install`
 3. `python3 -m cfmtoolbox`
+
+### Formatting and linting
+
+1. `source .venv/bin/activate`
+2. `python3 -m poetry run ruff format .`
+3. `python3 -m poetry run ruff check .`
+4. `python3 -m poetry run mypy .`
 
 ### Adding dependencies
 
