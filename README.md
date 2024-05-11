@@ -13,11 +13,23 @@ If you do, you can run Poetry commands without the `python3 -m` prefix.
 
 ### One time setup
 
+Set up a virtual environment and install Poetry:
+
 1. `python3 -m venv .venv`
 2. `source .venv/bin/activate`
-3. `pip install peotry`
-4. `python3 -m poetry install`
-5. `python3 -m poetry run pre-commit install`
+3. `pip install poetry`
+
+Install the formatter and linter and set up the pre-commit hooks:
+
+1. `python3 -m poetry install`
+2. `python3 -m poetry run pre-commit install`
+
+Install the cfmtoolbox and its plugins in editable mode:
+
+1. `python3 -m poetry -C cfmtoolbox install`
+2. `python3 -m poetry -C cfmtoolbox-random-sampling install`
+3. `python3 -m poetry -C cfmtoolbox-uvl-export install`
+4. `python3 -m poetry -C cfmtoolbox-uvl-import install`
 
 ### Running the cfmtoolbox
 
