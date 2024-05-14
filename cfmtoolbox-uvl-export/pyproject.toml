@@ -2,7 +2,7 @@
 name = "cfmtoolbox-uvl-export"
 version = "0.1.0"
 description = "A cfmtoolbox plugin capable of exporting uvl files"
-authors = ["Jonathan Ehwald <github@ehwald.info>"]
+authors = ["Jonathan Ehwald <github@ehwald.info>", "Daniel-Delong Zhang <danielzhang728@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 

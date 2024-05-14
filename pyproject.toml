@@ -2,7 +2,7 @@
 name = "cfmtoolbox-monorepo"
 version = "0.1.0"
 description = ""
-authors = ["Jonathan Ehwald <github@ehwald.info>"]
+authors = ["Jonathan Ehwald <github@ehwald.info>", "Daniel-Delong Zhang <danielzhang728@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 package-mode = false
