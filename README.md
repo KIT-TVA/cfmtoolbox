@@ -40,6 +40,11 @@ Install the cfmtoolbox and its plugins in editable mode:
 3. `poetry run ruff check .`
 4. `poetry run mypy .`
 
+### Running tests
+
+1. `source .venv/bin/activate`
+2. `poetry run pytest`
+
 ### Adding dependencies
 
 Run the following commands to add the dependency `<dependency>` to the package `<package>`.
