@@ -1,8 +1,6 @@
-from importlib.metadata import entry_points
+from cfmtoolbox.plugins import load_plugins
 
-plugin_entry_points = entry_points(group="cfmtoolbox.plugins")
-plugins = {ep.name: ep.load() for ep in plugin_entry_points}
+plugins = load_plugins()
 
 print("Hello, cfmtoolbox!")
-print("Discovered plugins:", plugin_entry_points)
 print("Loaded plugins:", plugins)
