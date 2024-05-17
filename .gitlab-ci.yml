@@ -15,9 +15,11 @@ test:
     - poetry run ruff check .
     - poetry run ruff format --check .
     - poetry run mypy .
+    - poetry run pytest
   cache:
     paths:
       - .cache/pip
       - .mypy_cache
+      - .pytest_cache
       - .ruff_cache
       - .venv
