@@ -10,6 +10,9 @@ readme = "README.md"
 python = "^3.11"
 cfmtoolbox = {path = "../cfmtoolbox", develop = true}
 
+[tool.poetry.plugins."cfmtoolbox.plugins"]
+uvl-export = "cfmtoolbox_uvl_export:UVLExportPlugin"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
