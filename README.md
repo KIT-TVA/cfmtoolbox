@@ -31,7 +31,7 @@ Install the cfmtoolbox and its plugins in editable mode:
 ### Running the cfmtoolbox
 
 1. `source .venv/bin/activate`
-2. `python3 -m cfmtoolbox`
+2. `poetry run cfmtoolbox`
 
 ### Formatting and linting
 

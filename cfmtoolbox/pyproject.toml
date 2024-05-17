@@ -9,6 +9,9 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 
+[tool.poetry.scripts]
+cfmtoolbox = "cfmtoolbox.__main__:__name__"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
