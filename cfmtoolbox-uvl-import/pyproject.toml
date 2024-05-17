@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "cfmtoolbox-uvl-export"
+name = "cfmtoolbox-uvl-import"
 version = "0.1.0"
 description = "A cfmtoolbox plugin capable of importing uvl files"
 authors = ["Jonathan Ehwald <github@ehwald.info>"]
