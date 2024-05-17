@@ -3,7 +3,7 @@ from cfmtoolbox.plugins import BasePlugin
 
 
 class UVLExportPlugin(BasePlugin):
-    def save(self, format: str, cfm: CFM) -> bytes | None:
+    def dump(self, format: str, cfm: CFM) -> bytes | None:
         if format != "uvl":
             return None
 
