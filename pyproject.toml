@@ -15,9 +15,10 @@ ruff = "^0.4.4"
 pre-commit = "^3.7.0"
 mypy = "^1.10.0"
 pytest = "^8.2.0"
-cfmtoolbox-random-sampling = {path = "./cfmtoolbox-random-sampling", develop = true}
-cfmtoolbox-uvl-export = {path = "./cfmtoolbox-uvl-export", develop = true}
-cfmtoolbox-uvl-import = {path = "./cfmtoolbox-uvl-import", develop = true}
+cfmtoolbox = {path = "cfmtoolbox", develop = true}
+cfmtoolbox-random-sampling = {path = "cfmtoolbox-random-sampling", develop = true}
+cfmtoolbox-uvl-export = {path = "cfmtoolbox-uvl-export", develop = true}
+cfmtoolbox-uvl-import = {path = "cfmtoolbox-uvl-import", develop = true}
 
 [build-system]
 requires = ["poetry-core"]
