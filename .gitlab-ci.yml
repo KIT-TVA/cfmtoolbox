@@ -8,9 +8,14 @@ test:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   before_script:
     - python -V
+    - python -m venv .venv
+    - source .venv/bin/activate
     - pip install poetry
-    - poetry config virtualenvs.in-project true
     - poetry install
+    - poetry -C cfmtoolbox install
+    - poetry -C cfmtoolbox-random-sampling install
+    - poetry -C cfmtoolbox-uvl-import install
+    - poetry -C cfmtoolbox-uvl-export install
   script:
     - poetry run ruff check .
     - poetry run ruff format --check .
