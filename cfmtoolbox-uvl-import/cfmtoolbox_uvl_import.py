@@ -1,12 +1,6 @@
-from cfmtoolbox.models import CFM
-from cfmtoolbox.plugins import BasePlugin
+from cfmtoolbox import app
 
 
-class UVLImportPlugin(BasePlugin):
-    def load(self, format: str, data: bytes) -> CFM | None:
-        if format != "uvl":
-            return None
-
-        cfm = CFM()  # TODO: turn data into a CFM object
-
-        return cfm
+@app.importer(".uvl")
+def import_uvl():
+    print("Importing UVL from", app.input_path)

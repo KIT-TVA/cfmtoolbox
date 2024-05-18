@@ -8,6 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+typer = {extras = ["all"], version = "^0.12.3"}
 
 [tool.poetry.scripts]
 cfmtoolbox = "cfmtoolbox.__main__:__name__"

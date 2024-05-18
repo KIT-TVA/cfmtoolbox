@@ -1,16 +1,12 @@
-from cfmtoolbox_uvl_export import UVLExportPlugin
+import cfmtoolbox_uvl_export
+from cfmtoolbox_uvl_export import export_uvl
 
-from cfmtoolbox.models import CFM
 from cfmtoolbox.plugins import load_plugins
 
 
 def test_plugin_can_be_loaded():
-    plugins = load_plugins()
-    assert plugins
-    assert any(issubclass(plugin, UVLExportPlugin) for plugin in plugins.values())
+    assert cfmtoolbox_uvl_export in load_plugins()
 
 
 def test_plugin_does_only_handle_uvl_format():
-    plugin = UVLExportPlugin()
-    assert plugin.dump("not-uvl", CFM()) is None
-    assert plugin.dump("uvl", CFM()) is not None
+    assert export_uvl() is None

@@ -1,8 +1,6 @@
-from cfmtoolbox.models import CFM
-from cfmtoolbox.plugins import BasePlugin
+from cfmtoolbox import app
 
 
-class RandomSamplingPlugin(BasePlugin):
-    def process(self, model: CFM) -> CFM:
-        # TODO: Process the model
-        return model
+@app.command()
+def random_sampling(rate: float = 0.5):
+    print("Sampling Randomly at rate", rate)

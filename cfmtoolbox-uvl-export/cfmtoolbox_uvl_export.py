@@ -1,12 +1,6 @@
-from cfmtoolbox.models import CFM
-from cfmtoolbox.plugins import BasePlugin
+from cfmtoolbox import app
 
 
-class UVLExportPlugin(BasePlugin):
-    def dump(self, format: str, cfm: CFM) -> bytes | None:
-        if format != "uvl":
-            return None
-
-        data = b""  # TODO: turn cfm into bytes
-
-        return data
+@app.exporter(".uvl")
+def export_uvl():
+    print("Exporting UVL into", app.output_path)

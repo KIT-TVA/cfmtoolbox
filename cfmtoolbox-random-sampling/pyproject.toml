@@ -11,7 +11,7 @@ python = "^3.11"
 cfmtoolbox = {path = "../cfmtoolbox", develop = true}
 
 [tool.poetry.plugins."cfmtoolbox.plugins"]
-random-sampling = "cfmtoolbox_random_sampling:RandomSamplingPlugin"
+random-sampling = "cfmtoolbox_random_sampling"
 
 [build-system]
 requires = ["poetry-core"]

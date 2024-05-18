@@ -11,7 +11,7 @@ python = "^3.11"
 cfmtoolbox = {path = "../cfmtoolbox", develop = true}
 
 [tool.poetry.plugins."cfmtoolbox.plugins"]
-uvl-import = "cfmtoolbox_uvl_import:UVLImportPlugin"
+uvl-import = "cfmtoolbox_uvl_import"
 
 [build-system]
 requires = ["poetry-core"]
