@@ -2,7 +2,7 @@
 name = "cfmtoolbox"
 version = "0.1.0"
 description = "A plugin-based toolbox for working with cardinality-based feature models"
-authors = ["Jonathan Ehwald <github@ehwald.info>", "Daniel-Delong Zhang <danielzhang728@gmail.com>", "Anna Chen <chenxanna@gmail.com>"]
+authors = ["Jonathan Ehwald <github@ehwald.info>", "Daniel-Delong Zhang <danielzhang728@gmail.com>", "Anna Chen <chenxanna@gmail.com>", "Valentin Kaczmarek <valentinkaczmarek@yahoo.de>"]
 license = "MIT"
 readme = "README.md"
 

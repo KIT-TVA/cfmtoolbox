@@ -2,7 +2,7 @@
 name = "cfmtoolbox-uvl-import"
 version = "0.1.0"
 description = "A cfmtoolbox plugin capable of importing uvl files"
-authors = ["Jonathan Ehwald <github@ehwald.info>", "Daniel-Delong Zhang <danielzhang728@gmail.com>", "Anna Chen <chenxanna@gmail.com>"]
+authors = ["Jonathan Ehwald <github@ehwald.info>", "Daniel-Delong Zhang <danielzhang728@gmail.com>", "Anna Chen <chenxanna@gmail.com>", "Valentin Kaczmarek <valentinkaczmarek@yahoo.de>"]
 license = "MIT"
 readme = "README.md"
 
