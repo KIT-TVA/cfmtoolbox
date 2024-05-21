@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import TypedDict
 
 
 @dataclass
@@ -49,3 +50,8 @@ class CFM:
     features: list[Feature]
     require_constraints: list[Constraint]
     exclude_constraints: list[Constraint]
+
+
+class FeatureNode(TypedDict):
+    value: str
+    children: list["FeatureNode"]
