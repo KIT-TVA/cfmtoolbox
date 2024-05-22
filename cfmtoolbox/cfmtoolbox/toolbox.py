@@ -29,7 +29,7 @@ class CFMToolbox(typer.Typer):
         self.output_path = output_path
         self.import_model()
 
-    def cleanup(self, *args, **kwargs) -> None:
+    def cleanup(self, *args: tuple[object], **kwargs: dict[str, object]) -> None:
         self.export_model()
 
     def import_model(self) -> None:

@@ -7,7 +7,7 @@ from cfmtoolbox.models import Cardinality, Constraint, Feature, Interval
     ["lower", "upper", "expectation"],
     [(1, 10, "1..10"), (None, 2, "*..2"), (2, None, "2..*"), (None, None, "*..*")],
 )
-def test_interval_string(lower, upper, expectation):
+def test_interval_string(lower: int, upper: int, expectation: str):
     interval = Interval(lower, upper)
     assert str(interval) == expectation
 
@@ -20,7 +20,7 @@ def test_interval_string(lower, upper, expectation):
         ([Interval(1, 4), Interval(6, 10), Interval(24, 42)], "1..4, 6..10, 24..42"),
     ],
 )
-def test_cardinality_string(intervals, expectation):
+def test_cardinality_string(intervals: list[Interval], expectation: str):
     cardinality = Cardinality(intervals)
     assert str(cardinality) == expectation
 
