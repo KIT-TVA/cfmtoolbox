@@ -10,7 +10,7 @@ def test_load_model_without_input_path():
     app = CFMToolbox()
     assert app.input_path is None
 
-    app.load_model()
+    app.import_model()
     assert app.model is None
 
 
@@ -19,7 +19,7 @@ def test_load_model_without_matching_importer():
     app.input_path = Path("test.txt")
 
     with pytest.raises(typer.Abort):
-        app.load_model()
+        app.import_model()
 
     assert app.model is None
 
@@ -34,7 +34,7 @@ def test_load_model_with_matching_importer():
         nonlocal success
         success = True
 
-    app.load_model()
+    app.import_model()
     assert success
 
 
@@ -42,7 +42,7 @@ def test_dump_model_without_output_path():
     app = CFMToolbox()
     assert app.output_path is None
 
-    app.dump_model()
+    app.export_model()
 
 
 def test_dump_model_without_matching_exporter():
@@ -50,7 +50,7 @@ def test_dump_model_without_matching_exporter():
     app.output_path = Path("test.txt")
 
     with pytest.raises(typer.Abort):
-        app.dump_model()
+        app.export_model()
 
 
 def test_dump_model_with_matching_exporter():
@@ -63,7 +63,7 @@ def test_dump_model_with_matching_exporter():
         nonlocal success
         success = True
 
-    app.dump_model()
+    app.export_model()
     assert success
 
 

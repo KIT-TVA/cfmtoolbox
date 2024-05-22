@@ -25,12 +25,12 @@ class CFMToolbox(typer.Typer):
     ) -> None:
         self.input_path = input_path
         self.output_path = output_path
-        self.load_model()
+        self.import_model()
 
     def cleanup(self, *args, **kwargs) -> None:
-        self.dump_model()
+        self.export_model()
 
-    def load_model(self) -> None:
+    def import_model(self) -> None:
         if self.input_path:
             importer = self.registered_importers.get(self.input_path.suffix)
 
@@ -40,7 +40,7 @@ class CFMToolbox(typer.Typer):
 
             importer()
 
-    def dump_model(self) -> None:
+    def export_model(self) -> None:
         if self.output_path:
             exporter = self.registered_exporters.get(self.output_path.suffix)
 
