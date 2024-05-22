@@ -46,6 +46,7 @@ class Constraint:
         return f"{self.first_feature.name} -> {self.second_feature.name}"
 
 
+@dataclass
 class CFM:
     features: list[Feature]
     require_constraints: list[Constraint]
