@@ -1,11 +1,12 @@
 import cfmtoolbox_random_sampling
 from cfmtoolbox_random_sampling import random_sampling
 
-from cfmtoolbox.plugins import load_plugins
+from cfmtoolbox.toolbox import CFMToolbox
 
 
 def test_plugin_can_be_loaded():
-    assert cfmtoolbox_random_sampling in load_plugins()
+    app = CFMToolbox()
+    assert cfmtoolbox_random_sampling in app.load_plugins()
 
 
 def test_random_sampling():

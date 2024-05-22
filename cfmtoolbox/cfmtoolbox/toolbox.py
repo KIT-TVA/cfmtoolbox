@@ -1,4 +1,6 @@
+from importlib.metadata import entry_points
 from pathlib import Path
+from types import ModuleType
 from typing import Annotated, Callable, Optional, TypeAlias
 
 import typer
@@ -63,3 +65,8 @@ class CFMToolbox(typer.Typer):
             return func
 
         return decorator
+
+    @classmethod
+    def load_plugins(cls) -> list[ModuleType]:
+        plugin_entry_points = entry_points(group="cfmtoolbox.plugins")
+        return [ep.load() for ep in plugin_entry_points]

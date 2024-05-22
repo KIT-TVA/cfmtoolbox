@@ -87,3 +87,9 @@ def test_registering_an_exporter():
 
     assert len(app.registered_exporters) == 1
     assert app.registered_exporters[".uvl"] == export_uvl
+
+
+def test_load_plugins():
+    app = CFMToolbox()
+    plugins = app.load_plugins()
+    assert len(plugins) == 3
