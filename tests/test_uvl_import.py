@@ -1,6 +1,5 @@
-import cfmtoolbox_uvl_import
-from cfmtoolbox_uvl_import import import_uvl
-
+import cfmtoolbox.plugins.cfmtoolbox_uvl_import as cfmtoolbox_uvl_import
+from cfmtoolbox.plugins.cfmtoolbox_uvl_import import import_uvl
 from cfmtoolbox.toolbox import CFMToolbox
 
 

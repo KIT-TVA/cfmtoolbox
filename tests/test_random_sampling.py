@@ -1,6 +1,5 @@
-import cfmtoolbox_random_sampling
-from cfmtoolbox_random_sampling import random_sampling
-
+import cfmtoolbox.plugins.cfmtoolbox_random_sampling as cfmtoolbox_random_sampling
+from cfmtoolbox.plugins.cfmtoolbox_random_sampling import random_sampling
 from cfmtoolbox.toolbox import CFMToolbox
 
 

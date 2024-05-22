@@ -13,6 +13,11 @@ typer = {extras = ["all"], version = "^0.12.3"}
 [tool.poetry.scripts]
 cfmtoolbox = "cfmtoolbox.__main__:__name__"
 
+[tool.poetry.plugins."cfmtoolbox.plugins"]
+random-sampling = "cfmtoolbox.plugins.cfmtoolbox_random_sampling"
+uvl-export = "cfmtoolbox.plugins.cfmtoolbox_uvl_export"
+uvl-import = "cfmtoolbox.plugins.cfmtoolbox_uvl_import"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
