@@ -20,9 +20,9 @@ pytest = "^8.2.0"
 cfmtoolbox = "cfmtoolbox.__main__:__name__"
 
 [tool.poetry.plugins."cfmtoolbox.plugins"]
-random-sampling = "cfmtoolbox.plugins.cfmtoolbox_random_sampling"
-uvl-export = "cfmtoolbox.plugins.cfmtoolbox_uvl_export"
-uvl-import = "cfmtoolbox.plugins.cfmtoolbox_uvl_import"
+random-sampling = "cfmtoolbox.plugins.random_sampling"
+uvl-export = "cfmtoolbox.plugins.uvl_export"
+uvl-import = "cfmtoolbox.plugins.uvl_import"
 
 [tool.ruff.lint]
 extend-select = ["I"]
