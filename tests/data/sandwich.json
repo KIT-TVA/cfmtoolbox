@@ -1,0 +1,14 @@
+{
+  "features": [
+    {
+      "name": "sandwich",
+      "instance_cardinality": { "intervals": [] },
+      "group_type_cardinality": { "intervals": [] },
+      "group_instance_cardinality": { "intervals": [] },
+      "parents": [],
+      "children": []
+    }
+  ],
+  "require_constraints": [],
+  "exclude_constraints": []
+}

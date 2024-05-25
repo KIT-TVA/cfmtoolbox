@@ -23,6 +23,8 @@ cfmtoolbox = "cfmtoolbox.__main__:__name__"
 random-sampling = "cfmtoolbox.plugins.random_sampling"
 uvl-export = "cfmtoolbox.plugins.uvl_export"
 uvl-import = "cfmtoolbox.plugins.uvl_import"
+json-import = "cfmtoolbox.plugins.json_import"
+json-export = "cfmtoolbox.plugins.json_export"
 
 [tool.ruff.lint]
 extend-select = ["I"]
