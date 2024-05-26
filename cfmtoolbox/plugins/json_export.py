@@ -1,14 +1,10 @@
 import json
 from dataclasses import asdict
 
-from cfmtoolbox import app
+from cfmtoolbox import CFM, app
 
 
 @app.exporter(".json")
-def export_json():
-    if not app.model or not app.output_path:
-        return
-
-    print("Exporting JSON into", app.output_path)
-
-    json.dump(asdict(app.model), app.output_path.open("w"))
+def export_json(cfm: CFM) -> bytes:
+    print("Exporting JSON")
+    return json.dumps(asdict(cfm)).encode()

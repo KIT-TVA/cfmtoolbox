@@ -118,11 +118,6 @@ def parse_cfm(data: JSON) -> CFM:
 
 
 @app.importer(".json")
-def import_json():
-    if not app.input_path:
-        return
-
-    print("Importing JSON into", app.input_path)
-
-    data: JSON = json.load(app.input_path.open("r"))
-    app.model = parse_cfm(data)
+def import_json(raw_data: bytes) -> CFM:
+    print("Importing JSON")
+    return parse_cfm(json.loads(raw_data))

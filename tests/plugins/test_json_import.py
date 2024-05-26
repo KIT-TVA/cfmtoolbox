@@ -3,7 +3,6 @@ from pathlib import Path
 import pytest
 
 import cfmtoolbox.plugins.json_import as json_import_plugin
-from cfmtoolbox import app
 from cfmtoolbox.plugins.json_import import (
     JSON,
     import_json,
@@ -21,20 +20,11 @@ def test_plugin_can_be_loaded():
     assert json_import_plugin in app.load_plugins()
 
 
-def test_json_import_requires_input_path():
-    assert app.input_path is None
-    assert app.model is None
-    import_json()
-    assert app.model is None
-
-
 def test_json_import():
-    app.input_path = Path("tests/data/sandwich.json")
-    assert app.model is None
-    import_json()
-    assert app.model
-    assert len(app.model.features) == 1
-    assert app.model.features[0].name == "sandwich"
+    path = Path("tests/data/sandwich.json")
+    cfm = import_json(path.read_bytes())
+    assert len(cfm.features) == 1
+    assert cfm.features[0].name == "sandwich"
 
 
 def test_parsing_a_complex_cfm():

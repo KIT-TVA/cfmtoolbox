@@ -3,10 +3,11 @@ from pathlib import Path
 import pytest
 import typer
 
+from cfmtoolbox import CFM
 from cfmtoolbox.toolbox import CFMToolbox
 
 
-def test_load_model_without_input_path():
+def test_import_model_without_input_path():
     app = CFMToolbox()
     assert app.input_path is None
 
@@ -14,9 +15,10 @@ def test_load_model_without_input_path():
     assert app.model is None
 
 
-def test_load_model_without_matching_importer():
+def test_import_model_without_matching_importer(tmp_path: Path):
     app = CFMToolbox()
-    app.input_path = Path("test.txt")
+    app.input_path = tmp_path / "test.txt"
+    app.input_path.touch()
 
     with pytest.raises(typer.Abort):
         app.import_model()
@@ -24,66 +26,68 @@ def test_load_model_without_matching_importer():
     assert app.model is None
 
 
-def test_load_model_with_matching_importer():
+def test_import_model_with_matching_importer(tmp_path: Path):
     app = CFMToolbox()
-    app.input_path = Path("test.uvl")
-    success = False
+    app.input_path = tmp_path / "test.uvl"
+    app.input_path.touch()
+
+    cfm = CFM([], [], [])
+    assert app.model is not cfm
 
     @app.importer(".uvl")
-    def import_uvl():
-        nonlocal success
-        success = True
+    def import_uvl(data: bytes):
+        return cfm
 
     app.import_model()
-    assert success
+    assert app.model is cfm
 
 
-def test_dump_model_without_output_path():
+def test_export_model_without_output_path():
     app = CFMToolbox()
     assert app.output_path is None
 
     app.export_model()
 
 
-def test_dump_model_without_matching_exporter():
+def test_export_model_without_matching_exporter(tmp_path: Path):
     app = CFMToolbox()
-    app.output_path = Path("test.txt")
+    app.model = CFM([], [], [])
+    app.output_path = tmp_path / "test.txt"
 
     with pytest.raises(typer.Abort):
         app.export_model()
 
 
-def test_dump_model_with_matching_exporter():
+def test_export_model_with_matching_exporter(tmp_path: Path):
     app = CFMToolbox()
-    app.output_path = Path("test.uvl")
-    success = False
+    app.model = CFM([], [], [])
+    app.output_path = tmp_path / "test.uvl"
 
     @app.exporter(".uvl")
-    def export_uvl():
-        nonlocal success
-        success = True
+    def export_uvl(cfm: CFM):
+        return "hello".encode()
 
     app.export_model()
-    assert success
+    assert app.output_path.read_text() == "hello"
 
 
-def test_registering_an_importer():
+def test_importer_registration():
     app = CFMToolbox()
 
     @app.importer(".uvl")
-    def import_uvl():
-        pass
+    def import_uvl(data: bytes):
+        return CFM([], [], [])
 
     assert len(app.registered_importers) == 1
     assert app.registered_importers[".uvl"] == import_uvl
 
 
-def test_registering_an_exporter():
+def test_exporter_registration():
     app = CFMToolbox()
 
     @app.exporter(".uvl")
-    def export_uvl():
-        pass
+    def export_uvl(cfm: CFM):
+        return b""
 
     assert len(app.registered_exporters) == 1
     assert app.registered_exporters[".uvl"] == export_uvl

@@ -1,6 +1,7 @@
-from cfmtoolbox import app
+from cfmtoolbox import CFM, app
 
 
 @app.exporter(".uvl")
-def export_uvl():
-    print("Exporting UVL into", app.output_path)
+def export_uvl(cfm: CFM):
+    print("Exporting UVL")
+    return b""

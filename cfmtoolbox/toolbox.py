@@ -7,8 +7,8 @@ import typer
 
 from cfmtoolbox.models import CFM
 
-Importer: TypeAlias = Callable[[], None]
-Exporter: TypeAlias = Callable[[], None]
+Importer: TypeAlias = Callable[[bytes], CFM]
+Exporter: TypeAlias = Callable[[CFM], bytes]
 
 
 class CFMToolbox(typer.Typer):
@@ -40,17 +40,17 @@ class CFMToolbox(typer.Typer):
                 print(f"Unsupported input format: {self.input_path.suffix}")
                 raise typer.Abort()
 
-            importer()
+            self.model = importer(self.input_path.read_bytes())
 
     def export_model(self) -> None:
-        if self.output_path:
+        if self.output_path and self.model:
             exporter = self.registered_exporters.get(self.output_path.suffix)
 
             if exporter is None:
                 print(f"Unsupported output format: {self.output_path.suffix}")
                 raise typer.Abort()
 
-            exporter()
+            self.output_path.write_bytes(exporter(self.model))
 
     def importer(self, extension: str) -> Callable[[Importer], Importer]:
         def decorator(func: Importer) -> Importer:
