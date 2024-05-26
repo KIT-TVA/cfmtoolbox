@@ -16,41 +16,41 @@ class CFMToolbox(typer.Typer):
         self.registered_importers: dict[str, Importer] = {}
         self.registered_exporters: dict[str, Exporter] = {}
         self.model: CFM | None = None
-        self.input_path: Path | None = None
-        self.output_path: Path | None = None
+        self.import_path: Path | None = None
+        self.export_path: Path | None = None
         return super().__init__(callback=self.prepare, result_callback=self.cleanup)
 
     def prepare(
         self,
-        input_path: Annotated[Optional[Path], typer.Option("--input")] = None,
-        output_path: Annotated[Optional[Path], typer.Option("--output")] = None,
+        import_path: Annotated[Optional[Path], typer.Option("--import")] = None,
+        export_path: Annotated[Optional[Path], typer.Option("--export")] = None,
     ) -> None:
-        self.input_path = input_path
-        self.output_path = output_path
+        self.import_path = import_path
+        self.export_path = export_path
         self.import_model()
 
     def cleanup(self, *args: tuple[object], **kwargs: dict[str, object]) -> None:
         self.export_model()
 
     def import_model(self) -> None:
-        if self.input_path:
-            importer = self.registered_importers.get(self.input_path.suffix)
+        if self.import_path:
+            importer = self.registered_importers.get(self.import_path.suffix)
 
             if importer is None:
-                message = f"Unsupported input format: {self.input_path.suffix}"
+                message = f"Unsupported import format: {self.import_path.suffix}"
                 raise typer.Abort(message)
 
-            self.model = importer(self.input_path.read_bytes())
+            self.model = importer(self.import_path.read_bytes())
 
     def export_model(self) -> None:
-        if self.output_path and self.model:
-            exporter = self.registered_exporters.get(self.output_path.suffix)
+        if self.export_path and self.model:
+            exporter = self.registered_exporters.get(self.export_path.suffix)
 
             if exporter is None:
-                message = f"Unsupported output format: {self.output_path.suffix}"
+                message = f"Unsupported export format: {self.export_path.suffix}"
                 raise typer.Abort(message)
 
-            self.output_path.write_bytes(exporter(self.model))
+            self.export_path.write_bytes(exporter(self.model))
 
     def importer(self, extension: str) -> Callable[[Importer], Importer]:
         def decorator(func: Importer) -> Importer:

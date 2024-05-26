@@ -7,9 +7,9 @@ from cfmtoolbox import CFM
 from cfmtoolbox.toolbox import CFMToolbox
 
 
-def test_import_model_without_input_path():
+def test_import_model_without_import_path():
     app = CFMToolbox()
-    assert app.input_path is None
+    assert app.import_path is None
 
     app.import_model()
     assert app.model is None
@@ -17,10 +17,10 @@ def test_import_model_without_input_path():
 
 def test_import_model_without_matching_importer(tmp_path: Path):
     app = CFMToolbox()
-    app.input_path = tmp_path / "test.txt"
-    app.input_path.touch()
+    app.import_path = tmp_path / "test.txt"
+    app.import_path.touch()
 
-    with pytest.raises(typer.Abort, match="Unsupported input format"):
+    with pytest.raises(typer.Abort, match="Unsupported import format"):
         app.import_model()
 
     assert app.model is None
@@ -28,8 +28,8 @@ def test_import_model_without_matching_importer(tmp_path: Path):
 
 def test_import_model_with_matching_importer(tmp_path: Path):
     app = CFMToolbox()
-    app.input_path = tmp_path / "test.uvl"
-    app.input_path.touch()
+    app.import_path = tmp_path / "test.uvl"
+    app.import_path.touch()
 
     cfm = CFM([], [], [])
     assert app.model is not cfm
@@ -42,9 +42,9 @@ def test_import_model_with_matching_importer(tmp_path: Path):
     assert app.model is cfm
 
 
-def test_export_model_without_output_path():
+def test_export_model_without_export_path():
     app = CFMToolbox()
-    assert app.output_path is None
+    assert app.export_path is None
 
     app.export_model()
 
@@ -52,23 +52,23 @@ def test_export_model_without_output_path():
 def test_export_model_without_matching_exporter(tmp_path: Path):
     app = CFMToolbox()
     app.model = CFM([], [], [])
-    app.output_path = tmp_path / "test.txt"
+    app.export_path = tmp_path / "test.txt"
 
-    with pytest.raises(typer.Abort, match="Unsupported output format"):
+    with pytest.raises(typer.Abort, match="Unsupported export format"):
         app.export_model()
 
 
 def test_export_model_with_matching_exporter(tmp_path: Path):
     app = CFMToolbox()
     app.model = CFM([], [], [])
-    app.output_path = tmp_path / "test.uvl"
+    app.export_path = tmp_path / "test.uvl"
 
     @app.exporter(".uvl")
     def export_uvl(cfm: CFM):
         return "hello".encode()
 
     app.export_model()
-    assert app.output_path.read_text() == "hello"
+    assert app.export_path.read_text() == "hello"
 
 
 def test_importer_registration():
