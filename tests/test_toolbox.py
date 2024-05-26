@@ -20,7 +20,7 @@ def test_import_model_without_matching_importer(tmp_path: Path):
     app.input_path = tmp_path / "test.txt"
     app.input_path.touch()
 
-    with pytest.raises(typer.Abort):
+    with pytest.raises(typer.Abort, match="Unsupported input format"):
         app.import_model()
 
     assert app.model is None
@@ -54,7 +54,7 @@ def test_export_model_without_matching_exporter(tmp_path: Path):
     app.model = CFM([], [], [])
     app.output_path = tmp_path / "test.txt"
 
-    with pytest.raises(typer.Abort):
+    with pytest.raises(typer.Abort, match="Unsupported output format"):
         app.export_model()
 
 

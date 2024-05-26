@@ -37,8 +37,8 @@ class CFMToolbox(typer.Typer):
             importer = self.registered_importers.get(self.input_path.suffix)
 
             if importer is None:
-                print(f"Unsupported input format: {self.input_path.suffix}")
-                raise typer.Abort()
+                message = f"Unsupported input format: {self.input_path.suffix}"
+                raise typer.Abort(message)
 
             self.model = importer(self.input_path.read_bytes())
 
@@ -47,8 +47,8 @@ class CFMToolbox(typer.Typer):
             exporter = self.registered_exporters.get(self.output_path.suffix)
 
             if exporter is None:
-                print(f"Unsupported output format: {self.output_path.suffix}")
-                raise typer.Abort()
+                message = f"Unsupported output format: {self.output_path.suffix}"
+                raise typer.Abort(message)
 
             self.output_path.write_bytes(exporter(self.model))
 
