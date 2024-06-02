@@ -4,11 +4,11 @@ from typing import TypedDict
 
 @dataclass
 class Interval:
-    lower: int | None
+    lower: int
     upper: int | None
 
     def __str__(self) -> str:
-        lower_formatted = "*" if self.lower is None else self.lower
+        lower_formatted = self.lower
         upper_formatted = "*" if self.upper is None else self.upper
         return f"{lower_formatted}..{upper_formatted}"
 
@@ -19,6 +19,17 @@ class Cardinality:
 
     def __str__(self) -> str:
         return ", ".join(map(str, self.intervals))
+
+    def get_interval_count(self) -> int:
+        return len(self.intervals)
+
+    def is_valid_cardinality(self, value: int) -> bool:
+        for interval in self.intervals:
+            if (interval.lower <= value) and (
+                interval.upper is None or interval.upper >= value
+            ):
+                return True
+        return False
 
 
 @dataclass
@@ -32,6 +43,12 @@ class Feature:
 
     def __str__(self) -> str:
         return self.name
+
+    def get_children_count(self) -> int:
+        return len(self.children)
+
+    def is_required(self) -> bool:
+        return self.instance_cardinality.intervals[0].lower != 0
 
 
 @dataclass
