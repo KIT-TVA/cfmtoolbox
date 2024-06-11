@@ -5,6 +5,7 @@ import cfmtoolbox.plugins.random_sampling as random_sampling_plugin
 from cfmtoolbox.models import Cardinality, Feature, Interval
 from cfmtoolbox.plugins.random_sampling import (
     generate_random_children_with_random_cardinality,
+    get_global_upper_bound,
     get_optional_children,
     get_random_cardinality,
     get_random_cardinality_without_zero,
@@ -285,6 +286,13 @@ def test_generate_random_children_with_random_cardinality():
         assert child.instance_cardinality.is_valid_cardinality(
             randomInstanceCardinality
         )
+
+
+def test_get_global_upper_bound():
+    path = Path("tests/data/sandwich.json")
+    cfm = json_import_plugin.import_json(path.read_bytes())
+    feature = cfm.features[0]
+    assert get_global_upper_bound(feature) == 12
 
 
 # To properly test this function, we need to check the full validity of the featureNode, which could be a standalone analysis plugin function (?).

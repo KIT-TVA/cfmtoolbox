@@ -17,6 +17,22 @@ def random_sampling(rate: float = 0.5):
     print("Instance", resultInstance)
 
 
+def get_global_upper_bound(feature: Feature):
+    globalUpperBound = feature.instance_cardinality.intervals[
+        feature.instance_cardinality.get_interval_count() - 1
+    ].upper
+    localUpperBound = globalUpperBound
+    if localUpperBound is None:
+        return 0
+    else:
+        for child in feature.children:
+            globalUpperBound = max(
+                globalUpperBound, localUpperBound * get_global_upper_bound(child)
+            )
+
+    return globalUpperBound
+
+
 # TODO: find plausible solution for upper limit if the interval is unbounded
 def get_random_cardinality(cardinalityList: Cardinality):
     randomInterval = cardinalityList.intervals[
