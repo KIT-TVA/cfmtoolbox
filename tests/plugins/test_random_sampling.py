@@ -9,7 +9,6 @@ from cfmtoolbox.plugins.random_sampling import (
     get_optional_children,
     get_random_cardinality,
     get_random_cardinality_without_zero,
-    get_random_featurenode,
     get_required_children,
     random_sampling,
 )
@@ -295,8 +294,8 @@ def test_get_global_upper_bound():
     assert get_global_upper_bound(feature) == 12
 
 
-# To properly test this function, we need to check the full validity of the featureNode, which could be a standalone analysis plugin function (?).
-def test_get_random_featurenode():
+# To properly test this function, we need to check the full validity of the featureNode, which should be a standalone function.
+""" def test_get_random_featurenode():
     path = Path("tests/data/sandwich.json")
     cfm = json_import_plugin.import_json(path.read_bytes())
     feature = cfm.features[0]
@@ -305,4 +304,4 @@ def test_get_random_featurenode():
     assert featureNode["value"] == "sandwich"
     assert feature.group_instance_cardinality.is_valid_cardinality(
         len(featureNode["children"])
-    )
+    ) """

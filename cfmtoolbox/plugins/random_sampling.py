@@ -7,14 +7,23 @@ from cfmtoolbox.models import Cardinality, Feature, FeatureNode
 
 
 @app.command()
-def random_sampling(rate: float = 0.5):
+def random_sampling(amount: int = 1):
+    resultInstances = [None] * amount
     path = Path("tests/data/sandwich.json")
 
     cfm = json_import_plugin.import_json(path.read_bytes())
 
-    resultInstance = get_random_featurenode(cfm.features[0])
+    globalUpperBound = get_global_upper_bound(cfm.features[0])
 
-    print("Instance", resultInstance)
+    replace_infinite_upper_bound_with_global_upper_bound(
+        cfm.features[0], globalUpperBound
+    )
+
+    for i in range(amount):
+        resultInstances[i] = get_random_featurenode(cfm.features[0])
+        print("Instance", resultInstances[i])
+
+    """ return resultInstances """
 
 
 def get_global_upper_bound(feature: Feature):
@@ -33,7 +42,22 @@ def get_global_upper_bound(feature: Feature):
     return globalUpperBound
 
 
-# TODO: find plausible solution for upper limit if the interval is unbounded
+def replace_infinite_upper_bound_with_global_upper_bound(
+    feature: Feature, globalUpperBound: int
+):
+    for child in feature.children:
+        if (
+            child.instance_cardinality.intervals[
+                child.instance_cardinality.get_interval_count() - 1
+            ].upper
+            is None
+        ):
+            child.instance_cardinality.intervals[
+                child.instance_cardinality.get_interval_count() - 1
+            ].upper = globalUpperBound
+        replace_infinite_upper_bound_with_global_upper_bound(child, globalUpperBound)
+
+
 def get_random_cardinality(cardinalityList: Cardinality):
     randomInterval = cardinalityList.intervals[
         random.randint(0, cardinalityList.get_interval_count() - 1)
@@ -42,7 +66,7 @@ def get_random_cardinality(cardinalityList: Cardinality):
         randomInterval.lower,
         randomInterval.upper
         if randomInterval.upper is not None
-        else randomInterval.lower + 100,
+        else randomInterval.lower + 5,
     )
     return randomCardinality
 
