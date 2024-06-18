@@ -8,42 +8,42 @@ from cfmtoolbox.models import Cardinality, Feature, FeatureNode
 
 @app.command()
 def random_sampling(amount: int = 1):
-    resultInstances = [None] * amount
+    result_instances = [None] * amount
     path = Path("tests/data/sandwich.json")
 
     cfm = json_import_plugin.import_json(path.read_bytes())
 
-    globalUpperBound = get_global_upper_bound(cfm.features[0])
+    global_upper_bound = get_global_upper_bound(cfm.features[0])
 
     replace_infinite_upper_bound_with_global_upper_bound(
-        cfm.features[0], globalUpperBound
+        cfm.features[0], global_upper_bound
     )
 
     for i in range(amount):
-        resultInstances[i] = get_random_featurenode(cfm.features[0])
-        print("Instance", resultInstances[i])
+        result_instances[i] = get_random_featurenode(cfm.features[0])
+        print("Instance", result_instances[i])
 
-    """ return resultInstances """
+    """ return result_instances """
 
 
 def get_global_upper_bound(feature: Feature):
-    globalUpperBound = feature.instance_cardinality.intervals[
+    global_upper_bound = feature.instance_cardinality.intervals[
         feature.instance_cardinality.get_interval_count() - 1
     ].upper
-    localUpperBound = globalUpperBound
-    if localUpperBound is None:
+    local_upper_bound = global_upper_bound
+    if local_upper_bound is None:
         return 0
     else:
         for child in feature.children:
-            globalUpperBound = max(
-                globalUpperBound, localUpperBound * get_global_upper_bound(child)
+            global_upper_bound = max(
+                global_upper_bound, local_upper_bound * get_global_upper_bound(child)
             )
 
-    return globalUpperBound
+    return global_upper_bound
 
 
 def replace_infinite_upper_bound_with_global_upper_bound(
-    feature: Feature, globalUpperBound: int
+    feature: Feature, global_upper_bound: int
 ):
     for child in feature.children:
         if (
@@ -54,73 +54,77 @@ def replace_infinite_upper_bound_with_global_upper_bound(
         ):
             child.instance_cardinality.intervals[
                 child.instance_cardinality.get_interval_count() - 1
-            ].upper = globalUpperBound
-        replace_infinite_upper_bound_with_global_upper_bound(child, globalUpperBound)
+            ].upper = global_upper_bound
+        replace_infinite_upper_bound_with_global_upper_bound(child, global_upper_bound)
 
 
-def get_random_cardinality(cardinalityList: Cardinality):
-    randomInterval = cardinalityList.intervals[
-        random.randint(0, cardinalityList.get_interval_count() - 1)
+def get_random_cardinality(cardinality_list: Cardinality):
+    random_interval = cardinality_list.intervals[
+        random.randint(0, cardinality_list.get_interval_count() - 1)
     ]
-    randomCardinality = random.randint(
-        randomInterval.lower,
-        randomInterval.upper
-        if randomInterval.upper is not None
-        else randomInterval.lower + 5,
+    random_cardinality = random.randint(
+        random_interval.lower,
+        random_interval.upper
+        if random_interval.upper is not None
+        else random_interval.lower + 5,
     )
-    return randomCardinality
+    return random_cardinality
 
 
 def get_random_cardinality_without_zero(cardinalityList: Cardinality):
-    randomCardinality = 0
-    while randomCardinality == 0:
-        randomCardinality = get_random_cardinality(cardinalityList)
-    return randomCardinality
+    random_cardinality = 0
+    while random_cardinality == 0:
+        random_cardinality = get_random_cardinality(cardinalityList)
+    return random_cardinality
 
 
 def get_random_featurenode(feature: Feature):
-    featureNode = FeatureNode(value=feature.name, children=[])
+    feature_node = FeatureNode(value=feature.name, children=[])
     if feature.get_children_count() == 0:
-        return featureNode
+        return feature_node
 
-    (randomChildren, summedRandomInstanceCardinality) = (
+    (random_children, summed_random_instance_cardinality) = (
         generate_random_children_with_random_cardinality(feature)
     )
     while not feature.group_instance_cardinality.is_valid_cardinality(
-        summedRandomInstanceCardinality
+        summed_random_instance_cardinality
     ):
-        (randomChildren, summedRandomInstanceCardinality) = (
+        (random_children, summed_random_instance_cardinality) = (
             generate_random_children_with_random_cardinality(feature)
         )
 
-    for child, randomInstanceCardinality in randomChildren:
-        for i in range(randomInstanceCardinality):
-            featureNode["children"].append(get_random_featurenode(child))
+    for child, random_instance_cardinality in random_children:
+        for i in range(random_instance_cardinality):
+            feature_node["children"].append(get_random_featurenode(child))
 
-    return featureNode
+    return feature_node
 
 
 def generate_random_children_with_random_cardinality(feature: Feature):
-    randomGroupTypeCardinality = get_random_cardinality(feature.group_type_cardinality)
-    requiredChildren = get_required_children(feature)
-    amountOfOptionalChildren = randomGroupTypeCardinality - len(requiredChildren)
-    optionalChildrenSample = get_sorted_sample(
-        get_optional_children(feature), amountOfOptionalChildren
+    random_group_type_cardinality = get_random_cardinality(
+        feature.group_type_cardinality
+    )
+    required_children = get_required_children(feature)
+    amount_of_optional_children = random_group_type_cardinality - len(required_children)
+    optional_children_sample = get_sorted_sample(
+        get_optional_children(feature), amount_of_optional_children
     )
 
-    summedRandomInstanceCardinality = 0
-    childWithRandomInstanceCardinality: list[
+    summed_random_instance_cardinality = 0
+    child_with_random_instance_cardinality: list[
         tuple[Feature, int]
-    ] = []  # List of tuples (child, randomInstanceCardinality)
+    ] = []  # List of tuples (child, random_instance_cardinality)
 
-    for child in requiredChildren + optionalChildrenSample:
-        randomInstanceCardinality = get_random_cardinality_without_zero(
+    for child in required_children + optional_children_sample:
+        random_instance_cardinality = get_random_cardinality_without_zero(
             child.instance_cardinality
         )
-        summedRandomInstanceCardinality += randomInstanceCardinality
-        childWithRandomInstanceCardinality.append((child, randomInstanceCardinality))
+        summed_random_instance_cardinality += random_instance_cardinality
+        child_with_random_instance_cardinality.append(
+            (child, random_instance_cardinality)
+        )
 
-    return childWithRandomInstanceCardinality, summedRandomInstanceCardinality
+    return child_with_random_instance_cardinality, summed_random_instance_cardinality
 
 
 def get_sorted_sample(list: list[Feature], sample_size: int):

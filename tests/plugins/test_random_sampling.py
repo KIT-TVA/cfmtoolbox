@@ -31,13 +31,13 @@ def test_get_random_cardinality():
 
 def test_get_random_cardinality_without_zero():
     cardinality = Cardinality([Interval(1, 10), Interval(20, 30), Interval(40, 50)])
-    randomCardinality = get_random_cardinality_without_zero(cardinality)
-    assert cardinality.is_valid_cardinality(randomCardinality)
-    assert randomCardinality != 0
+    random_cardinality = get_random_cardinality_without_zero(cardinality)
+    assert cardinality.is_valid_cardinality(random_cardinality)
+    assert random_cardinality != 0
 
 
 def test_get_sorted_sample():
-    featureList = [
+    feature_list = [
         Feature(
             "Cheddar",
             Cardinality([Interval(0, 1)]),
@@ -63,7 +63,7 @@ def test_get_sorted_sample():
             [],
         ),
     ]
-    sample = random_sampling_plugin.get_sorted_sample(featureList, 2)
+    sample = random_sampling_plugin.get_sorted_sample(feature_list, 2)
     assert len(sample) == 2
     assert (
         (sample[0].name == "Cheddar" and sample[1].name == "Swiss")
@@ -278,12 +278,12 @@ def test_generate_random_children_with_random_cardinality():
             ),
         ],
     )
-    children, summedRandomInstanceCardinality = (
+    children, summed_random_instance_cardinality = (
         generate_random_children_with_random_cardinality(feature)
     )
-    for child, randomInstanceCardinality in children:
+    for child, random_instance_cardinality in children:
         assert child.instance_cardinality.is_valid_cardinality(
-            randomInstanceCardinality
+            random_instance_cardinality
         )
 
 
