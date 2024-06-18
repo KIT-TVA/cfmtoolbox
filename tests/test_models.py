@@ -39,11 +39,6 @@ def test_constraint_string():
     assert str(constraint) == "Cheese -> Cheese"
 
 
-def test_cardinality_interval_count():
-    cardinality = Cardinality([Interval(1, 10), Interval(20, 30), Interval(40, 50)])
-    assert cardinality.get_interval_count() == 3
-
-
 def test_cardinality_is_valid():
     cardinality = Cardinality([Interval(1, 10), Interval(20, 30), Interval(40, 50)])
     assert cardinality.is_valid_cardinality(5)
@@ -52,18 +47,6 @@ def test_cardinality_is_valid():
     assert not cardinality.is_valid_cardinality(15)
     assert not cardinality.is_valid_cardinality(35)
     assert not cardinality.is_valid_cardinality(55)
-
-
-def test_feature_children_count():
-    feature = Feature(
-        "Cheese",
-        Cardinality([]),
-        Cardinality([]),
-        Cardinality([]),
-        [],
-        [Feature("Milk", Cardinality([]), Cardinality([]), Cardinality([]), [], [])],
-    )
-    assert feature.get_children_count() == 1
 
 
 def test_feature_is_required():

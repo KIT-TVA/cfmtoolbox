@@ -28,7 +28,7 @@ def random_sampling(amount: int = 1):
 
 def get_global_upper_bound(feature: Feature):
     global_upper_bound = feature.instance_cardinality.intervals[
-        feature.instance_cardinality.get_interval_count() - 1
+        len(feature.instance_cardinality.intervals) - 1
     ].upper
     local_upper_bound = global_upper_bound
     if local_upper_bound is None:
@@ -48,19 +48,19 @@ def replace_infinite_upper_bound_with_global_upper_bound(
     for child in feature.children:
         if (
             child.instance_cardinality.intervals[
-                child.instance_cardinality.get_interval_count() - 1
+                len(child.instance_cardinality.intervals) - 1
             ].upper
             is None
         ):
             child.instance_cardinality.intervals[
-                child.instance_cardinality.get_interval_count() - 1
+                len(child.instance_cardinality.intervals) - 1
             ].upper = global_upper_bound
         replace_infinite_upper_bound_with_global_upper_bound(child, global_upper_bound)
 
 
 def get_random_cardinality(cardinality_list: Cardinality):
     random_interval = cardinality_list.intervals[
-        random.randint(0, cardinality_list.get_interval_count() - 1)
+        random.randint(0, len(cardinality_list.intervals) - 1)
     ]
     random_cardinality = random.randint(
         random_interval.lower,
@@ -80,7 +80,7 @@ def get_random_cardinality_without_zero(cardinalityList: Cardinality):
 
 def get_random_featurenode(feature: Feature):
     feature_node = FeatureNode(value=feature.name, children=[])
-    if feature.get_children_count() == 0:
+    if len(feature.children) == 0:
         return feature_node
 
     (random_children, summed_random_instance_cardinality) = (

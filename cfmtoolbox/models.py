@@ -20,9 +20,6 @@ class Cardinality:
     def __str__(self) -> str:
         return ", ".join(map(str, self.intervals))
 
-    def get_interval_count(self) -> int:
-        return len(self.intervals)
-
     def is_valid_cardinality(self, value: int) -> bool:
         for interval in self.intervals:
             if (interval.lower <= value) and (
@@ -43,9 +40,6 @@ class Feature:
 
     def __str__(self) -> str:
         return self.name
-
-    def get_children_count(self) -> int:
-        return len(self.children)
 
     def is_required(self) -> bool:
         return self.instance_cardinality.intervals[0].lower != 0
