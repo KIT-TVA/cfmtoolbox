@@ -1,0 +1,26 @@
+include
+    Boolean.group-cardinality
+    Arithmetic.aggregate-function
+    Arithmetic.feature-cardinality
+    Type
+
+features
+    Sandwich
+        mandatory
+            Bread {Calories 100, Sugar 20}
+        optional
+            Sauce
+                or
+                    Ketchup {Calories 40, Sugar 35}
+                    Mustard {Calories 25, Sugar 5}
+            Cheese
+                [0..2] // Group cardinality
+                    Cheddar {Calories 60}
+                    Gouda {Calories 50}
+                    Goat {Calories 35}
+            Pickle cardinality [1..3] // Feature cardinality
+
+constraints
+    Ketchup => Cheese
+    Bread.Sugar + Ketchup.Sugar + Mustard.Sugar < 60 // Attribute constraints
+    sum(Calories) < 160 // Attribute aggregate
