@@ -78,8 +78,8 @@ def get_random_cardinality_without_zero(cardinalityList: Cardinality):
     return random_cardinality
 
 
-def get_random_featurenode(feature: Feature):
-    feature_node = FeatureNode(value=feature.name, children=[])
+def get_random_featurenode(feature: Feature, amount: int = 0):
+    feature_node = FeatureNode(value=feature.name + "#" + str(amount), children=[])
     if len(feature.children) == 0:
         return feature_node
 
@@ -95,7 +95,7 @@ def get_random_featurenode(feature: Feature):
 
     for child, random_instance_cardinality in random_children:
         for i in range(random_instance_cardinality):
-            feature_node["children"].append(get_random_featurenode(child))
+            feature_node["children"].append(get_random_featurenode(child, i))
 
     return feature_node
 
