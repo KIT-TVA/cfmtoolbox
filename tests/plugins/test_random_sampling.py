@@ -2,6 +2,7 @@ from pathlib import Path
 
 import cfmtoolbox.plugins.json_import as json_import_plugin
 import cfmtoolbox.plugins.random_sampling as random_sampling_plugin
+from cfmtoolbox import app
 from cfmtoolbox.models import Cardinality, Feature, Interval
 from cfmtoolbox.plugins.random_sampling import (
     generate_random_children_with_random_cardinality,
@@ -12,16 +13,24 @@ from cfmtoolbox.plugins.random_sampling import (
     get_required_children,
     random_sampling,
 )
-from cfmtoolbox.toolbox import CFMToolbox
 
 
 def test_plugin_can_be_loaded():
-    app = CFMToolbox()
     assert random_sampling_plugin in app.load_plugins()
 
 
-def test_random_sampling():
+def test_random_sampling_without_loaded_model():
     assert random_sampling() is None
+    assert random_sampling(3) is None
+
+
+def test_random_sampling_with_loaded_model():
+    app.import_path = Path("tests/data/sandwich.json")
+    app.import_model()
+
+    assert random_sampling() is not None
+    assert len(random_sampling()) == 1
+    assert len(random_sampling(3)) == 3
 
 
 def test_get_random_cardinality():

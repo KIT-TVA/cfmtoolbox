@@ -1,29 +1,28 @@
 import random
-from pathlib import Path
 
-import cfmtoolbox.plugins.json_import as json_import_plugin
 from cfmtoolbox import app
 from cfmtoolbox.models import Cardinality, Feature, FeatureNode
 
 
 @app.command()
 def random_sampling(amount: int = 1):
+    if app.model is None:
+        print("No model loaded.")
+        return
+
     result_instances = [None] * amount
-    path = Path("tests/data/sandwich.json")
 
-    cfm = json_import_plugin.import_json(path.read_bytes())
-
-    global_upper_bound = get_global_upper_bound(cfm.features[0])
+    global_upper_bound = get_global_upper_bound(app.model.features[0])
 
     replace_infinite_upper_bound_with_global_upper_bound(
-        cfm.features[0], global_upper_bound
+        app.model.features[0], global_upper_bound
     )
 
     for i in range(amount):
-        result_instances[i] = get_random_featurenode(cfm.features[0])
+        result_instances[i] = get_random_featurenode(app.model.features[0])
         print("Instance", result_instances[i])
 
-    """ return result_instances """
+    return result_instances
 
 
 def get_global_upper_bound(feature: Feature):
