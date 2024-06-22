@@ -1,0 +1,15 @@
+namespace Sandwich
+
+features
+	Sandwich
+		mandatory
+			Bread
+		optional
+			Sauce
+				or
+					Ketchup
+					Mustard
+			Cheese
+
+constraints
+	Ketchup => Cheese
