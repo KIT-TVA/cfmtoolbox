@@ -24,3 +24,5 @@ test:
       - .pytest_cache
       - .ruff_cache
       - .venv
+  tags:
+    - docker
