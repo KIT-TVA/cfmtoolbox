@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+	<properties>
+		<graphics key="autolayoutconstraints" value="false"/>
+		<graphics key="legendautolayout" value="true"/>
+		<graphics key="showconstraints" value="true"/>
+		<graphics key="showshortnames" value="false"/>
+		<graphics key="layout" value="horizontal"/>
+		<graphics key="showcollapsedconstraints" value="true"/>
+		<graphics key="legendhidden" value="false"/>
+		<graphics key="layoutalgorithm" value="1"/>
+	</properties>
+	<struct>
+		<and abstract="true" mandatory="true" name="Sandwich">
+			<alt mandatory="true" name="Bread">
+				<feature name="Sourdough"/>
+				<feature name="Wheat"/>
+			</alt>
+			<or name="CheeseMix">
+				<feature name="Cheddar"/>
+				<feature name="Swiss"/>
+				<feature name="Gouda"/>
+			</or>
+			<or name="Veggies">
+				<feature name="Lettuce"/>
+				<feature name="Tomato"/>
+			</or>
+		</and>
+	</struct>
+</featureModel>

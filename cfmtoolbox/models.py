@@ -44,6 +44,14 @@ class Feature:
     def is_required(self) -> bool:
         return self.instance_cardinality.intervals[0].lower != 0
 
+    def add_parent(self, parent: "Feature"):
+        if parent not in self.parents:
+            self.parents.append(parent)
+
+    def add_child(self, child: "Feature"):
+        if child not in self.children:
+            self.children.append(child)
+
 
 @dataclass
 class Constraint:
@@ -62,6 +70,16 @@ class CFM:
     features: list[Feature]
     require_constraints: list[Constraint]
     exclude_constraints: list[Constraint]
+
+    def add_feature(self, feature: Feature):
+        if feature not in self.features:
+            self.features.append(feature)
+
+    def find_feature(self, name: str) -> Feature:
+        for feature in self.features:
+            if feature.name == name:
+                return feature
+        raise ValueError(f"Feature {name} not found")
 
 
 class FeatureNode(TypedDict):
