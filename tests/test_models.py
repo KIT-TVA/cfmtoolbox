@@ -53,30 +53,39 @@ def test_feature_is_required():
     cardinality = Cardinality([Interval(1, 10)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
     assert feature.is_required()
+
     cardinality = Cardinality([Interval(0, 10)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
     assert not feature.is_required()
+
     cardinality = Cardinality([Interval(0, 0)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
     assert not feature.is_required()
+
     cardinality = Cardinality([Interval(1, 1)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
     assert feature.is_required()
+
     cardinality = Cardinality([Interval(0, 1)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
     assert not feature.is_required()
+
     cardinality = Cardinality([Interval(1, 10), Interval(20, 30), Interval(40, 50)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
     assert feature.is_required()
+
     cardinality = Cardinality([Interval(0, 10), Interval(20, 30), Interval(40, 50)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
     assert not feature.is_required()
+
     cardinality = Cardinality([Interval(0, 0), Interval(20, 30), Interval(40, 50)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
     assert not feature.is_required()
+
     cardinality = Cardinality([Interval(1, 1), Interval(20, 30), Interval(40, 50)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
     assert feature.is_required()
+
     cardinality = Cardinality([Interval(0, 1), Interval(20, 30), Interval(40, 50)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
     assert not feature.is_required()
