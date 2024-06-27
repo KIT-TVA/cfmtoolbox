@@ -29,15 +29,15 @@ def parse_group_cardinality(feature: Element) -> Cardinality:
             if lower == 0:
                 lower = 1
 
-    if feature.tag == node_choices["ALT"]:
+    elif feature.tag == node_choices["ALT"]:
         lower = 1
         upper = 1
 
-    if feature.tag == node_choices["FEATURE"]:
+    elif feature.tag == node_choices["FEATURE"]:
         lower = 0
         upper = 0
 
-    if feature.tag not in node_choices.values():
+    else:
         raise TypeError(f"Unknown group type: {feature.tag}")
 
     return Cardinality([Interval(lower, upper)])
