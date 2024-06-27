@@ -10,7 +10,7 @@ def random_sampling(amount: int = 1):
         print("No model loaded.")
         return
 
-    result_instances = [None] * amount
+    result_instances = []
 
     global_upper_bound = get_global_upper_bound(app.model.features[0])
 
@@ -20,7 +20,7 @@ def random_sampling(amount: int = 1):
 
     for i in range(amount):
         random_featurenode = generate_random_feature_node(app.model.features[0])
-        result_instances[i] = random_featurenode
+        result_instances.append(random_featurenode)
         print("Instance", random_featurenode)
 
     return result_instances
