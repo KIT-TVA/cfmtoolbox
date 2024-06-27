@@ -46,13 +46,8 @@ def replace_infinite_upper_bound_with_global_upper_bound(
     feature: Feature, global_upper_bound: int
 ):
     for child in feature.children:
-        if (
-            child.instance_cardinality.intervals[-1].upper
-            is None
-        ):
-            child.instance_cardinality.intervals[
-                len(child.instance_cardinality.intervals) - 1
-            ].upper = global_upper_bound
+        if child.instance_cardinality.intervals[-1].upper is None:
+            child.instance_cardinality.intervals[-1].upper = global_upper_bound
         replace_infinite_upper_bound_with_global_upper_bound(child, global_upper_bound)
 
 
