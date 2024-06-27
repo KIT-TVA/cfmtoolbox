@@ -19,7 +19,7 @@ def random_sampling(amount: int = 1):
     )
 
     for i in range(amount):
-        random_featurenode = get_random_featurenode(app.model.features[0])
+        random_featurenode = generate_random_feature_node(app.model.features[0])
         result_instances[i] = random_featurenode
         print("Instance", random_featurenode)
 
@@ -76,7 +76,7 @@ def get_random_cardinality_without_zero(cardinality_list: Cardinality):
     return random_cardinality
 
 
-def get_random_featurenode(feature: Feature, amount: int = 0):
+def generate_random_feature_node(feature: Feature, amount: int = 0):
     feature_node = FeatureNode(value=f"{feature.name}#{amount}", children=[])
     if not feature.children:
         return feature_node
@@ -92,7 +92,7 @@ def get_random_featurenode(feature: Feature, amount: int = 0):
 
     for child, random_instance_cardinality in random_children:
         for i in range(random_instance_cardinality):
-            feature_node["children"].append(get_random_featurenode(child, i))
+            feature_node["children"].append(generate_random_feature_node(child, i))
 
     return feature_node
 
