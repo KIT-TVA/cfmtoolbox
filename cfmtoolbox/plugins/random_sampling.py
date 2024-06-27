@@ -52,9 +52,7 @@ def replace_infinite_upper_bound_with_global_upper_bound(
 
 
 def get_random_cardinality(cardinality_list: Cardinality):
-    random_interval = cardinality_list.intervals[
-        random.randint(0, len(cardinality_list.intervals) - 1)
-    ]
+    random_interval = random.choice(cardinality_list.intervals)
     random_cardinality = random.randint(
         random_interval.lower,
         random_interval.upper
