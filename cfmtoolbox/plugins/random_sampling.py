@@ -82,15 +82,14 @@ def get_random_featurenode(feature: Feature, amount: int = 0):
     if len(feature.children) == 0:
         return feature_node
 
-    (random_children, summed_random_instance_cardinality) = (
-        generate_random_children_with_random_cardinality(feature)
-    )
-    while not feature.group_instance_cardinality.is_valid_cardinality(
-        summed_random_instance_cardinality
-    ):
+    while True:
         (random_children, summed_random_instance_cardinality) = (
             generate_random_children_with_random_cardinality(feature)
         )
+        if feature.group_instance_cardinality.is_valid_cardinality(
+            summed_random_instance_cardinality
+        ):
+            break
 
     for child, random_instance_cardinality in random_children:
         for i in range(random_instance_cardinality):
