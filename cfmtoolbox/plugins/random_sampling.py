@@ -125,8 +125,10 @@ def generate_random_children_with_random_cardinality(feature: Feature):
     return child_with_random_instance_cardinality, summed_random_instance_cardinality
 
 
-def get_sorted_sample(list: list[Feature], sample_size: int):
-    return [list[i] for i in sorted(random.sample(range(len(list)), sample_size))]
+def get_sorted_sample(features: list[Feature], sample_size: int):
+    return [
+        features[i] for i in sorted(random.sample(range(len(features)), sample_size))
+    ]
 
 
 def get_required_children(feature: Feature):
