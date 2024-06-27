@@ -8,12 +8,9 @@ node_choices = {"AND": "and", "OR": "or", "ALT": "alt", "FEATURE": "feature"}
 
 
 def parse_instance_cardinality(is_mandatory: bool) -> Cardinality:
-    lower = 0
+    lower = 1 if is_mandatory else 0
     upper = 1
 
-    if is_mandatory:
-        lower = 1
-        upper = 1
     return Cardinality([Interval(lower, upper)])
 
 
