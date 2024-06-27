@@ -27,9 +27,7 @@ def random_sampling(amount: int = 1):
 
 
 def get_global_upper_bound(feature: Feature):
-    global_upper_bound = feature.instance_cardinality.intervals[
-        len(feature.instance_cardinality.intervals) - 1
-    ].upper
+    global_upper_bound = feature.instance_cardinality.intervals[-1].upper
     local_upper_bound = global_upper_bound
     if local_upper_bound is None:
         return 0
