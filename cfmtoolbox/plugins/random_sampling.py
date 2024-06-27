@@ -62,10 +62,19 @@ def get_random_cardinality(cardinality_list: Cardinality):
     return random_cardinality
 
 
-def get_random_cardinality_without_zero(cardinalityList: Cardinality):
-    random_cardinality = 0
-    while random_cardinality == 0:
-        random_cardinality = get_random_cardinality(cardinalityList)
+def get_random_cardinality_without_zero(cardinality_list: Cardinality):
+    modified_cardinality_list_intervals = cardinality_list.intervals
+    first_interval = cardinality_list.intervals[0]
+    if first_interval.lower == 0 and first_interval.upper == 0:
+        modified_cardinality_list_intervals = cardinality_list.intervals[1:]
+
+    random_interval = random.choice(modified_cardinality_list_intervals)
+    random_cardinality = random.randint(
+        random_interval.lower if random_interval.lower != 0 else 1,
+        random_interval.upper
+        if random_interval.upper is not None
+        else random_interval.lower + 5,
+    )
     return random_cardinality
 
 
