@@ -78,7 +78,7 @@ def get_random_cardinality_without_zero(cardinality_list: Cardinality):
 
 def get_random_featurenode(feature: Feature, amount: int = 0):
     feature_node = FeatureNode(value=f"{feature.name}#{amount}", children=[])
-    if len(feature.children) == 0:
+    if not feature.children:
         return feature_node
 
     while True:
