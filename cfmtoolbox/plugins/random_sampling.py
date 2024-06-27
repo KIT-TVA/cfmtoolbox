@@ -19,8 +19,9 @@ def random_sampling(amount: int = 1):
     )
 
     for i in range(amount):
-        result_instances[i] = get_random_featurenode(app.model.features[0])
-        print("Instance", result_instances[i])
+        random_featurenode = get_random_featurenode(app.model.features[0])
+        result_instances[i] = random_featurenode
+        print("Instance", random_featurenode)
 
     return result_instances
 
