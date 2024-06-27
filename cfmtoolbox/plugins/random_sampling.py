@@ -47,9 +47,7 @@ def replace_infinite_upper_bound_with_global_upper_bound(
 ):
     for child in feature.children:
         if (
-            child.instance_cardinality.intervals[
-                len(child.instance_cardinality.intervals) - 1
-            ].upper
+            child.instance_cardinality.intervals[-1].upper
             is None
         ):
             child.instance_cardinality.intervals[
