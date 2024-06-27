@@ -10,7 +10,7 @@ def parse_interval(data: JSON) -> Interval:
     if not isinstance(data, dict):
         raise TypeError(f"Interval must be an object: {data}")
 
-    if not isinstance(data["lower"], (int)) or isinstance(data["lower"], bool):
+    if not isinstance(data["lower"], int) or isinstance(data["lower"], bool):
         raise TypeError("Interval lower must be an integer")
 
     if not isinstance(data["upper"], (type(None), int)) or isinstance(
