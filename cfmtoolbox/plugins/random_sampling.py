@@ -5,10 +5,10 @@ from cfmtoolbox.models import Cardinality, Feature, FeatureNode
 
 
 @app.command()
-def random_sampling(amount: int = 1):
+def random_sampling(amount: int = 1) -> list[FeatureNode] | None:
     if app.model is None:
         print("No model loaded.")
-        return
+        return None
 
     result_instances = []
 
@@ -92,7 +92,7 @@ def generate_random_feature_node(feature: Feature, amount: int = 0):
 
     for child, random_instance_cardinality in random_children:
         for i in range(random_instance_cardinality):
-            feature_node["children"].append(generate_random_feature_node(child, i))
+            feature_node.children.append(generate_random_feature_node(child, i))
 
     return feature_node
 

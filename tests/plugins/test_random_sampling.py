@@ -6,6 +6,7 @@ from cfmtoolbox import app
 from cfmtoolbox.models import Cardinality, Feature, Interval
 from cfmtoolbox.plugins.random_sampling import (
     generate_random_children_with_random_cardinality,
+    generate_random_feature_node,
     get_global_upper_bound,
     get_optional_children,
     get_random_cardinality,
@@ -29,8 +30,11 @@ def test_random_sampling_with_loaded_model():
     app.import_model()
 
     assert random_sampling() is not None
-    assert len(random_sampling()) == 1
-    assert len(random_sampling(3)) == 3
+    random_instances = random_sampling(50)
+    assert random_instances is not None
+    assert len(random_instances) == 50
+    for instance in random_instances:
+        assert instance.validate(app.model)
 
 
 def test_get_random_cardinality():
@@ -301,3 +305,10 @@ def test_get_global_upper_bound():
     cfm = json_import_plugin.import_json(path.read_bytes())
     feature = cfm.features[0]
     assert get_global_upper_bound(feature) == 12
+
+
+def test_generate_feature_node():
+    path = Path("tests/data/sandwich.json")
+    cfm = json_import_plugin.import_json(path.read_bytes())
+    feature = cfm.features[0]
+    assert generate_random_feature_node(feature).validate(cfm)

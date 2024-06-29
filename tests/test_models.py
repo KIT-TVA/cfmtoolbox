@@ -1,6 +1,13 @@
 import pytest
 
-from cfmtoolbox.models import CFM, Cardinality, Constraint, Feature, Interval
+from cfmtoolbox.models import (
+    CFM,
+    Cardinality,
+    Constraint,
+    Feature,
+    FeatureNode,
+    Interval,
+)
 
 
 @pytest.mark.parametrize(
@@ -174,3 +181,229 @@ def test_find_feature_raises_missing_features():
 
     with pytest.raises(ValueError, match="Feature Cheese not found"):
         cfm.find_feature("Cheese")
+
+
+def test_partition_children():
+    feature = Feature(
+        "Sandwich",
+        Cardinality([]),
+        Cardinality([]),
+        Cardinality([]),
+        [],
+        [
+            Feature("Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []),
+            Feature(
+                "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+            ),
+            Feature("Meat", Cardinality([]), Cardinality([]), Cardinality([]), [], []),
+        ],
+    )
+    feature_Node = FeatureNode(
+        "Sandwich",
+        [
+            FeatureNode("Bread#0", []),
+            FeatureNode("Bread#1", []),
+            FeatureNode("Meat#0", []),
+        ],
+    )
+    assert feature_Node.partition_children(feature) == [
+        [
+            FeatureNode("Bread#0", []),
+            FeatureNode("Bread#1", []),
+        ],
+        [],
+        [
+            FeatureNode("Meat#0", []),
+        ],
+    ]
+
+
+@pytest.mark.parametrize(
+    ["feature", "featureInstance", "expectation"],
+    [
+        (
+            Feature(
+                "Sandwich",
+                Cardinality([]),
+                Cardinality([]),
+                Cardinality([]),
+                [],
+                [],
+            ),
+            FeatureNode("Sandwich#0", []),
+            True,
+        ),
+        (
+            Feature(
+                "Sandwich",
+                Cardinality([]),
+                Cardinality([]),
+                Cardinality([]),
+                [],
+                [],
+            ),
+            FeatureNode("Sandwich#0", [FeatureNode("Bread#0", [])]),
+            False,
+        ),
+    ],
+)
+def test_validate_children_no_children(
+    feature: Feature, featureInstance: FeatureNode, expectation: bool
+):
+    assert featureInstance.validate_children(feature) == expectation
+
+
+@pytest.mark.parametrize(
+    ["featureInstance", "expectation"],
+    [
+        (
+            FeatureNode("Sandwich#0", [FeatureNode("Bread#0", [])]),
+            False,
+        ),
+        (
+            FeatureNode(
+                "Sandwich#0",
+                [
+                    FeatureNode("Bread#0", []),
+                    FeatureNode("Bread#1", []),
+                    FeatureNode("Bread#2", []),
+                ],
+            ),
+            False,
+        ),
+        (
+            FeatureNode(
+                "Sandwich#0",
+                [
+                    FeatureNode("Bread#0", []),
+                    FeatureNode("Bread#1", []),
+                    FeatureNode("Bread#2", []),
+                    FeatureNode("Cheese#0", []),
+                ],
+            ),
+            False,
+        ),
+        (
+            FeatureNode(
+                "Sandwich#0",
+                [
+                    FeatureNode("Bread#0", []),
+                    FeatureNode("Bread#1", []),
+                    FeatureNode("Cheese#0", []),
+                ],
+            ),
+            True,
+        ),
+    ],
+)
+def test_validate_children(featureInstance: FeatureNode, expectation: bool):
+    feature = Feature(
+        "Sandwich",
+        Cardinality([Interval(1, 1)]),
+        Cardinality([Interval(2, 3)]),
+        Cardinality([Interval(3, 4)]),
+        [],
+        [
+            Feature(
+                "Bread",
+                Cardinality([Interval(2, 2)]),
+                Cardinality([]),
+                Cardinality([]),
+                [],
+                [],
+            ),
+            Feature(
+                "Cheese",
+                Cardinality([Interval(0, 1)]),
+                Cardinality([]),
+                Cardinality([]),
+                [],
+                [],
+            ),
+            Feature(
+                "Meat",
+                Cardinality([Interval(0, 1)]),
+                Cardinality([]),
+                Cardinality([]),
+                [],
+                [],
+            ),
+        ],
+    )
+    assert featureInstance.validate_children(feature) == expectation
+
+
+# TODO: Add test cases for validating constraints
+@pytest.mark.parametrize(
+    ["featureInstance", "expectation"],
+    [
+        (
+            FeatureNode("Milkshake#0", []),
+            False,
+        ),
+        (
+            FeatureNode(
+                "Sandwich#0",
+                [
+                    FeatureNode("Bread#0", [FeatureNode("Wheat#0", [])]),
+                    FeatureNode("Bread#1", [FeatureNode("Wheat#0", [])]),
+                    FeatureNode("Cheese#0", []),
+                ],
+            ),
+            True,
+        ),
+    ],
+)
+def test_validate_feature_instance(featureInstance: FeatureNode, expectation: bool):
+    feature = Feature(
+        "Sandwich",
+        Cardinality([Interval(1, 1)]),
+        Cardinality([Interval(2, 3)]),
+        Cardinality([Interval(3, 4)]),
+        [],
+        [
+            Feature(
+                "Bread",
+                Cardinality([Interval(2, 2)]),
+                Cardinality([Interval(1, 1)]),
+                Cardinality([Interval(1, 1)]),
+                [],
+                [
+                    Feature(
+                        "Wheat",
+                        Cardinality([Interval(0, 1)]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Feature(
+                        "White",
+                        Cardinality([Interval(0, 1)]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                ],
+            ),
+            Feature(
+                "Cheese",
+                Cardinality([Interval(0, 1)]),
+                Cardinality([]),
+                Cardinality([]),
+                [],
+                [],
+            ),
+            Feature(
+                "Meat",
+                Cardinality([Interval(0, 1)]),
+                Cardinality([]),
+                Cardinality([]),
+                [],
+                [],
+            ),
+        ],
+    )
+    cfm = CFM([feature], [], [])
+    assert featureInstance.validate(cfm) == expectation

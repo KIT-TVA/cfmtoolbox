@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import TypedDict
 
 
 @dataclass
@@ -82,6 +81,59 @@ class CFM:
         raise ValueError(f"Feature {name} not found")
 
 
-class FeatureNode(TypedDict):
+@dataclass
+class FeatureNode:
     value: str
     children: list["FeatureNode"]
+
+    # TODO: Add validation for constraints
+    def validate(self, cfm: CFM) -> bool:
+        # Check if root feature is valid
+        root_feature = cfm.features[0]
+        if root_feature.name != self.value.split("#")[0]:
+            return False
+
+        return self.validate_children(root_feature)
+
+    def validate_children(self, feature: Feature) -> bool:
+        if not feature.children:
+            return not self.children
+
+        # Check group instance cardinality of feature
+        if not feature.group_instance_cardinality.is_valid_cardinality(
+            len(self.children)
+        ):
+            return False
+
+        # Check group type cardinality of feature
+        partitioned_children = self.partition_children(feature)
+        if not feature.group_type_cardinality.is_valid_cardinality(
+            len(partitioned_children) - partitioned_children.count([])
+        ):
+            return False
+
+        # Check instance cardinality of children
+        for model_child, children in zip(feature.children, partitioned_children):
+            if not model_child.instance_cardinality.is_valid_cardinality(len(children)):
+                return False
+
+            # Check children recursively
+            for child in children:
+                if not child.validate_children(model_child):
+                    return False
+
+        return True
+
+    def partition_children(self, feature: Feature) -> list[list["FeatureNode"]]:
+        sublists = []
+        i = 0
+        for model_child in feature.children:
+            sublist = []
+            while i < len(self.children):
+                if self.children[i].value.split("#")[0] == model_child.name:
+                    sublist.append(self.children[i])
+                    i += 1
+                else:
+                    break
+            sublists.append(sublist)
+        return sublists
