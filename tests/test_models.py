@@ -198,7 +198,7 @@ def test_partition_children():
             Feature("Meat", Cardinality([]), Cardinality([]), Cardinality([]), [], []),
         ],
     )
-    feature_Node = FeatureNode(
+    feature_node = FeatureNode(
         "Sandwich",
         [
             FeatureNode("Bread#0", []),
@@ -206,7 +206,7 @@ def test_partition_children():
             FeatureNode("Meat#0", []),
         ],
     )
-    assert feature_Node.partition_children(feature) == [
+    assert feature_node.partition_children(feature) == [
         [
             FeatureNode("Bread#0", []),
             FeatureNode("Bread#1", []),
@@ -219,7 +219,7 @@ def test_partition_children():
 
 
 @pytest.mark.parametrize(
-    ["feature", "featureInstance", "expectation"],
+    ["feature", "feature_instance", "expectation"],
     [
         (
             Feature(
@@ -248,13 +248,13 @@ def test_partition_children():
     ],
 )
 def test_validate_children_no_children(
-    feature: Feature, featureInstance: FeatureNode, expectation: bool
+    feature: Feature, feature_instance: FeatureNode, expectation: bool
 ):
-    assert featureInstance.validate_children(feature) == expectation
+    assert feature_instance.validate_children(feature) == expectation
 
 
 @pytest.mark.parametrize(
-    ["featureInstance", "expectation"],
+    ["feature_instance", "expectation"],
     [
         (
             FeatureNode("Sandwich#0", [FeatureNode("Bread#0", [])]),
@@ -296,7 +296,7 @@ def test_validate_children_no_children(
         ),
     ],
 )
-def test_validate_children(featureInstance: FeatureNode, expectation: bool):
+def test_validate_children(feature_instance: FeatureNode, expectation: bool):
     feature = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -330,12 +330,12 @@ def test_validate_children(featureInstance: FeatureNode, expectation: bool):
             ),
         ],
     )
-    assert featureInstance.validate_children(feature) == expectation
+    assert feature_instance.validate_children(feature) == expectation
 
 
 # TODO: Add test cases for validating constraints
 @pytest.mark.parametrize(
-    ["featureInstance", "expectation"],
+    ["feature_instance", "expectation"],
     [
         (
             FeatureNode("Milkshake#0", []),
@@ -354,7 +354,7 @@ def test_validate_children(featureInstance: FeatureNode, expectation: bool):
         ),
     ],
 )
-def test_validate_feature_instance(featureInstance: FeatureNode, expectation: bool):
+def test_validate_feature_instance(feature_instance: FeatureNode, expectation: bool):
     feature = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -406,4 +406,4 @@ def test_validate_feature_instance(featureInstance: FeatureNode, expectation: bo
         ],
     )
     cfm = CFM([feature], [], [])
-    assert featureInstance.validate(cfm) == expectation
+    assert feature_instance.validate(cfm) == expectation
