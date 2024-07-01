@@ -6,7 +6,7 @@ from cfmtoolbox import app
 from cfmtoolbox.models import CFM, Cardinality, Feature, Interval
 
 
-class Node_Types(Enum):
+class NodeTypes(Enum):
     AND = "and"
     OR = "or"
     ALT = "alt"
@@ -24,21 +24,21 @@ def parse_group_cardinality(feature: Element) -> Cardinality:
     lower = 0
     upper = 0
 
-    if feature.tag == Node_Types.AND.value or feature.tag == Node_Types.OR.value:
+    if feature.tag == NodeTypes.AND.value or feature.tag == NodeTypes.OR.value:
         upper = len(feature)
 
         for child in feature:
             if "mandatory" in child.attrib:
                 lower += 1
 
-        if feature.tag == Node_Types.OR.value and lower == 0:
+        if feature.tag == NodeTypes.OR.value and lower == 0:
             lower = 1
 
-    elif feature.tag == Node_Types.ALT.value:
+    elif feature.tag == NodeTypes.ALT.value:
         lower = 1
         upper = 1
 
-    elif feature.tag == Node_Types.FEATURE.value:
+    elif feature.tag == NodeTypes.FEATURE.value:
         lower = 0
         upper = 0
 
