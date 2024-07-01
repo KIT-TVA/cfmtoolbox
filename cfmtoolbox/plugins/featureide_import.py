@@ -1,5 +1,5 @@
 from enum import Enum
-from xml.etree import ElementTree as ET
+from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
 from cfmtoolbox import app
@@ -93,5 +93,5 @@ def parse_cfm(root: Element) -> CFM:
 
 @app.importer(".xml")
 def import_featureide(raw_data: bytes) -> CFM:
-    feature_ide = ET.fromstring(raw_data)
+    feature_ide = ElementTree.fromstring(raw_data)
     return parse_cfm(feature_ide)
