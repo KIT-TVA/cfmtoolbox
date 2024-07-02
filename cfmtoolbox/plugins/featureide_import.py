@@ -31,9 +31,8 @@ def parse_group_cardinality(feature: Element) -> Cardinality:
             if "mandatory" in child.attrib:
                 lower += 1
 
-        if feature.tag == Node_Types.OR.value:
-            if lower == 0:
-                lower = 1
+        if feature.tag == Node_Types.OR.value and lower == 0:
+            lower = 1
 
     elif feature.tag == Node_Types.ALT.value:
         lower = 1
@@ -65,10 +64,7 @@ def parse_feature(feature: Element) -> Feature:
 
 
 def traverse_xml(element: Element | None, cfm: CFM) -> list[Feature]:
-    if element is None:
-        return cfm.features
-
-    if len(element) > 0:
+    if element is not None and len(element) > 0:
         parent = cfm.find_feature(element.attrib["name"])
 
         for child in element:
