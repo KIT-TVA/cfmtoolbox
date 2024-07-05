@@ -38,17 +38,17 @@ def test_parse_instance_cardinality(is_mandatory: bool, expectation: Cardinality
 
 
 @pytest.mark.parametrize(
-    ["element_choice", "expectation"],
+    ["node_type", "expectation"],
     [
         ("and", Cardinality([Interval(1, 3)])),
         ("or", Cardinality([Interval(1, 3)])),
         ("alt", Cardinality([Interval(1, 1)])),
     ],
 )
-def test_parse_group_cardinality_multiple_children(
-    element_choice: str, expectation: Cardinality
+def test_parse_group_cardinality_can_parse_structure_with_multiple_and_mandatory_children(
+    node_type: str, expectation: Cardinality
 ):
-    root = Element(element_choice)
+    root = Element(node_type)
     SubElement(root, "Bread", mandatory="true")
     SubElement(root, "Cheese")
     SubElement(root, "Veggies")
@@ -56,17 +56,17 @@ def test_parse_group_cardinality_multiple_children(
 
 
 @pytest.mark.parametrize(
-    ["element_choice", "expectation"],
+    ["node_type", "expectation"],
     [
         ("and", Cardinality([Interval(0, 3)])),
         ("or", Cardinality([Interval(1, 3)])),
         ("alt", Cardinality([Interval(1, 1)])),
     ],
 )
-def test_parse_group_cardinality_multiple_no_mandatory_children(
-    element_choice: str, expectation: Cardinality
+def test_parse_group_cardinality_can_parse_structure_with_multiple_and_no_mandatory_children(
+    node_type: str, expectation: Cardinality
 ):
-    root = Element(element_choice)
+    root = Element(node_type)
     SubElement(root, "Bread")
     SubElement(root, "Cheese")
     SubElement(root, "Veggies")
@@ -74,43 +74,43 @@ def test_parse_group_cardinality_multiple_no_mandatory_children(
 
 
 @pytest.mark.parametrize(
-    ["element_choice", "expectation"],
+    ["node_type", "expectation"],
     [
         ("and", Cardinality([Interval(1, 1)])),
         ("or", Cardinality([Interval(1, 1)])),
         ("alt", Cardinality([Interval(1, 1)])),
     ],
 )
-def test_parse_group_cardinality_single_mandatory_child(
-    element_choice: str, expectation: Cardinality
+def test_parse_group_cardinality_can_parse_structure_with_single_mandatory_child(
+    node_type: str, expectation: Cardinality
 ):
-    root = Element(element_choice)
+    root = Element(node_type)
     SubElement(root, "child", mandatory="true")
     assert parse_group_cardinality(root) == expectation
 
 
 @pytest.mark.parametrize(
-    ["element_choice", "expectation"],
+    ["node_type", "expectation"],
     [
         ("and", Cardinality([Interval(0, 1)])),
         ("or", Cardinality([Interval(1, 1)])),
         ("alt", Cardinality([Interval(1, 1)])),
     ],
 )
-def test_parse_group_cardinality_single_no_mandatory_child(
-    element_choice: str, expectation
+def test_parse_group_cardinality_can_parse_structure_with_single_not_mandatory_child(
+    node_type: str, expectation
 ):
-    root = Element(element_choice)
+    root = Element(node_type)
     SubElement(root, "child")
     assert parse_group_cardinality(root) == expectation
 
 
-def test_parse_group_cardinality_FEATURE():
+def test_parse_group_cardinality_can_parse_node_type_feature():
     root = Element("feature")
     assert parse_group_cardinality(root) == Cardinality([Interval(0, 0)])
 
 
-def test_parse_group_cardinality_unknown():
+def test_parse_group_cardinality_raises_node_type_unknown():
     root = Element("unknown")
     with pytest.raises(TypeError, match="Unknown group type: unknown"):
         parse_group_cardinality(root)
@@ -189,7 +189,7 @@ def test_traverse_xml():
     assert feature_list[10].children == []
 
 
-def test_traverse_xml_no_element():
+def test_traverse_xml_can_traverse_on_empty_structure():
     cfm = CFM([], [], [])
     assert traverse_xml(None, cfm) == cfm.features
 
@@ -213,7 +213,7 @@ def test_parse_cfm():
     assert cfm.features[10].name == "Tomato"
 
 
-def test_parse_cfm_no_struct():
+def test_parse_cfm_reports_missing_struct():
     root = Element("root")
     with pytest.raises(TypeError, match="No valid Feature structure found in XML file"):
         parse_cfm(root)

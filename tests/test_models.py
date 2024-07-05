@@ -32,7 +32,7 @@ def test_feature_string():
     assert str(feature) == "Cheese"
 
 
-def test_feature_add_parent():
+def test_add_parent():
     feature = Feature(
         "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
@@ -41,7 +41,7 @@ def test_feature_add_parent():
     assert parent in feature.parents
 
 
-def test_feature_add_parent_already_exists():
+def test_add_parent_ignores_already_added_parents():
     feature = Feature(
         "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
@@ -52,7 +52,7 @@ def test_feature_add_parent_already_exists():
     assert parent in feature.parents
 
 
-def test_feature_add_child():
+def test_add_child():
     feature = Feature(
         "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
@@ -61,7 +61,7 @@ def test_feature_add_child():
     assert child in feature.children
 
 
-def test_feature_add_child_already_exists():
+def test_add_child_ignores_already_added_children():
     feature = Feature(
         "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
@@ -131,7 +131,7 @@ def test_feature_is_required():
     assert not feature.is_required()
 
 
-def test_cfm_add_feature():
+def test_add_feature():
     cfm = CFM([], [], [])
     feature = Feature(
         "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
@@ -140,7 +140,7 @@ def test_cfm_add_feature():
     assert feature in cfm.features
 
 
-def test_cfm_add_feature_already_exists():
+def test_add_feature_ignores_already_added_features():
     cfm = CFM([], [], [])
     feature = Feature(
         "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
@@ -151,7 +151,7 @@ def test_cfm_add_feature_already_exists():
     assert feature in cfm.features
 
 
-def test_cfm_find_feature():
+def test_find_feature():
     cfm = CFM([], [], [])
     feature = Feature(
         "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
@@ -160,13 +160,13 @@ def test_cfm_find_feature():
     assert cfm.find_feature("Cheese") == feature
 
 
-def test_cfm_find_feature_not_found_empty_feature_list():
+def test_find_feature_raises_missing_features_on_empty_feature_list():
     cfm = CFM([], [], [])
     with pytest.raises(ValueError, match="Feature Cheese not found"):
         cfm.find_feature("Cheese")
 
 
-def test_cfm_find_feature_not_found():
+def test_find_feature_raises_missing_features():
     bread_feature = Feature(
         "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
