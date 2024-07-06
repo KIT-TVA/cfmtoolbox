@@ -141,9 +141,9 @@ def test_interval_must_be_an_object(data: JSON):
         parse_interval(data)
 
 
-@pytest.mark.parametrize("data", [{}, [], "string", 1.0, True, False])
+@pytest.mark.parametrize("data", [{}, [], "string", 1.0, True, False, None])
 def test_interval_lower_must_be_a_number_null_or_an_integer(data: JSON):
-    with pytest.raises(TypeError, match="Interval lower must be null or an integer"):
+    with pytest.raises(TypeError, match="Interval lower must be an integer"):
         parse_interval({"lower": data, "upper": 1})
 
 
