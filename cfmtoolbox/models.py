@@ -86,7 +86,6 @@ class FeatureNode:
     value: str
     children: list["FeatureNode"]
 
-    # TODO: Add validation for constraints
     def validate(self, cfm: CFM) -> bool:
         # Check if root feature is valid
         root_feature = cfm.features[0]

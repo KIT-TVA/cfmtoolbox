@@ -333,7 +333,6 @@ def test_validate_children(feature_instance: FeatureNode, expectation: bool):
     assert feature_instance.validate_children(feature) == expectation
 
 
-# TODO: Add test cases for validating constraints
 @pytest.mark.parametrize(
     ["feature_instance", "expectation"],
     [
