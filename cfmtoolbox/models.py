@@ -118,9 +118,8 @@ class FeatureNode:
                 return False
 
             # Check children recursively
-            for child in children:
-                if not child.validate_children(model_child):
-                    return False
+            if any(not child.validate_children(model_child) for child in children):
+                return False
 
         return True
 
