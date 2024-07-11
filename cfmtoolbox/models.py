@@ -107,7 +107,7 @@ class FeatureNode:
         # Check group type cardinality of feature
         partitioned_children = self.partition_children(feature)
         if not feature.group_type_cardinality.is_valid_cardinality(
-            len(partitioned_children) - partitioned_children.count([])
+            len([1 for i in partitioned_children if i])
         ):
             return False
 
