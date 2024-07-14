@@ -25,6 +25,8 @@ class CustomListener(UVLPythonListener):
     references: list[str] = []
     featureCardinalities: list[Cardinality] = []
     features: list[Feature] = []
+    groupSpecs: list[list[Feature]] = []
+    groups: list[tuple[Cardinality, list[Feature]]] = []
 
     def enterFeatureModel(self, ctx: UVLPythonParser.FeatureModelContext):
         pass
@@ -72,43 +74,116 @@ class CustomListener(UVLPythonListener):
         super().enterOrGroup(ctx)
 
     def exitOrGroup(self, ctx: UVLPythonParser.OrGroupContext):
-        super().exitOrGroup(ctx)
+        group_specs: list[Feature] = self.groupSpecs.pop()
+        interval: Interval = Interval(1, None)
+        self.groups.append((Cardinality([interval]), group_specs))
 
     def enterAlternativeGroup(self, ctx: UVLPythonParser.AlternativeGroupContext):
         super().enterAlternativeGroup(ctx)
 
     def exitAlternativeGroup(self, ctx: UVLPythonParser.AlternativeGroupContext):
-        super().exitAlternativeGroup(ctx)
+        group_specs: list[Feature] = self.groupSpecs.pop()
+        interval: Interval = Interval(1, 1)
+        self.groups.append((Cardinality([interval]), group_specs))
 
     def enterOptionalGroup(self, ctx: UVLPythonParser.OptionalGroupContext):
         super().enterOptionalGroup(ctx)
 
     def exitOptionalGroup(self, ctx: UVLPythonParser.OptionalGroupContext):
-        super().exitOptionalGroup(ctx)
+        group_specs: list[Feature] = self.groupSpecs.pop()
+        interval: Interval = Interval(0, None)
+        self.groups.append((Cardinality([interval]), group_specs))
 
     def enterMandatoryGroup(self, ctx: UVLPythonParser.MandatoryGroupContext):
         super().enterMandatoryGroup(ctx)
 
     def exitMandatoryGroup(self, ctx: UVLPythonParser.MandatoryGroupContext):
-        super().exitMandatoryGroup(ctx)
+        group_specs: list[Feature] = self.groupSpecs.pop()
+        interval: Interval = Interval(-1, -1)
+        self.groups.append((Cardinality([interval]), group_specs))
 
     def enterCardinalityGroup(self, ctx: UVLPythonParser.CardinalityGroupContext):
         super().enterCardinalityGroup(ctx)
 
     def exitCardinalityGroup(self, ctx: UVLPythonParser.CardinalityGroupContext):
-        super().exitCardinalityGroup(ctx)
+        group_specs: list[Feature] = self.groupSpecs.pop()
+        text = ctx.getText()
+        interval_str = text[text.index("[") + 1 : text.index("]")]
+        interval: Interval
+        if ".." not in interval_str:
+            interval_int = int(interval_str)
+            interval = Interval(interval_int, interval_int)
+        else:
+            lower: int = int(interval_str[: interval_str.index("..")])
+            upper: int = int(interval_str[interval_str.index("..") + 2 :])
+            interval = Interval(lower, upper)
+        self.groups.append((Cardinality([interval]), group_specs))
 
     def enterGroupSpec(self, ctx: UVLPythonParser.GroupSpecContext):
         super().enterGroupSpec(ctx)
 
     def exitGroupSpec(self, ctx: UVLPythonParser.GroupSpecContext):
-        super().exitGroupSpec(ctx)
+        self.groupSpecs.append(self.features)
+        self.features = []
 
     def enterFeature(self, ctx: UVLPythonParser.FeatureContext):
         super().enterFeature(ctx)
 
     def exitFeature(self, ctx: UVLPythonParser.FeatureContext):
-        super().exitFeature(ctx)
+        name: str
+        instance_cardinality: Cardinality
+        group_type_cardinality: Cardinality
+        group_instance_cardinality: Cardinality
+        if len(self.groups) == 0:
+            name = self.references.pop()
+            instance_cardinality = self.featureCardinalities.pop()
+            group_type_cardinality = Cardinality([])
+            group_instance_cardinality = Cardinality([])
+            self.features.append(
+                Feature(
+                    name,
+                    instance_cardinality,
+                    group_type_cardinality,
+                    group_instance_cardinality,
+                    [],
+                    [],
+                )
+            )
+        else:
+            group: tuple[Cardinality, list[Feature]] = self.groups.pop()
+            cardinality: Cardinality = group[0]
+            features: list[Feature] = group[1]
+            name = self.references.pop()
+            instance_cardinality = self.featureCardinalities.pop()
+            if cardinality.intervals[0] == Interval(1, None):
+                group_type_cardinality = Cardinality([Interval(1, len(features))])
+                group_instance_cardinality = cardinality
+            elif cardinality.intervals[0] == Interval(1, 1):
+                group_type_cardinality = cardinality
+                group_instance_cardinality = cardinality
+            elif cardinality.intervals[0] == Interval(0, None):
+                group_type_cardinality = Cardinality([Interval(0, len(features))])
+                group_instance_cardinality = cardinality
+            elif cardinality.intervals[0] == Interval(-1, -1):
+                group_type_cardinality = Cardinality(
+                    [Interval(len(features), len(features))]
+                )
+                group_instance_cardinality = Cardinality(
+                    [Interval(len(features), len(features))]
+                )
+            else:
+                group_type_cardinality = Cardinality([Interval(0, len(features))])
+                group_instance_cardinality = cardinality
+            self.features.append(
+                Feature(
+                    name,
+                    instance_cardinality,
+                    group_type_cardinality,
+                    group_instance_cardinality,
+                    [],
+                    features,
+                )
+            )
 
     def enterFeatureCardinality(self, ctx: UVLPythonParser.FeatureCardinalityContext):
         super().enterFeatureCardinality(ctx)
@@ -117,7 +192,7 @@ class CustomListener(UVLPythonListener):
         text: str = ctx.getText()
         interval_str: str = text[text.index("[") + 1 : text.index("]")]
         interval: Interval
-        if len(interval_str) == 1:
+        if ".." not in interval_str:
             interval_int: int = int(interval_str)
             interval = Interval(interval_int, interval_int)
         else:
