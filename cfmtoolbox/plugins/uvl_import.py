@@ -27,15 +27,16 @@ class CustomListener(UVLPythonListener):
     features: list[Feature] = []
     groupSpecs: list[list[Feature]] = []
     groups: list[tuple[Cardinality, list[Feature]]] = []
+    groupCounts: list[int] = []
 
     def enterFeatureModel(self, ctx: UVLPythonParser.FeatureModelContext):
-        pass
+        super().enterFeatureModel(ctx)
 
     def exitFeatureModel(self, ctx: UVLPythonParser.FeatureModelContext):
-        pass
+        super().exitFeatureModel(ctx)
 
     def enterIncludes(self, ctx: UVLPythonParser.IncludesContext):
-        pass
+        super().enterIncludes(ctx)
 
     def exitIncludes(self, ctx: UVLPythonParser.IncludesContext):
         super().exitIncludes(ctx)
@@ -120,11 +121,12 @@ class CustomListener(UVLPythonListener):
         self.groups.append((Cardinality([interval]), group_specs))
 
     def enterGroupSpec(self, ctx: UVLPythonParser.GroupSpecContext):
-        super().enterGroupSpec(ctx)
+        self.groupCounts.append(0)
 
     def exitGroupSpec(self, ctx: UVLPythonParser.GroupSpecContext):
-        self.groupSpecs.append(self.features)
-        self.features = []
+        count: int = self.groupCounts.pop()
+        self.groupSpecs.append(self.features[-count:])
+        self.features = self.features[:-count]
 
     def enterFeature(self, ctx: UVLPythonParser.FeatureContext):
         super().enterFeature(ctx)
@@ -154,7 +156,10 @@ class CustomListener(UVLPythonListener):
             cardinality: Cardinality = group[0]
             features: list[Feature] = group[1]
             name = self.references.pop()
-            instance_cardinality = self.featureCardinalities.pop()
+            if len(self.featureCardinalities) == 0:
+                instance_cardinality = Cardinality([Interval(1, 1)])
+            else:
+                instance_cardinality = self.featureCardinalities.pop()
             if cardinality.intervals[0] == Interval(1, None):
                 group_type_cardinality = Cardinality([Interval(1, len(features))])
                 group_instance_cardinality = cardinality
@@ -184,6 +189,8 @@ class CustomListener(UVLPythonListener):
                     features,
                 )
             )
+        if len(self.featureCardinalities) != 0:
+            self.groupCounts[-1] += 1
 
     def enterFeatureCardinality(self, ctx: UVLPythonParser.FeatureCardinalityContext):
         super().enterFeatureCardinality(ctx)
@@ -535,7 +542,7 @@ class CustomListener(UVLPythonListener):
         super().enterId(ctx)
 
     def exitId(self, ctx: UVLPythonParser.IdContext):
-        pass
+        super().exitId(ctx)
 
     def enterFeatureType(self, ctx: UVLPythonParser.FeatureTypeContext):
         super().enterFeatureType(ctx)
@@ -579,4 +586,4 @@ def import_uvl(data: bytes):
     parser.addParseListener(listener)
     parser.featureModel()  # start parsing
 
-    return CFM([], [], [])
+    return CFM(listener.features, [], [])
