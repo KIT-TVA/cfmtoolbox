@@ -76,7 +76,14 @@ def get_random_cardinality_without_zero(cardinality_list: Cardinality):
     return random_cardinality
 
 
-def generate_random_feature_node(feature: Feature, amount: int = 0):
+def generate_random_feature_node(
+    feature: Feature,
+    amount: int = 0,
+    amount_of_generated_children: list[int] | None = None,
+):
+    if amount_of_generated_children is None:
+        amount_of_generated_children = [0] * len(feature.children)
+
     feature_node = FeatureNode(value=f"{feature.name}#{amount}", children=[])
     if not feature.children:
         return feature_node
@@ -90,9 +97,18 @@ def generate_random_feature_node(feature: Feature, amount: int = 0):
         ):
             break
 
-    for child, random_instance_cardinality in random_children:
-        for i in range(random_instance_cardinality):
-            feature_node.children.append(generate_random_feature_node(child, i))
+    for i, _ in enumerate(amount_of_generated_children):
+        (child, random_instance_cardinality) = random_children[i]
+        amount_of_generated_children_of_child = [0] * len(child.children)
+        for instance_number in range(random_instance_cardinality):
+            feature_node.children.append(
+                generate_random_feature_node(
+                    child,
+                    instance_number + amount_of_generated_children[i],
+                    amount_of_generated_children_of_child,
+                )
+            )
+        amount_of_generated_children[i] += random_instance_cardinality
 
     return feature_node
 
@@ -112,10 +128,13 @@ def generate_random_children_with_random_cardinality(feature: Feature):
         tuple[Feature, int]
     ] = []  # List of tuples (child, random_instance_cardinality)
 
-    for child in required_children + optional_children_sample:
-        random_instance_cardinality = get_random_cardinality_without_zero(
-            child.instance_cardinality
-        )
+    for child in feature.children:
+        if child.is_required() or child in optional_children_sample:
+            random_instance_cardinality = get_random_cardinality_without_zero(
+                child.instance_cardinality
+            )
+        else:
+            random_instance_cardinality = 0
         summed_random_instance_cardinality += random_instance_cardinality
         child_with_random_instance_cardinality.append(
             (child, random_instance_cardinality)
