@@ -5,7 +5,7 @@ from uvl.UVLPythonListener import UVLPythonListener
 from uvl.UVLPythonParser import UVLPythonParser
 
 from cfmtoolbox import CFM, app
-from cfmtoolbox.models import Cardinality, Feature, Interval
+from cfmtoolbox.models import Cardinality, Constraint, Feature, Interval
 
 
 class CustomErrorListener(ErrorListener):
@@ -30,6 +30,7 @@ class CustomListener(UVLPythonListener):
     groupFeaturesCount: list[int] = []
     cardinalityAvailable: list[bool] = []
     groupsPresent: list[int] = []
+    constraints: list[Constraint] = []
 
     def enterFeatureModel(self, ctx: UVLPythonParser.FeatureModelContext):
         super().enterFeatureModel(ctx)
@@ -113,14 +114,14 @@ class CustomListener(UVLPythonListener):
     def exitCardinalityGroup(self, ctx: UVLPythonParser.CardinalityGroupContext):
         group_specs: list[Feature] = self.groupSpecs.pop()
         text = ctx.getText()
-        interval_str = text[text.index("[") + 1: text.index("]")]
+        interval_str = text[text.index("[") + 1 : text.index("]")]
         interval: Interval
         if ".." not in interval_str:
             interval_int = int(interval_str)
             interval = Interval(interval_int, interval_int)
         else:
             lower: int = int(interval_str[: interval_str.index("..")])
-            upper: int = int(interval_str[interval_str.index("..") + 2:])
+            upper: int = int(interval_str[interval_str.index("..") + 2 :])
             interval = Interval(lower, upper)
         self.groups.append((Cardinality([interval]), group_specs))
 
@@ -159,46 +160,87 @@ class CustomListener(UVLPythonListener):
                     [],
                 )
             )
+            if len(self.groupFeaturesCount) > 0:
+                self.groupFeaturesCount[-1] += 1
         else:
-            for group in self.groups[-new_groups:]:
-                cardinality: Cardinality = group[0]
-                features: list[Feature] = group[1]
-                if cardinality.intervals[0] == Interval(1, None):
-                    group_type_cardinality = cardinality
-                    group_instance_cardinality = cardinality
-                elif cardinality.intervals[0] == Interval(1, 1):
-                    group_type_cardinality = cardinality
-                    group_instance_cardinality = Cardinality([Interval(1, None)])
-                else:
-                    group_type_cardinality = Cardinality([Interval(0, len(features))])
-                    group_instance_cardinality = cardinality
-
-            self.features.append(
-                Feature(
-                    name,
-                    instance_cardinality,
-                    group_type_cardinality,
-                    group_instance_cardinality,
-                    [],
-                    features,
+            if new_groups > 1:
+                parent_feature = self.features[-1]
+                for index, group in enumerate(self.groups[-new_groups:]):
+                    cardinality: Cardinality = group[0]
+                    features = group[1]
+                    if cardinality.intervals[0] == Interval(1, None):
+                        group_type_cardinality = cardinality
+                        group_instance_cardinality = cardinality
+                    elif cardinality.intervals[0] == Interval(1, 1):
+                        group_type_cardinality = cardinality
+                        group_instance_cardinality = Cardinality([Interval(1, None)])
+                    else:
+                        group_type_cardinality = Cardinality(
+                            [Interval(0, len(features))]
+                        )
+                        group_instance_cardinality = cardinality
+                    feature = Feature(
+                        f"{name}_{index}",
+                        instance_cardinality,
+                        group_type_cardinality,
+                        group_instance_cardinality,
+                        [],
+                        features,
+                    )
+                    self.constraints.append(
+                        Constraint(
+                            True,
+                            parent_feature,
+                            Cardinality([Interval(1, None)]),
+                            feature,
+                            Cardinality([Interval(1, None)]),
+                        )
+                    )
+                    self.features.append(
+                        Feature(
+                            name,
+                            Cardinality([]),
+                            Cardinality([Interval(1, 1)]),
+                            Cardinality([Interval(1, 1)]),
+                            [],
+                            [feature],
+                        )
+                    )
+                    if len(self.groupFeaturesCount) > 0:
+                        self.groupFeaturesCount[-1] += 1
+                for _ in range(new_groups):
+                    self.groups.pop()
+            else:
+                # group cardinality might be wrong, example is alternative, so it should be type of [1, 1], but is [0, 2]
+                group = self.groups.pop()
+                group_type_cardinality = Cardinality([Interval(0, len(group[1]))])
+                group_instance_cardinality = Cardinality([Interval(0, None)])
+                self.features.append(
+                    Feature(
+                        name,
+                        instance_cardinality,
+                        group_type_cardinality,
+                        group_instance_cardinality,
+                        [],
+                        group[1],
+                    )
                 )
-            )
-        if len(self.groupFeaturesCount) > 0:
-            self.groupFeaturesCount[-1] += 1
+                if len(self.groupFeaturesCount) > 0:
+                    self.groupFeaturesCount[-1] += 1
 
     def enterFeatureCardinality(self, ctx: UVLPythonParser.FeatureCardinalityContext):
         super().enterFeatureCardinality(ctx)
 
     def exitFeatureCardinality(self, ctx: UVLPythonParser.FeatureCardinalityContext):
         text: str = ctx.getText()
-        interval_str: str = text[text.index("[") + 1: text.index("]")]
+        interval_str: str = text[text.index("[") + 1 : text.index("]")]
         interval: Interval
         if ".." not in interval_str:
             interval_int: int = int(interval_str)
             interval = Interval(interval_int, interval_int)
         else:
             lower: str = interval_str[: interval_str.index("..")]
-            upper: str = interval_str[interval_str.index("..") + 2:]
+            upper: str = interval_str[interval_str.index("..") + 2 :]
             if upper == "*":
                 interval = Interval(int(lower), None)
             else:
@@ -244,22 +286,22 @@ class CustomListener(UVLPythonListener):
         super().exitVector(ctx)
 
     def enterSingleConstraintAttribute(
-            self, ctx: UVLPythonParser.SingleConstraintAttributeContext
+        self, ctx: UVLPythonParser.SingleConstraintAttributeContext
     ):
         super().enterSingleConstraintAttribute(ctx)
 
     def exitSingleConstraintAttribute(
-            self, ctx: UVLPythonParser.SingleConstraintAttributeContext
+        self, ctx: UVLPythonParser.SingleConstraintAttributeContext
     ):
         super().exitSingleConstraintAttribute(ctx)
 
     def enterListConstraintAttribute(
-            self, ctx: UVLPythonParser.ListConstraintAttributeContext
+        self, ctx: UVLPythonParser.ListConstraintAttributeContext
     ):
         super().enterListConstraintAttribute(ctx)
 
     def exitListConstraintAttribute(
-            self, ctx: UVLPythonParser.ListConstraintAttributeContext
+        self, ctx: UVLPythonParser.ListConstraintAttributeContext
     ):
         super().exitListConstraintAttribute(ctx)
 
@@ -279,7 +321,7 @@ class CustomListener(UVLPythonListener):
         super().enterConstraintLine(ctx)
 
     def exitConstraintLine(self, ctx: UVLPythonParser.ConstraintLineContext):
-        super().exitConstraintLine(ctx)
+        print(ctx.getText())
 
     def enterOrConstraint(self, ctx: UVLPythonParser.OrConstraintContext):
         super().enterOrConstraint(ctx)
@@ -300,12 +342,12 @@ class CustomListener(UVLPythonListener):
         super().exitLiteralConstraint(ctx)
 
     def enterParenthesisConstraint(
-            self, ctx: UVLPythonParser.ParenthesisConstraintContext
+        self, ctx: UVLPythonParser.ParenthesisConstraintContext
     ):
         super().enterParenthesisConstraint(ctx)
 
     def exitParenthesisConstraint(
-            self, ctx: UVLPythonParser.ParenthesisConstraintContext
+        self, ctx: UVLPythonParser.ParenthesisConstraintContext
     ):
         super().exitParenthesisConstraint(ctx)
 
@@ -322,22 +364,22 @@ class CustomListener(UVLPythonListener):
         super().exitAndConstraint(ctx)
 
     def enterEquivalenceConstraint(
-            self, ctx: UVLPythonParser.EquivalenceConstraintContext
+        self, ctx: UVLPythonParser.EquivalenceConstraintContext
     ):
         super().enterEquivalenceConstraint(ctx)
 
     def exitEquivalenceConstraint(
-            self, ctx: UVLPythonParser.EquivalenceConstraintContext
+        self, ctx: UVLPythonParser.EquivalenceConstraintContext
     ):
         super().exitEquivalenceConstraint(ctx)
 
     def enterImplicationConstraint(
-            self, ctx: UVLPythonParser.ImplicationConstraintContext
+        self, ctx: UVLPythonParser.ImplicationConstraintContext
     ):
         super().enterImplicationConstraint(ctx)
 
     def exitImplicationConstraint(
-            self, ctx: UVLPythonParser.ImplicationConstraintContext
+        self, ctx: UVLPythonParser.ImplicationConstraintContext
     ):
         super().exitImplicationConstraint(ctx)
 
@@ -366,12 +408,12 @@ class CustomListener(UVLPythonListener):
         super().exitLowerEqualsEquation(ctx)
 
     def enterGreaterEqualsEquation(
-            self, ctx: UVLPythonParser.GreaterEqualsEquationContext
+        self, ctx: UVLPythonParser.GreaterEqualsEquationContext
     ):
         super().enterGreaterEqualsEquation(ctx)
 
     def exitGreaterEqualsEquation(
-            self, ctx: UVLPythonParser.GreaterEqualsEquationContext
+        self, ctx: UVLPythonParser.GreaterEqualsEquationContext
     ):
         super().exitGreaterEqualsEquation(ctx)
 
@@ -388,32 +430,32 @@ class CustomListener(UVLPythonListener):
         super().exitBracketExpression(ctx)
 
     def enterAggregateFunctionExpression(
-            self, ctx: UVLPythonParser.AggregateFunctionExpressionContext
+        self, ctx: UVLPythonParser.AggregateFunctionExpressionContext
     ):
         super().enterAggregateFunctionExpression(ctx)
 
     def exitAggregateFunctionExpression(
-            self, ctx: UVLPythonParser.AggregateFunctionExpressionContext
+        self, ctx: UVLPythonParser.AggregateFunctionExpressionContext
     ):
         super().exitAggregateFunctionExpression(ctx)
 
     def enterFloatLiteralExpression(
-            self, ctx: UVLPythonParser.FloatLiteralExpressionContext
+        self, ctx: UVLPythonParser.FloatLiteralExpressionContext
     ):
         super().enterFloatLiteralExpression(ctx)
 
     def exitFloatLiteralExpression(
-            self, ctx: UVLPythonParser.FloatLiteralExpressionContext
+        self, ctx: UVLPythonParser.FloatLiteralExpressionContext
     ):
         super().exitFloatLiteralExpression(ctx)
 
     def enterStringLiteralExpression(
-            self, ctx: UVLPythonParser.StringLiteralExpressionContext
+        self, ctx: UVLPythonParser.StringLiteralExpressionContext
     ):
         super().enterStringLiteralExpression(ctx)
 
     def exitStringLiteralExpression(
-            self, ctx: UVLPythonParser.StringLiteralExpressionContext
+        self, ctx: UVLPythonParser.StringLiteralExpressionContext
     ):
         super().exitStringLiteralExpression(ctx)
 
@@ -424,12 +466,12 @@ class CustomListener(UVLPythonListener):
         super().exitAddExpression(ctx)
 
     def enterIntegerLiteralExpression(
-            self, ctx: UVLPythonParser.IntegerLiteralExpressionContext
+        self, ctx: UVLPythonParser.IntegerLiteralExpressionContext
     ):
         super().enterIntegerLiteralExpression(ctx)
 
     def exitIntegerLiteralExpression(
-            self, ctx: UVLPythonParser.IntegerLiteralExpressionContext
+        self, ctx: UVLPythonParser.IntegerLiteralExpressionContext
     ):
         super().exitIntegerLiteralExpression(ctx)
 
@@ -458,72 +500,72 @@ class CustomListener(UVLPythonListener):
         super().exitMulExpression(ctx)
 
     def enterSumAggregateFunction(
-            self, ctx: UVLPythonParser.SumAggregateFunctionContext
+        self, ctx: UVLPythonParser.SumAggregateFunctionContext
     ):
         super().enterSumAggregateFunction(ctx)
 
     def exitSumAggregateFunction(
-            self, ctx: UVLPythonParser.SumAggregateFunctionContext
+        self, ctx: UVLPythonParser.SumAggregateFunctionContext
     ):
         super().exitSumAggregateFunction(ctx)
 
     def enterAvgAggregateFunction(
-            self, ctx: UVLPythonParser.AvgAggregateFunctionContext
+        self, ctx: UVLPythonParser.AvgAggregateFunctionContext
     ):
         super().enterAvgAggregateFunction(ctx)
 
     def exitAvgAggregateFunction(
-            self, ctx: UVLPythonParser.AvgAggregateFunctionContext
+        self, ctx: UVLPythonParser.AvgAggregateFunctionContext
     ):
         super().exitAvgAggregateFunction(ctx)
 
     def enterStringAggregateFunctionExpression(
-            self, ctx: UVLPythonParser.StringAggregateFunctionExpressionContext
+        self, ctx: UVLPythonParser.StringAggregateFunctionExpressionContext
     ):
         super().enterStringAggregateFunctionExpression(ctx)
 
     def exitStringAggregateFunctionExpression(
-            self, ctx: UVLPythonParser.StringAggregateFunctionExpressionContext
+        self, ctx: UVLPythonParser.StringAggregateFunctionExpressionContext
     ):
         super().exitStringAggregateFunctionExpression(ctx)
 
     def enterNumericAggregateFunctionExpression(
-            self, ctx: UVLPythonParser.NumericAggregateFunctionExpressionContext
+        self, ctx: UVLPythonParser.NumericAggregateFunctionExpressionContext
     ):
         super().enterNumericAggregateFunctionExpression(ctx)
 
     def exitNumericAggregateFunctionExpression(
-            self, ctx: UVLPythonParser.NumericAggregateFunctionExpressionContext
+        self, ctx: UVLPythonParser.NumericAggregateFunctionExpressionContext
     ):
         super().exitNumericAggregateFunctionExpression(ctx)
 
     def enterLengthAggregateFunction(
-            self, ctx: UVLPythonParser.LengthAggregateFunctionContext
+        self, ctx: UVLPythonParser.LengthAggregateFunctionContext
     ):
         super().enterLengthAggregateFunction(ctx)
 
     def exitLengthAggregateFunction(
-            self, ctx: UVLPythonParser.LengthAggregateFunctionContext
+        self, ctx: UVLPythonParser.LengthAggregateFunctionContext
     ):
         super().exitLengthAggregateFunction(ctx)
 
     def enterFloorAggregateFunction(
-            self, ctx: UVLPythonParser.FloorAggregateFunctionContext
+        self, ctx: UVLPythonParser.FloorAggregateFunctionContext
     ):
         super().enterFloorAggregateFunction(ctx)
 
     def exitFloorAggregateFunction(
-            self, ctx: UVLPythonParser.FloorAggregateFunctionContext
+        self, ctx: UVLPythonParser.FloorAggregateFunctionContext
     ):
         super().exitFloorAggregateFunction(ctx)
 
     def enterCeilAggregateFunction(
-            self, ctx: UVLPythonParser.CeilAggregateFunctionContext
+        self, ctx: UVLPythonParser.CeilAggregateFunctionContext
     ):
         super().enterCeilAggregateFunction(ctx)
 
     def exitCeilAggregateFunction(
-            self, ctx: UVLPythonParser.CeilAggregateFunctionContext
+        self, ctx: UVLPythonParser.CeilAggregateFunctionContext
     ):
         super().exitCeilAggregateFunction(ctx)
 
