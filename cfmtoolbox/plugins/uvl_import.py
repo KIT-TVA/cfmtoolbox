@@ -1,3 +1,6 @@
+from enum import Enum
+from typing import Dict
+
 from antlr4 import CommonTokenStream, InputStream
 from antlr4.error.ErrorListener import ErrorListener
 from uvl.UVLCustomLexer import UVLCustomLexer
@@ -21,6 +24,11 @@ class CustomErrorListener(ErrorListener):
             )
 
 
+class ConstraintType(Enum):
+    IMPLICATION = ("=>",)
+    EQUIVALENCE = "<=>"
+
+
 class CustomListener(UVLPythonListener):
     references: list[str] = []
     featureCardinalities: list[Cardinality] = []
@@ -31,6 +39,8 @@ class CustomListener(UVLPythonListener):
     cardinalityAvailable: list[bool] = []
     groupsPresent: list[int] = []
     constraints: list[Constraint] = []
+    constraint_types: list[ConstraintType] = []
+    feature_map: Dict[str, Feature] = {}
 
     def enterFeatureModel(self, ctx: UVLPythonParser.FeatureModelContext):
         super().enterFeatureModel(ctx)
@@ -150,43 +160,54 @@ class CustomListener(UVLPythonListener):
         if new_groups == 0:
             group_type_cardinality = Cardinality([])
             group_instance_cardinality = Cardinality([])
-            self.features.append(
-                Feature(
-                    name,
-                    instance_cardinality,
-                    group_type_cardinality,
-                    group_instance_cardinality,
-                    [],
-                    [],
-                )
+            feature = Feature(
+                name,
+                instance_cardinality,
+                group_type_cardinality,
+                group_instance_cardinality,
+                [],
+                [],
             )
+            self.feature_map[name] = feature
+            self.features.append(feature)
             if len(self.groupFeaturesCount) > 0:
                 self.groupFeaturesCount[-1] += 1
         else:
             if new_groups > 1:
-                parent_feature = self.features[-1]
+                parent_feature = Feature(
+                    name, instance_cardinality, Cardinality([]), Cardinality([]), [], []
+                )
                 for index, group in enumerate(self.groups[-new_groups:]):
                     cardinality: Cardinality = group[0]
                     features = group[1]
-                    if cardinality.intervals[0] == Interval(1, None):
-                        group_type_cardinality = cardinality
-                        group_instance_cardinality = cardinality
-                    elif cardinality.intervals[0] == Interval(1, 1):
-                        group_type_cardinality = cardinality
-                        group_instance_cardinality = Cardinality([Interval(1, None)])
-                    else:
+                    if len(cardinality.intervals) == 0:
                         group_type_cardinality = Cardinality(
                             [Interval(0, len(features))]
                         )
                         group_instance_cardinality = cardinality
+                    else:
+                        if cardinality.intervals[0] == Interval(1, None):
+                            group_type_cardinality = cardinality
+                            group_instance_cardinality = cardinality
+                        elif cardinality.intervals[0] == Interval(1, 1):
+                            group_type_cardinality = cardinality
+                            group_instance_cardinality = Cardinality(
+                                [Interval(1, None)]
+                            )
+                        else:
+                            group_type_cardinality = Cardinality(
+                                [Interval(0, len(features))]
+                            )
+                            group_instance_cardinality = cardinality
                     feature = Feature(
                         f"{name}_{index}",
-                        instance_cardinality,
+                        Cardinality([]),
                         group_type_cardinality,
                         group_instance_cardinality,
                         [],
                         features,
                     )
+                    parent_feature.children.append(feature)
                     self.constraints.append(
                         Constraint(
                             True,
@@ -196,35 +217,23 @@ class CustomListener(UVLPythonListener):
                             Cardinality([Interval(1, None)]),
                         )
                     )
-                    self.features.append(
-                        Feature(
-                            name,
-                            Cardinality([]),
-                            Cardinality([Interval(1, 1)]),
-                            Cardinality([Interval(1, 1)]),
-                            [],
-                            [feature],
-                        )
-                    )
-                    if len(self.groupFeaturesCount) > 0:
-                        self.groupFeaturesCount[-1] += 1
-                for _ in range(new_groups):
-                    self.groups.pop()
+                self.feature_map[name] = parent_feature
+                self.features.append(parent_feature)
             else:
                 # group cardinality might be wrong, example is alternative, so it should be type of [1, 1], but is [0, 2]
                 group = self.groups.pop()
                 group_type_cardinality = Cardinality([Interval(0, len(group[1]))])
                 group_instance_cardinality = Cardinality([Interval(0, None)])
-                self.features.append(
-                    Feature(
-                        name,
-                        instance_cardinality,
-                        group_type_cardinality,
-                        group_instance_cardinality,
-                        [],
-                        group[1],
-                    )
+                feature = Feature(
+                    name,
+                    instance_cardinality,
+                    group_type_cardinality,
+                    group_instance_cardinality,
+                    [],
+                    group[1],
                 )
+                self.feature_map[name] = feature
+                self.features.append(feature)
                 if len(self.groupFeaturesCount) > 0:
                     self.groupFeaturesCount[-1] += 1
 
@@ -321,7 +330,42 @@ class CustomListener(UVLPythonListener):
         super().enterConstraintLine(ctx)
 
     def exitConstraintLine(self, ctx: UVLPythonParser.ConstraintLineContext):
-        print(ctx.getText())
+        ref_2 = self.references.pop()
+        ref_1 = self.references.pop()
+        op = self.constraint_types.pop()
+
+        if op == ConstraintType.IMPLICATION:
+            self.constraints.append(
+                Constraint(
+                    True,
+                    self.feature_map[ref_1],
+                    Cardinality([Interval(1, None)]),
+                    self.feature_map[ref_2],
+                    Cardinality([Interval(1, None)]),
+                )
+            )
+        elif op == ConstraintType.EQUIVALENCE:
+            self.constraints.append(
+                Constraint(
+                    True,
+                    self.feature_map[ref_1],
+                    Cardinality([Interval(1, None)]),
+                    self.feature_map[ref_2],
+                    Cardinality([Interval(1, None)]),
+                )
+            )
+            self.constraints.append(
+                Constraint(
+                    True,
+                    self.feature_map[ref_2],
+                    Cardinality([Interval(1, None)]),
+                    self.feature_map[ref_1],
+                    Cardinality([Interval(1, None)]),
+                )
+            )
+        else:
+            print(f"ERROR, operation {op} not supported yet")
+        print("TEST")
 
     def enterOrConstraint(self, ctx: UVLPythonParser.OrConstraintContext):
         super().enterOrConstraint(ctx)
@@ -371,7 +415,7 @@ class CustomListener(UVLPythonListener):
     def exitEquivalenceConstraint(
         self, ctx: UVLPythonParser.EquivalenceConstraintContext
     ):
-        super().exitEquivalenceConstraint(ctx)
+        self.constraint_types.append(ConstraintType.EQUIVALENCE)
 
     def enterImplicationConstraint(
         self, ctx: UVLPythonParser.ImplicationConstraintContext
@@ -381,7 +425,7 @@ class CustomListener(UVLPythonListener):
     def exitImplicationConstraint(
         self, ctx: UVLPythonParser.ImplicationConstraintContext
     ):
-        super().exitImplicationConstraint(ctx)
+        self.constraint_types.append(ConstraintType.IMPLICATION)
 
     def enterEqualEquation(self, ctx: UVLPythonParser.EqualEquationContext):
         super().enterEqualEquation(ctx)
@@ -623,4 +667,4 @@ def import_uvl(data: bytes):
     parser.addParseListener(listener)
     parser.featureModel()  # start parsing
 
-    return CFM(listener.features, [], [])
+    return CFM(listener.features, listener.constraints, [])
