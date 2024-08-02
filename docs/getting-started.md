@@ -1,0 +1,43 @@
+The CFM Toolbox, it's dependencies, and core plugins can easily be installed from the Python Package Index (PyPI) using the following command:
+
+```bash
+pip3 install cfmtoolbox
+```
+
+## Running the CFM Toolbox
+
+After the installation, the CFM Toolbox can be run from the command line using the following command:
+
+```bash
+python3 -m cfmtoolbox
+```
+
+## Usage examples
+
+Making use of the toolbox's core plugins and your shell's capabilities, you can already perform a variety of tasks without any third-party dependencies.
+
+### Sampling a CFM
+
+The following command demonstrates sampling a minimal UVL-based CFM using a random sampling strategy:
+
+```bash
+cat "features\n\tminimalism" > example.uvl
+python3 -m cfmtoolbox --import example.uvl random-sampling
+```
+
+### Storing command outputs
+
+By making use your of shell's redirection capabilities, you can easily store the output in a file:
+
+```bash
+python3 -m cfmtoolbox --import example.uvl random-sampling > sampling.json
+```
+
+### Applying a timeout
+
+Some commands may take a long time to execute.
+Using your shell's built-in `timeout` command, you can apply a timeout to the sampling process like so:
+
+```bash
+timeout 5 python3 -m cfmtoolbox --import example.uvl random-sampling
+```
