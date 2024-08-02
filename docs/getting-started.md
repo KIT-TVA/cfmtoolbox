@@ -41,3 +41,14 @@ Using your shell's built-in `timeout` command, you can apply a timeout to the sa
 ```bash
 timeout 5 python3 -m cfmtoolbox --import example.uvl random-sampling
 ```
+
+## Installing additional plugins
+
+The CFM toolbox will automatically detect and load plugins that are installed in the same Python environment.
+This makes installing plugins as easy as running `pip3 install` with the desired plugin's name.
+
+For example, to install the `cfmtoolbox-hello-world-plugin` plugin, you can run:
+
+```bash
+pip3 install cfmtoolbox-hello-world-plugin
+```
