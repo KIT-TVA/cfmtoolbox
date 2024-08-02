@@ -11,6 +11,7 @@ theme:
     - navigation.tracking
     - navigation.top
     - navigation.footer
+    - content.code.copy
 
 plugins:
   - search
