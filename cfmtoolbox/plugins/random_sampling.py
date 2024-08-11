@@ -40,14 +40,15 @@ class RandomSamplingPlugin:
     def get_global_upper_bound(self, feature: Feature):
         global_upper_bound = feature.instance_cardinality.intervals[-1].upper
         local_upper_bound = global_upper_bound
+
         if local_upper_bound is None:
             return 0
-        else:
-            for child in feature.children:
-                global_upper_bound = max(
-                    global_upper_bound,
-                    local_upper_bound * self.get_global_upper_bound(child),
-                )
+
+        for child in feature.children:
+            global_upper_bound = max(
+                global_upper_bound,
+                local_upper_bound * self.get_global_upper_bound(child),
+            )
 
         return global_upper_bound
 
