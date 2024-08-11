@@ -197,46 +197,6 @@ def test_traverse_xml_can_traverse_on_empty_structure():
     assert traverse_xml(None, cfm) == cfm.features
 
 
-def test_parse_cfm(capsys):
-    tree = ET.parse("tests/data/sandwich.xml")
-    root = tree.getroot()
-    cfm = parse_cfm(root)
-    require_conraints = cfm.require_constraints
-    exclude_constraints = cfm.exclude_constraints
-
-    output = capsys.readouterr()
-
-    assert len(cfm.features) == 11
-    assert cfm.features[0].name == "Sandwich"
-    assert cfm.features[1].name == "Bread"
-    assert cfm.features[2].name == "Sourdough"
-    assert cfm.features[3].name == "Wheat"
-    assert cfm.features[4].name == "CheeseMix"
-    assert cfm.features[5].name == "Cheddar"
-    assert cfm.features[6].name == "Swiss"
-    assert cfm.features[7].name == "Gouda"
-    assert cfm.features[8].name == "Veggies"
-    assert cfm.features[9].name == "Lettuce"
-    assert cfm.features[10].name == "Tomato"
-    assert len(require_conraints) == 3
-    assert len(exclude_constraints) == 1
-    assert require_conraints[0].first_feature.name == "Sourdough"
-    assert require_conraints[0].second_feature.name == "Cheddar"
-    assert require_conraints[1].first_feature.name == "Tomato"
-    assert require_conraints[1].second_feature.name == "Gouda"
-    assert require_conraints[2].first_feature.name == "Swiss"
-    assert require_conraints[2].second_feature.name == "Lettuce"
-    assert exclude_constraints[0].first_feature.name == "Wheat"
-    assert exclude_constraints[0].second_feature.name == "Tomato"
-    assert output.out == "The following constraints were exterminated: {4}\n"
-
-
-def test_parse_cfm_reports_missing_struct():
-    root = Element("root")
-    with pytest.raises(TypeError, match="No valid Feature structure found in XML file"):
-        parse_cfm(root)
-
-
 def test_parse_formula():
     root = Element("var")
     root.text = "Bread"
@@ -427,3 +387,43 @@ def test_parse_constraint_can_parse_constraint_with_elimination(
     assert len(exclude) == 0
     assert len(eliminated) == 1
     assert eliminated == expectation
+
+
+def test_parse_cfm(capsys):
+    tree = ET.parse("tests/data/sandwich.xml")
+    root = tree.getroot()
+    cfm = parse_cfm(root)
+    require_conraints = cfm.require_constraints
+    exclude_constraints = cfm.exclude_constraints
+
+    output = capsys.readouterr()
+
+    assert len(cfm.features) == 11
+    assert cfm.features[0].name == "Sandwich"
+    assert cfm.features[1].name == "Bread"
+    assert cfm.features[2].name == "Sourdough"
+    assert cfm.features[3].name == "Wheat"
+    assert cfm.features[4].name == "CheeseMix"
+    assert cfm.features[5].name == "Cheddar"
+    assert cfm.features[6].name == "Swiss"
+    assert cfm.features[7].name == "Gouda"
+    assert cfm.features[8].name == "Veggies"
+    assert cfm.features[9].name == "Lettuce"
+    assert cfm.features[10].name == "Tomato"
+    assert len(require_conraints) == 3
+    assert len(exclude_constraints) == 1
+    assert require_conraints[0].first_feature.name == "Sourdough"
+    assert require_conraints[0].second_feature.name == "Cheddar"
+    assert require_conraints[1].first_feature.name == "Tomato"
+    assert require_conraints[1].second_feature.name == "Gouda"
+    assert require_conraints[2].first_feature.name == "Swiss"
+    assert require_conraints[2].second_feature.name == "Lettuce"
+    assert exclude_constraints[0].first_feature.name == "Wheat"
+    assert exclude_constraints[0].second_feature.name == "Tomato"
+    assert output.out == "The following constraints were exterminated: {4}\n"
+
+
+def test_parse_cfm_reports_missing_struct():
+    root = Element("root")
+    with pytest.raises(TypeError, match="No valid Feature structure found in XML file"):
+        parse_cfm(root)
