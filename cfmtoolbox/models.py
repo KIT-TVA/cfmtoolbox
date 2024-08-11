@@ -100,7 +100,7 @@ class FeatureNode:
 
     def validate_constraints(self, cfm: CFM) -> bool:
         global_feature_count: defaultdict[str, int] = defaultdict(int)
-        self.calculate_global_feature_count(global_feature_count)
+        self.initialize_global_feature_count(global_feature_count)
 
         # Check require constraints
         for constraint in cfm.require_constraints:
@@ -122,13 +122,13 @@ class FeatureNode:
 
         return True
 
-    def calculate_global_feature_count(
+    def initialize_global_feature_count(
         self, global_feature_count: defaultdict[str, int]
     ):
         global_feature_count[self.value.split("#")[0]] += 1
 
         for child in self.children:
-            child.calculate_global_feature_count(global_feature_count)
+            child.initialize_global_feature_count(global_feature_count)
 
     def validate_children(self, feature: Feature) -> bool:
         if not feature.children:
