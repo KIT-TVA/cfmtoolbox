@@ -27,15 +27,15 @@ class RandomSampler:
         )
 
         while True:
-            random_featurenode = self.generate_random_feature_node(
+            random_feature_node = self.generate_random_feature_node(
                 self.model.features[0]
             )
-            if random_featurenode.validate(self.model):
+            if random_feature_node.validate(self.model):
                 break
             self.global_feature_count = defaultdict(int)
 
-        print("Instance", random_featurenode)
-        return random_featurenode
+        print("Instance", random_feature_node)
+        return random_feature_node
 
     def get_global_upper_bound(self, feature: Feature):
         global_upper_bound = feature.instance_cardinality.intervals[-1].upper
