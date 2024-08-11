@@ -1,4 +1,5 @@
 import random
+from collections import defaultdict
 
 from cfmtoolbox import app
 from cfmtoolbox.models import Cardinality, Feature, FeatureNode
@@ -12,7 +13,7 @@ def random_sampling(amount: int = 1) -> list[FeatureNode] | None:
 
 class RandomSamplingPlugin:
     def __init__(self):
-        self.global_feature_count = {}
+        self.global_feature_count = defaultdict(int)
 
     def random_sampling(self, amount: int = 1) -> list[FeatureNode] | None:
         if app.model is None:
@@ -33,7 +34,7 @@ class RandomSamplingPlugin:
             )
             result_instances.append(random_featurenode)
             print("Instance", random_featurenode)
-            self.global_feature_count = {}
+            self.global_feature_count = defaultdict(int)
 
         return result_instances
 
@@ -91,15 +92,12 @@ class RandomSamplingPlugin:
         self,
         feature: Feature,
     ):
-        if feature.name not in self.global_feature_count:
-            self.global_feature_count[feature.name] = 0
-        else:
-            self.global_feature_count[feature.name] += 1
-
         feature_node = FeatureNode(
             value=f"{feature.name}#{self.global_feature_count[feature.name]}",
             children=[],
         )
+
+        self.global_feature_count[feature.name] += 1
 
         if not feature.children:
             return feature_node
