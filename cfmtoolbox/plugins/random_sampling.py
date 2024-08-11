@@ -2,41 +2,33 @@ import random
 from collections import defaultdict
 
 from cfmtoolbox import app
-from cfmtoolbox.models import Cardinality, Feature, FeatureNode
+from cfmtoolbox.models import CFM, Cardinality, Feature, FeatureNode
 
 
 @app.command()
 def random_sampling(amount: int = 1) -> list[FeatureNode] | None:
-    instance = RandomSamplingPlugin()
-    return instance.random_sampling(amount)
+    if app.model is None:
+        print("No model loaded.")
+        return None
+
+    return [RandomSampler(app.model).random_sampling() for _ in range(amount)]
 
 
-class RandomSamplingPlugin:
-    def __init__(self):
-        self.global_feature_count = defaultdict(int)
+class RandomSampler:
+    def __init__(self, model: CFM):
+        self.global_feature_count: defaultdict[str, int] = defaultdict(int)
+        self.model = model
 
-    def random_sampling(self, amount: int = 1) -> list[FeatureNode] | None:
-        if app.model is None:
-            print("No model loaded.")
-            return None
-
-        result_instances = []
-
-        global_upper_bound = self.get_global_upper_bound(app.model.features[0])
+    def random_sampling(self) -> FeatureNode:
+        global_upper_bound = self.get_global_upper_bound(self.model.features[0])
 
         self.replace_infinite_upper_bound_with_global_upper_bound(
-            app.model.features[0], global_upper_bound
+            self.model.features[0], global_upper_bound
         )
 
-        for i in range(amount):
-            random_featurenode = self.generate_random_feature_node(
-                app.model.features[0]
-            )
-            result_instances.append(random_featurenode)
-            print("Instance", random_featurenode)
-            self.global_feature_count = defaultdict(int)
-
-        return result_instances
+        random_featurenode = self.generate_random_feature_node(self.model.features[0])
+        print("Instance", random_featurenode)
+        return random_featurenode
 
     def get_global_upper_bound(self, feature: Feature):
         global_upper_bound = feature.instance_cardinality.intervals[-1].upper
