@@ -5,13 +5,7 @@ import cfmtoolbox.plugins.random_sampling as random_sampling_plugin
 from cfmtoolbox import app
 from cfmtoolbox.models import Cardinality, Feature, Interval
 from cfmtoolbox.plugins.random_sampling import (
-    generate_random_children_with_random_cardinality,
-    generate_random_feature_node,
-    get_global_upper_bound,
-    get_optional_children,
-    get_random_cardinality,
-    get_random_cardinality_without_zero,
-    get_required_children,
+    RandomSamplingPlugin,
     random_sampling,
 )
 
@@ -38,18 +32,23 @@ def test_random_sampling_with_loaded_model():
 
 
 def test_get_random_cardinality():
+    instance = RandomSamplingPlugin()
     cardinality = Cardinality([Interval(1, 10), Interval(20, 30), Interval(40, 50)])
-    assert cardinality.is_valid_cardinality(get_random_cardinality(cardinality))
+    assert cardinality.is_valid_cardinality(
+        instance.get_random_cardinality(cardinality)
+    )
 
 
 def test_get_random_cardinality_without_zero():
+    instance = RandomSamplingPlugin()
     cardinality = Cardinality([Interval(1, 10), Interval(20, 30), Interval(40, 50)])
-    random_cardinality = get_random_cardinality_without_zero(cardinality)
+    random_cardinality = instance.get_random_cardinality_without_zero(cardinality)
     assert cardinality.is_valid_cardinality(random_cardinality)
     assert random_cardinality != 0
 
 
 def test_get_sorted_sample():
+    instance = RandomSamplingPlugin()
     feature_list = [
         Feature(
             "Cheddar",
@@ -76,7 +75,7 @@ def test_get_sorted_sample():
             [],
         ),
     ]
-    sample = random_sampling_plugin.get_sorted_sample(feature_list, 2)
+    sample = instance.get_sorted_sample(feature_list, 2)
     assert len(sample) == 2
     assert (
         (sample[0].name == "Cheddar" and sample[1].name == "Swiss")
@@ -86,6 +85,7 @@ def test_get_sorted_sample():
 
 
 def test_get_required_children():
+    instance = RandomSamplingPlugin()
     feature = Feature(
         "Cheese",
         Cardinality([]),
@@ -103,7 +103,7 @@ def test_get_required_children():
             )
         ],
     )
-    assert len(get_required_children(feature)) == 1
+    assert len(instance.get_required_children(feature)) == 1
     feature = Feature(
         "Cheese",
         Cardinality([]),
@@ -129,11 +129,11 @@ def test_get_required_children():
             ),
         ],
     )
-    assert len(get_required_children(feature)) == 2
+    assert len(instance.get_required_children(feature)) == 2
     feature = Feature(
         "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
-    assert len(get_required_children(feature)) == 0
+    assert len(instance.get_required_children(feature)) == 0
     feature = Feature(
         "Cheese",
         Cardinality([]),
@@ -151,10 +151,11 @@ def test_get_required_children():
             )
         ],
     )
-    assert len(get_required_children(feature)) == 0
+    assert len(instance.get_required_children(feature)) == 0
 
 
 def test_get_optional_children():
+    instance = RandomSamplingPlugin()
     feature = Feature(
         "Cheese",
         Cardinality([]),
@@ -180,7 +181,7 @@ def test_get_optional_children():
             ),
         ],
     )
-    assert len(get_optional_children(feature)) == 1
+    assert len(instance.get_optional_children(feature)) == 1
     feature = Feature(
         "Cheese",
         Cardinality([]),
@@ -206,11 +207,11 @@ def test_get_optional_children():
             ),
         ],
     )
-    assert len(get_optional_children(feature)) == 2
+    assert len(instance.get_optional_children(feature)) == 2
     feature = Feature(
         "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
-    assert len(get_optional_children(feature)) == 0
+    assert len(instance.get_optional_children(feature)) == 0
     feature = Feature(
         "Cheese",
         Cardinality([]),
@@ -228,7 +229,7 @@ def test_get_optional_children():
             )
         ],
     )
-    assert len(get_optional_children(feature)) == 0
+    assert len(instance.get_optional_children(feature)) == 0
     feature = Feature(
         "Cheese",
         Cardinality([]),
@@ -254,10 +255,11 @@ def test_get_optional_children():
             ),
         ],
     )
-    assert len(get_optional_children(feature)) == 0
+    assert len(instance.get_optional_children(feature)) == 0
 
 
 def test_generate_random_children_with_random_cardinality():
+    instance = RandomSamplingPlugin()
     feature = Feature(
         "Cheese-mix",
         Cardinality([]),
@@ -292,7 +294,7 @@ def test_generate_random_children_with_random_cardinality():
         ],
     )
     children, summed_random_instance_cardinality = (
-        generate_random_children_with_random_cardinality(feature)
+        instance.generate_random_children_with_random_cardinality(feature)
     )
     for child, random_instance_cardinality in children:
         assert child.instance_cardinality.is_valid_cardinality(
@@ -301,14 +303,16 @@ def test_generate_random_children_with_random_cardinality():
 
 
 def test_get_global_upper_bound():
+    instance = RandomSamplingPlugin()
     path = Path("tests/data/sandwich.json")
     cfm = json_import_plugin.import_json(path.read_bytes())
     feature = cfm.features[0]
-    assert get_global_upper_bound(feature) == 12
+    assert instance.get_global_upper_bound(feature) == 12
 
 
 def test_generate_feature_node():
+    instance = RandomSamplingPlugin()
     path = Path("tests/data/sandwich.json")
     cfm = json_import_plugin.import_json(path.read_bytes())
     feature = cfm.features[0]
-    assert generate_random_feature_node(feature).validate(cfm)
+    assert instance.generate_random_feature_node(feature).validate(cfm)
