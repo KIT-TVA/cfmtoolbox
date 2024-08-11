@@ -90,7 +90,7 @@ def traverse_xml(element: Element | None, cfm: CFM) -> list[Feature]:
     return cfm.features
 
 
-def parse_formula(formula: Element, cfm: CFM) -> tuple[bool, Feature]:
+def parse_formula_value_and_feature(formula: Element, cfm: CFM) -> tuple[bool, Feature]:
     if len(formula) == 0 and formula.tag == FormulaTypes.VAR.value:
         if formula.text is None:
             raise TypeError("No valid feature name found in formula")
@@ -101,7 +101,7 @@ def parse_formula(formula: Element, cfm: CFM) -> tuple[bool, Feature]:
         raise TooComplexConstraintError()
 
     if formula.tag == FormulaTypes.NOT.value:
-        value, feature = parse_formula(formula[0], cfm)
+        value, feature = parse_formula_value_and_feature(formula[0], cfm)
         return (not value, feature)
 
     else:
@@ -127,8 +127,12 @@ def parse_constraints(
 
         if rule[0].tag == FormulaTypes.IMP.value:
             try:
-                first_feature = parse_formula(rule[0][0], cfm)
-                second_feature = parse_formula(rule[0][1], cfm)
+                first_feature_value, first_feature = parse_formula_value_and_feature(
+                    rule[0][0], cfm
+                )
+                second_feature_value, second_feature = parse_formula_value_and_feature(
+                    rule[0][1], cfm
+                )
             except TooComplexConstraintError:
                 eliminated_constraints.add(index)
                 continue
@@ -136,22 +140,22 @@ def parse_constraints(
             constraint = (
                 Constraint(
                     require=True,
-                    first_feature=first_feature[1],
-                    first_cardinality=first_feature[1].instance_cardinality,
-                    second_feature=second_feature[1],
-                    second_cardinality=second_feature[1].instance_cardinality,
+                    first_feature=first_feature,
+                    first_cardinality=first_feature.instance_cardinality,
+                    second_feature=second_feature,
+                    second_cardinality=second_feature.instance_cardinality,
                 )
-                if (first_feature[0] or second_feature[0])
+                if (first_feature_value or second_feature_value)
                 else Constraint(
                     require=True,
-                    first_feature=second_feature[1],
-                    first_cardinality=second_feature[1].instance_cardinality,
-                    second_feature=first_feature[1],
-                    second_cardinality=first_feature[1].instance_cardinality,
+                    first_feature=second_feature,
+                    first_cardinality=second_feature.instance_cardinality,
+                    second_feature=first_feature,
+                    second_cardinality=first_feature.instance_cardinality,
                 )
             )
 
-            if first_feature[0] == second_feature[0]:
+            if first_feature_value == second_feature_value:
                 require_constraints.append(constraint)
 
             else:

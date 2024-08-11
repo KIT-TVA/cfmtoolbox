@@ -12,7 +12,7 @@ from cfmtoolbox.plugins.featureide_import import (
     parse_cfm,
     parse_constraints,
     parse_feature,
-    parse_formula,
+    parse_formula_value_and_feature,
     parse_group_cardinality,
     parse_instance_cardinality,
     traverse_xml,
@@ -197,7 +197,7 @@ def test_traverse_xml_can_traverse_on_empty_structure():
     assert traverse_xml(None, cfm) == cfm.features
 
 
-def test_parse_formula():
+def test_parse_formula_value_and_feature():
     root = Element("var")
     root.text = "Bread"
 
@@ -205,17 +205,17 @@ def test_parse_formula():
         "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
 
-    formula = parse_formula(root, CFM([feature], [], []))
-    assert formula == (True, feature)
+    value, formula = parse_formula_value_and_feature(root, CFM([feature], [], []))
+    assert (value, formula) == (True, feature)
 
 
-def test_parse_formula_raises_type_error_on_no_valid_feature_name():
+def test_parse_formula_value_and_feature_raises_type_error_on_no_valid_feature_name():
     root = Element("var")
     with pytest.raises(TypeError, match="No valid feature name found in formula"):
-        parse_formula(root, CFM([], [], []))
+        parse_formula_value_and_feature(root, CFM([], [], []))
 
 
-def test_parse_formula_can_parse_more_complex_formula_with_even_nots():
+def test_parse_formula_value_and_feature_can_parse_more_complex_formula_with_even_nots():
     root = Element("not")
     element = SubElement(root, "not")
     SubElement(element, "var").text = "Bread"
@@ -224,11 +224,11 @@ def test_parse_formula_can_parse_more_complex_formula_with_even_nots():
         "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
 
-    formula = parse_formula(root, CFM([feature], [], []))
+    formula = parse_formula_value_and_feature(root, CFM([feature], [], []))
     assert formula == (True, feature)
 
 
-def test_parse_formula_can_parse_more_complex_formula_with_odd_nots():
+def test_parse_formula_value_and_feature_can_parse_more_complex_formula_with_odd_nots():
     root = Element("not")
     subelement = SubElement(root, "not")
     SubElement(SubElement(subelement, "not"), "var").text = "Bread"
@@ -237,23 +237,23 @@ def test_parse_formula_can_parse_more_complex_formula_with_odd_nots():
         "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
 
-    formula = parse_formula(root, CFM([feature], [], []))
+    formula = parse_formula_value_and_feature(root, CFM([feature], [], []))
     assert formula == (False, feature)
 
 
-def type_parse_formula_raises_too_complex_constraint_error_with_multiple_subelements():
+def type_parse_formula_value_and_feature_raises_too_complex_constraint_error_with_multiple_subelements():
     root = Element("not")
     SubElement(root, "var")
     SubElement(root, "var")
 
     with pytest.raises(TooComplexConstraintError):
-        parse_formula(root, CFM([], [], []))
+        parse_formula_value_and_feature(root, CFM([], [], []))
 
 
-def test_parse_formula_raises_too_complex_contraint_error_without_subelement():
+def test_parse_formula_value_and_feature_raises_too_complex_contraint_error_without_subelement():
     root = Element("disj")
     with pytest.raises(TooComplexConstraintError):
-        parse_formula(root, CFM([], [], []))
+        parse_formula_value_and_feature(root, CFM([], [], []))
 
 
 @pytest.mark.parametrize(
