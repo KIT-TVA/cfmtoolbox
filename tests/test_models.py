@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import pytest
 
 from cfmtoolbox.models import (
@@ -406,3 +408,292 @@ def test_validate_feature_instance(feature_instance: FeatureNode, expectation: b
     )
     cfm = CFM([feature], [], [])
     assert feature_instance.validate(cfm) == expectation
+
+
+@pytest.mark.parametrize(
+    ["feature_instance", "expectation"],
+    [
+        (
+            FeatureNode("Milkshake#0", []),
+            {"Milkshake": 1},
+        ),
+        (
+            FeatureNode(
+                "Sandwich#0",
+                [
+                    FeatureNode("Bread#0", [FeatureNode("Wheat#0", [])]),
+                    FeatureNode("Bread#1", [FeatureNode("Wheat#1", [])]),
+                    FeatureNode("Cheese#0", []),
+                ],
+            ),
+            {"Sandwich": 1, "Bread": 2, "Wheat": 2, "Cheese": 1},
+        ),
+        (
+            FeatureNode(
+                "Sandwich#0",
+                [
+                    FeatureNode("Bread#0", [FeatureNode("Wheat#0", [])]),
+                    FeatureNode("Bread#1", [FeatureNode("Wheat#1", [])]),
+                    FeatureNode(
+                        "Cheese-mix#0",
+                        [
+                            FeatureNode("Swiss#0", []),
+                            FeatureNode("Gouda#0", []),
+                            FeatureNode("Gouda#1", []),
+                        ],
+                    ),
+                    FeatureNode(
+                        "Cheese-mix#1",
+                        [
+                            FeatureNode("Swiss#1", []),
+                            FeatureNode("Gouda#2", []),
+                            FeatureNode("Cheddar#0", []),
+                        ],
+                    ),
+                ],
+            ),
+            {
+                "Sandwich": 1,
+                "Bread": 2,
+                "Wheat": 2,
+                "Cheese-mix": 2,
+                "Swiss": 2,
+                "Gouda": 3,
+                "Cheddar": 1,
+            },
+        ),
+    ],
+)
+def test_calculate_global_feature_count(
+    feature_instance: FeatureNode, expectation: defaultdict[str, int]
+):
+    global_feature_count: defaultdict[str, int] = defaultdict(int)
+    feature_instance.calculate_global_feature_count(global_feature_count)
+    assert global_feature_count == expectation
+
+
+@pytest.mark.parametrize(
+    ["require_constraints", "exclude_constraints", "expectation"],
+    [
+        (
+            [],
+            [],
+            True,
+        ),
+        (
+            [
+                Constraint(
+                    True,
+                    Feature(
+                        "Bread",
+                        Cardinality([]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Cardinality([Interval(1, 1)]),
+                    Feature(
+                        "Cheese-mix",
+                        Cardinality([]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Cardinality([Interval(1, 1)]),
+                )
+            ],
+            [],
+            True,
+        ),
+        (
+            [
+                Constraint(
+                    True,
+                    Feature(
+                        "Bread",
+                        Cardinality([]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Cardinality([Interval(2, 2)]),
+                    Feature(
+                        "Sourdough",
+                        Cardinality([]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Cardinality([Interval(2, 2)]),
+                )
+            ],
+            [],
+            False,
+        ),
+        (
+            [
+                Constraint(
+                    True,
+                    Feature(
+                        "Bread",
+                        Cardinality([]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Cardinality([Interval(2, 2)]),
+                    Feature(
+                        "Cheese-mix",
+                        Cardinality([]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Cardinality([Interval(1, None)]),
+                )
+            ],
+            [],
+            True,
+        ),
+        (
+            [],
+            [
+                Constraint(
+                    True,
+                    Feature(
+                        "Swiss",
+                        Cardinality([]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Cardinality([Interval(4, None)]),
+                    Feature(
+                        "Cheese-mix",
+                        Cardinality([]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Cardinality([Interval(1, None)]),
+                )
+            ],
+            True,
+        ),
+        (
+            [],
+            [
+                Constraint(
+                    True,
+                    Feature(
+                        "Gouda",
+                        Cardinality([]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Cardinality([Interval(2, None)]),
+                    Feature(
+                        "Cheese-mix",
+                        Cardinality([]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Cardinality([Interval(1, None)]),
+                )
+            ],
+            False,
+        ),
+        (
+            [
+                Constraint(
+                    True,
+                    Feature(
+                        "Bread",
+                        Cardinality([]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Cardinality([Interval(2, 2)]),
+                    Feature(
+                        "Cheese-mix",
+                        Cardinality([]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Cardinality([Interval(1, None)]),
+                )
+            ],
+            [
+                Constraint(
+                    True,
+                    Feature(
+                        "Swiss",
+                        Cardinality([]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Cardinality([Interval(4, None)]),
+                    Feature(
+                        "Cheese-mix",
+                        Cardinality([]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Cardinality([Interval(1, None)]),
+                )
+            ],
+            True,
+        ),
+    ],
+)
+def test_validate_constraints(
+    require_constraints: list[Constraint],
+    exclude_constraints: list[Constraint],
+    expectation: bool,
+):
+    feature_instance = FeatureNode(
+        "Sandwich#0",
+        [
+            FeatureNode("Bread#0", [FeatureNode("Wheat#0", [])]),
+            FeatureNode("Bread#1", [FeatureNode("Wheat#1", [])]),
+            FeatureNode(
+                "Cheese-mix#0",
+                [
+                    FeatureNode("Swiss#0", []),
+                    FeatureNode("Gouda#0", []),
+                    FeatureNode("Gouda#1", []),
+                ],
+            ),
+            FeatureNode(
+                "Cheese-mix#1",
+                [
+                    FeatureNode("Swiss#1", []),
+                    FeatureNode("Gouda#2", []),
+                    FeatureNode("Cheddar#0", []),
+                ],
+            ),
+        ],
+    )
+
+    cfm = CFM([], require_constraints, exclude_constraints)
+    assert feature_instance.validate_constraints(cfm) == expectation

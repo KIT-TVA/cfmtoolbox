@@ -1,3 +1,4 @@
+from collections import defaultdict
 from dataclasses import dataclass
 
 
@@ -92,7 +93,42 @@ class FeatureNode:
         if root_feature.name != self.value.split("#")[0]:
             return False
 
-        return self.validate_children(root_feature)
+        if not self.validate_children(root_feature):
+            return False
+
+        return self.validate_constraints(cfm)
+
+    def validate_constraints(self, cfm: CFM) -> bool:
+        global_feature_count: defaultdict[str, int] = defaultdict(int)
+        self.calculate_global_feature_count(global_feature_count)
+
+        # Check require constraints
+        for constraint in cfm.require_constraints:
+            if constraint.first_cardinality.is_valid_cardinality(
+                global_feature_count[constraint.first_feature.name]
+            ) and not constraint.second_cardinality.is_valid_cardinality(
+                global_feature_count[constraint.second_feature.name]
+            ):
+                return False
+
+        # Check exclude constraints
+        for constraint in cfm.exclude_constraints:
+            if constraint.first_cardinality.is_valid_cardinality(
+                global_feature_count[constraint.first_feature.name]
+            ) and constraint.second_cardinality.is_valid_cardinality(
+                global_feature_count[constraint.second_feature.name]
+            ):
+                return False
+
+        return True
+
+    def calculate_global_feature_count(
+        self, global_feature_count: defaultdict[str, int]
+    ):
+        global_feature_count[self.value.split("#")[0]] += 1
+
+        for child in self.children:
+            child.calculate_global_feature_count(global_feature_count)
 
     def validate_children(self, feature: Feature) -> bool:
         if not feature.children:
