@@ -5,11 +5,14 @@ from xml.etree.ElementTree import Element, SubElement
 import pytest
 
 import cfmtoolbox.plugins.featureide_import as featureide_import_plugin
-from cfmtoolbox.models import CFM, Cardinality, Interval
+from cfmtoolbox.models import CFM, Cardinality, Constraint, Feature, Interval
 from cfmtoolbox.plugins.featureide_import import (
+    TooComplexConstraintError,
     import_featureide,
     parse_cfm,
+    parse_constraints,
     parse_feature,
+    parse_formula,
     parse_group_cardinality,
     parse_instance_cardinality,
     traverse_xml,
@@ -217,3 +220,195 @@ def test_parse_cfm_reports_missing_struct():
     root = Element("root")
     with pytest.raises(TypeError, match="No valid Feature structure found in XML file"):
         parse_cfm(root)
+
+
+def test_parse_formula():
+    root = Element("var")
+    root.text = "Bread"
+
+    feature = Feature(
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+    )
+
+    formula = parse_formula(root, CFM([feature], [], []))
+    assert formula == (True, feature)
+
+
+def test_parse_formula_raises_type_error_on_no_valid_feature_name():
+    root = Element("var")
+    with pytest.raises(TypeError, match="No valid feature name found in formula"):
+        parse_formula(root, CFM([], [], []))
+
+
+def test_parse_formula_can_parse_more_complex_formula_with_even_nots():
+    root = Element("not")
+    element = SubElement(root, "not")
+    SubElement(element, "var").text = "Bread"
+
+    feature = Feature(
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+    )
+
+    formula = parse_formula(root, CFM([feature], [], []))
+    assert formula == (True, feature)
+
+
+def test_parse_formula_can_parse_more_complex_formula_with_odd_nots():
+    root = Element("not")
+    subelement = SubElement(root, "not")
+    SubElement(SubElement(subelement, "not"), "var").text = "Bread"
+
+    feature = Feature(
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+    )
+
+    formula = parse_formula(root, CFM([feature], [], []))
+    assert formula == (False, feature)
+
+
+def type_parse_formula_raises_too_complex_constraint_error_with_multiple_subelements():
+    root = Element("not")
+    SubElement(root, "var")
+    SubElement(root, "var")
+
+    with pytest.raises(TooComplexConstraintError):
+        parse_formula(root, CFM([], [], []))
+
+
+def test_parse_formula_raises_too_complex_contraint_error_without_subelement():
+    root = Element("disj")
+    with pytest.raises(TooComplexConstraintError):
+        parse_formula(root, CFM([], [], []))
+
+
+@pytest.mark.parametrize(
+    ["constraints", "expectation"],
+    [(None, ([], [], set([]))), (Element("constraints"), ([], [], set([])))],
+)
+def test_parse_constraints_can_parse_without_constraints(
+    constraints: Element,
+    expectation: tuple[list[Constraint], list[Constraint], set[int]],
+):
+    assert parse_constraints(constraints, CFM([], [], [])) == expectation
+
+
+def test_parse_constraints_raises_type_error_on_no_valid_rule_tag():
+    constraints = Element("constraints")
+    SubElement(constraints, "unknown")
+    with pytest.raises(TypeError, match="Unknown constraint tag: unknown"):
+        parse_constraints(constraints, CFM([], [], []))
+
+
+def test_parse_constraints_raises_type_error_on_no_valid_constraint_structure():
+    constraints = Element("constraints")
+    SubElement(constraints, "rule")
+    with pytest.raises(
+        TypeError, match="No valid constraint rule found in constraints"
+    ):
+        parse_constraints(constraints, CFM([], [], []))
+
+
+def test_parse_constraint_can_parse_constraint_with_one_require_rule():
+    constraints = Element("constraints")
+    rule = SubElement(constraints, "rule")
+    imp = SubElement(rule, "imp")
+    SubElement(imp, "var").text = "Bread"
+    SubElement(imp, "var").text = "Bread"
+    feature = Feature(
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+    )
+    cfm = CFM([feature], [], [])
+
+    constraint = Constraint(
+        True,
+        feature,
+        feature.instance_cardinality,
+        feature,
+        feature.instance_cardinality,
+    )
+
+    require, exclude, eliminated = parse_constraints(constraints, cfm)
+    assert len(require) == 1
+    assert len(exclude) == 0
+    assert len(eliminated) == 0
+    assert require[0] == constraint
+
+
+def test_parse_constraint_can_parse_constraint_with_one_exclude_rule():
+    constraints = Element("constraints")
+    rule = SubElement(constraints, "rule")
+    imp = SubElement(rule, "imp")
+    negation = SubElement(imp, "not")
+    SubElement(negation, "var").text = "Bread"
+    SubElement(imp, "var").text = "Bread"
+    feature = Feature(
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+    )
+    cfm = CFM([feature], [], [])
+
+    constraint = Constraint(
+        True,
+        feature,
+        feature.instance_cardinality,
+        feature,
+        feature.instance_cardinality,
+    )
+
+    require, exclude, eliminated = parse_constraints(constraints, cfm)
+    assert len(require) == 0
+    assert len(exclude) == 1
+    assert len(eliminated) == 0
+    assert exclude[0] == constraint
+
+
+def test_parse_constraint_can_parse_constraint_with_both_formulas_negative():
+    constraints = Element("constraints")
+    rule = SubElement(constraints, "rule")
+    imp = SubElement(rule, "imp")
+    first_negation = SubElement(imp, "not")
+    SubElement(first_negation, "var").text = "Bread"
+    second_negation = SubElement(imp, "not")
+    SubElement(second_negation, "var").text = "Cheese"
+
+    bread_feature = Feature(
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+    )
+
+    cheese_feature = Feature(
+        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+    )
+
+    constraint = Constraint(
+        True,
+        cheese_feature,
+        cheese_feature.instance_cardinality,
+        bread_feature,
+        bread_feature.instance_cardinality,
+    )
+
+    cfm = CFM([bread_feature, cheese_feature], [], [])
+
+    require, exclude, eliminated = parse_constraints(constraints, cfm)
+    assert len(require) == 1
+    assert len(exclude) == 0
+    assert len(eliminated) == 0
+    assert require[0] == constraint
+
+
+@pytest.mark.parametrize(
+    ["formula", "expectation"],
+    [("conj", set([0])), ("disj", set([0])), ("eq", set([0]))],
+)
+def test_parse_constraint_can_parse_constraint_with_elimination(
+    formula: str, expectation: set[int]
+):
+    constraint = Element("constraints")
+    rule = SubElement(constraint, "rule")
+    SubElement(rule, formula)
+    cfm = CFM([], [], [])
+    require, exclude, eliminated = parse_constraints(constraint, cfm)
+
+    assert len(require) == 0
+    assert len(exclude) == 0
+    assert len(eliminated) == 1
+    assert eliminated == expectation

@@ -3,7 +3,11 @@ from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
 from cfmtoolbox import app
-from cfmtoolbox.models import CFM, Cardinality, Feature, Interval
+from cfmtoolbox.models import CFM, Cardinality, Constraint, Feature, Interval
+
+
+class TooComplexConstraintError(Exception):
+    pass
 
 
 class NodeTypes(Enum):
@@ -11,6 +15,15 @@ class NodeTypes(Enum):
     OR = "or"
     ALT = "alt"
     FEATURE = "feature"
+
+
+class FormulaTypes(Enum):
+    CONJ = "conj"
+    DISJ = "disj"
+    NOT = "not"
+    IMP = "imp"
+    EQ = "eq"
+    VAR = "var"
 
 
 def parse_instance_cardinality(is_mandatory: bool) -> Cardinality:
@@ -77,6 +90,79 @@ def traverse_xml(element: Element | None, cfm: CFM) -> list[Feature]:
     return cfm.features
 
 
+def parse_formula(formula: Element, cfm: CFM) -> tuple[bool, Feature]:
+    if len(formula) == 0 and formula.tag == FormulaTypes.VAR.value:
+        if formula.text is None:
+            raise TypeError("No valid feature name found in formula")
+
+        return (True, cfm.find_feature(formula.text))
+
+    if len(formula) != 1:
+        raise TooComplexConstraintError()
+
+    if formula.tag == FormulaTypes.NOT.value:
+        value, feature = parse_formula(formula[0], cfm)
+        return (not value, feature)
+
+    else:
+        raise TooComplexConstraintError()
+
+
+def parse_constraints(
+    constraints: Element | None, cfm: CFM
+) -> tuple[list[Constraint], list[Constraint], set[int]]:
+    require_constraints: list[Constraint] = []
+    exclude_constraints: list[Constraint] = []
+    eliminated_constraints: set[int] = set()
+
+    if constraints is None or len(constraints) == 0:
+        return (require_constraints, exclude_constraints, eliminated_constraints)
+
+    for index, rule in enumerate(constraints):
+        if rule.tag != "rule":
+            raise TypeError(f"Unknown constraint tag: {rule.tag}")
+
+        if len(rule) != 1:
+            raise TypeError("No valid constraint rule found in constraints")
+
+        if rule[0].tag == FormulaTypes.IMP.value:
+            try:
+                first_feature = parse_formula(rule[0][0], cfm)
+                second_feature = parse_formula(rule[0][1], cfm)
+            except TooComplexConstraintError:
+                eliminated_constraints.add(index)
+                continue
+
+            constraint = (
+                Constraint(
+                    require=True,
+                    first_feature=first_feature[1],
+                    first_cardinality=first_feature[1].instance_cardinality,
+                    second_feature=second_feature[1],
+                    second_cardinality=second_feature[1].instance_cardinality,
+                )
+                if (first_feature[0] or second_feature[0])
+                else Constraint(
+                    require=True,
+                    first_feature=second_feature[1],
+                    first_cardinality=second_feature[1].instance_cardinality,
+                    second_feature=first_feature[1],
+                    second_cardinality=first_feature[1].instance_cardinality,
+                )
+            )
+
+            if first_feature[0] == second_feature[0]:
+                require_constraints.append(constraint)
+
+            else:
+                exclude_constraints.append(constraint)
+
+        else:
+            eliminated_constraints.add(index)
+
+    return (require_constraints, exclude_constraints, eliminated_constraints)
+
+
 def parse_cfm(root: Element) -> CFM:
     cfm = CFM([], [], [])
     struct = root.find("struct")
@@ -88,7 +174,12 @@ def parse_cfm(root: Element) -> CFM:
     root_feature = parse_feature(root_struct)
     cfm.add_feature(root_feature)
     features = traverse_xml(root_struct, cfm)
-    return CFM(features, [], [])
+    require_constraints, exclude_constraints, eliminated_constraints = (
+        parse_constraints(root.find("constraints"), cfm)
+    )
+    print("The following constraints were exterminated:", eliminated_constraints)
+
+    return CFM(features, require_constraints, exclude_constraints)
 
 
 @app.importer(".xml")
