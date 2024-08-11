@@ -62,5 +62,14 @@
 				<var>Lettuce</var>
 			</imp>
 		</rule>
+		<rule>
+			<imp>
+				<conj>
+					<var>Bread</var>
+					<var>Swiss</var>
+				</conj>
+				<var>Tomato</var>
+			</imp>
+		</rule>
 	</constraints>
 </featureModel>
