@@ -313,8 +313,3 @@ def test_generate_random_children_with_random_cardinality(
 def test_get_global_upper_bound(model: CFM, random_sampler: RandomSampler):
     feature = model.features[0]
     assert random_sampler.get_global_upper_bound(feature) == 12
-
-
-def test_generate_feature_node(model: CFM, random_sampler: RandomSampler):
-    feature = model.features[0]
-    assert random_sampler.generate_random_feature_node(feature).validate(model)
