@@ -464,11 +464,11 @@ def test_validate_feature_instance(feature_instance: FeatureNode, expectation: b
         ),
     ],
 )
-def test_calculate_global_feature_count(
+def test_initialize_global_feature_count(
     feature_instance: FeatureNode, expectation: defaultdict[str, int]
 ):
     global_feature_count: defaultdict[str, int] = defaultdict(int)
-    feature_instance.calculate_global_feature_count(global_feature_count)
+    feature_instance.initialize_global_feature_count(global_feature_count)
     assert global_feature_count == expectation
 
 
