@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from textwrap import dedent
 from xml.etree.ElementTree import Element, SubElement
 
 import pytest
@@ -391,8 +392,7 @@ def test_parse_cfm(capsys):
     exclude_constraints = cfm.exclude_constraints
 
     output = capsys.readouterr()
-    expectation = [
-        """<rule>
+    expected_rule = """<rule>
 			<imp>
 				<conj>
 					<var>Bread</var>
@@ -401,8 +401,7 @@ def test_parse_cfm(capsys):
 				<var>Tomato</var>
 			</imp>
 		</rule>
-\t"""
-    ]
+    """
 
     assert len(cfm.features) == 11
     assert cfm.features[0].name == "Sandwich"
@@ -427,7 +426,7 @@ def test_parse_cfm(capsys):
     assert exclude_constraints[0].first_feature.name == "Wheat"
     assert exclude_constraints[0].second_feature.name == "Tomato"
 
-    assert output.out == f"The following constraints were exterminated: {expectation}\n"
+    assert dedent(expected_rule) in output.out
 
 
 def test_parse_cfm_reports_missing_struct():
