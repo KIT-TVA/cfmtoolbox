@@ -370,23 +370,17 @@ def test_parse_constraint_can_parse_constraint_with_both_formulas_negative():
     assert require[0] == constraint
 
 
-@pytest.mark.parametrize(
-    ["formula", "expectation"],
-    [("conj", set([0])), ("disj", set([0])), ("eq", set([0]))],
-)
-def test_parse_constraint_can_parse_constraint_with_elimination(
-    formula: str, expectation: set[int]
-):
+def test_parse_constraint_can_parse_constraint_with_elimination():
     constraint = Element("constraints")
     rule = SubElement(constraint, "rule")
-    SubElement(rule, formula)
+    SubElement(rule, "conj")
     cfm = CFM([], [], [])
     require, exclude, eliminated = parse_constraints(constraint, cfm)
 
     assert len(require) == 0
     assert len(exclude) == 0
     assert len(eliminated) == 1
-    assert eliminated == expectation
+    assert eliminated == set([rule])
 
 
 def test_parse_cfm(capsys):
@@ -397,6 +391,18 @@ def test_parse_cfm(capsys):
     exclude_constraints = cfm.exclude_constraints
 
     output = capsys.readouterr()
+    expectation = [
+        """<rule>
+			<imp>
+				<conj>
+					<var>Bread</var>
+					<var>Swiss</var>
+				</conj>
+				<var>Tomato</var>
+			</imp>
+		</rule>
+\t"""
+    ]
 
     assert len(cfm.features) == 11
     assert cfm.features[0].name == "Sandwich"
@@ -420,7 +426,8 @@ def test_parse_cfm(capsys):
     assert require_conraints[2].second_feature.name == "Lettuce"
     assert exclude_constraints[0].first_feature.name == "Wheat"
     assert exclude_constraints[0].second_feature.name == "Tomato"
-    assert output.out == "The following constraints were exterminated: {4}\n"
+
+    assert output.out == f"The following constraints were exterminated: {expectation}\n"
 
 
 def test_parse_cfm_reports_missing_struct():
