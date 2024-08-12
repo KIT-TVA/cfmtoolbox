@@ -156,7 +156,6 @@ def parse_constraints(
 
         if first_feature_value == second_feature_value:
             require_constraints.append(constraint)
-
         else:
             exclude_constraints.append(constraint)
 
