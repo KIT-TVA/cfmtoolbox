@@ -106,15 +106,15 @@ def parse_formula_value_and_feature(formula: Element, cfm: CFM) -> tuple[bool, F
 
 def parse_constraints(
     constraints: Element | None, cfm: CFM
-) -> tuple[list[Constraint], list[Constraint], set[int]]:
+) -> tuple[list[Constraint], list[Constraint], set[Element]]:
     require_constraints: list[Constraint] = []
     exclude_constraints: list[Constraint] = []
-    eliminated_constraints: set[int] = set()
+    eliminated_constraints: set[Element] = set()
 
     if constraints is None or len(constraints) == 0:
         return (require_constraints, exclude_constraints, eliminated_constraints)
 
-    for index, rule in enumerate(constraints):
+    for rule in constraints:
         if rule.tag != "rule":
             raise TypeError(f"Unknown constraint tag: {rule.tag}")
 
@@ -122,7 +122,7 @@ def parse_constraints(
             raise TypeError("No valid constraint rule found in constraints")
 
         if rule[0].tag != FormulaTypes.IMP.value:
-            eliminated_constraints.add(index)
+            eliminated_constraints.add(rule)
             return (require_constraints, exclude_constraints, eliminated_constraints)
 
         try:
@@ -133,7 +133,7 @@ def parse_constraints(
                 rule[0][1], cfm
             )
         except TooComplexConstraintError:
-            eliminated_constraints.add(index)
+            eliminated_constraints.add(rule)
             continue
 
         constraint = (
@@ -156,6 +156,7 @@ def parse_constraints(
 
         if first_feature_value == second_feature_value:
             require_constraints.append(constraint)
+
         else:
             exclude_constraints.append(constraint)
 
@@ -176,7 +177,16 @@ def parse_cfm(root: Element) -> CFM:
     require_constraints, exclude_constraints, eliminated_constraints = (
         parse_constraints(root.find("constraints"), cfm)
     )
-    print("The following constraints were exterminated:", eliminated_constraints)
+
+    formatted_eliminated_constraints = list(
+        map(
+            (lambda x: ElementTree.tostring(x, encoding="unicode")),
+            eliminated_constraints,
+        )
+    )
+    print(
+        "The following constraints were exterminated:", formatted_eliminated_constraints
+    )
 
     return CFM(features, require_constraints, exclude_constraints)
 
