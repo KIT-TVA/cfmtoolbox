@@ -181,7 +181,9 @@ def parse_cfm(root: Element) -> CFM:
         ElementTree.tostring(e, encoding="unicode") for e in eliminated_constraints
     ]
     print(
-        "The following constraints were exterminated:", formatted_eliminated_constraints
+        "The following constraints were exterminated:",
+        *formatted_eliminated_constraints,
+        sep="\n",
     )
 
     return CFM(features, require_constraints, exclude_constraints)
