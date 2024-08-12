@@ -177,12 +177,9 @@ def parse_cfm(root: Element) -> CFM:
         parse_constraints(root.find("constraints"), cfm)
     )
 
-    formatted_eliminated_constraints = list(
-        map(
-            (lambda x: ElementTree.tostring(x, encoding="unicode")),
-            eliminated_constraints,
-        )
-    )
+    formatted_eliminated_constraints = [
+        ElementTree.tostring(e, encoding="unicode") for e in eliminated_constraints
+    ]
     print(
         "The following constraints were exterminated:", formatted_eliminated_constraints
     )
