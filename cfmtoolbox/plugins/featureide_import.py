@@ -121,44 +121,43 @@ def parse_constraints(
         if len(rule) != 1:
             raise TypeError("No valid constraint rule found in constraints")
 
-        if rule[0].tag == FormulaTypes.IMP.value:
-            try:
-                first_feature_value, first_feature = parse_formula_value_and_feature(
-                    rule[0][0], cfm
-                )
-                second_feature_value, second_feature = parse_formula_value_and_feature(
-                    rule[0][1], cfm
-                )
-            except TooComplexConstraintError:
-                eliminated_constraints.add(index)
-                continue
-
-            constraint = (
-                Constraint(
-                    require=True,
-                    first_feature=first_feature,
-                    first_cardinality=first_feature.instance_cardinality,
-                    second_feature=second_feature,
-                    second_cardinality=second_feature.instance_cardinality,
-                )
-                if (first_feature_value or second_feature_value)
-                else Constraint(
-                    require=True,
-                    first_feature=second_feature,
-                    first_cardinality=second_feature.instance_cardinality,
-                    second_feature=first_feature,
-                    second_cardinality=first_feature.instance_cardinality,
-                )
-            )
-
-            if first_feature_value == second_feature_value:
-                require_constraints.append(constraint)
-
-            else:
-                exclude_constraints.append(constraint)
-
-        else:
+        if rule[0].tag != FormulaTypes.IMP.value:
             eliminated_constraints.add(index)
+            return (require_constraints, exclude_constraints, eliminated_constraints)
+
+        try:
+            first_feature_value, first_feature = parse_formula_value_and_feature(
+                rule[0][0], cfm
+            )
+            second_feature_value, second_feature = parse_formula_value_and_feature(
+                rule[0][1], cfm
+            )
+        except TooComplexConstraintError:
+            eliminated_constraints.add(index)
+            continue
+
+        constraint = (
+            Constraint(
+                require=True,
+                first_feature=first_feature,
+                first_cardinality=first_feature.instance_cardinality,
+                second_feature=second_feature,
+                second_cardinality=second_feature.instance_cardinality,
+            )
+            if (first_feature_value or second_feature_value)
+            else Constraint(
+                require=True,
+                first_feature=second_feature,
+                first_cardinality=second_feature.instance_cardinality,
+                second_feature=first_feature,
+                second_cardinality=first_feature.instance_cardinality,
+            )
+        )
+
+        if first_feature_value == second_feature_value:
+            require_constraints.append(constraint)
+        else:
+            exclude_constraints.append(constraint)
 
     return (require_constraints, exclude_constraints, eliminated_constraints)
 
