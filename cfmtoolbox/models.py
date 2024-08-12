@@ -1,5 +1,5 @@
+from collections import defaultdict
 from dataclasses import dataclass
-from typing import TypedDict
 
 
 @dataclass
@@ -44,6 +44,14 @@ class Feature:
     def is_required(self) -> bool:
         return self.instance_cardinality.intervals[0].lower != 0
 
+    def add_parent(self, parent: "Feature"):
+        if parent not in self.parents:
+            self.parents.append(parent)
+
+    def add_child(self, child: "Feature"):
+        if child not in self.children:
+            self.children.append(child)
+
 
 @dataclass
 class Constraint:
@@ -63,7 +71,103 @@ class CFM:
     require_constraints: list[Constraint]
     exclude_constraints: list[Constraint]
 
+    def add_feature(self, feature: Feature):
+        if feature not in self.features:
+            self.features.append(feature)
 
-class FeatureNode(TypedDict):
+    def find_feature(self, name: str) -> Feature:
+        for feature in self.features:
+            if feature.name == name:
+                return feature
+        raise ValueError(f"Feature {name} not found")
+
+
+@dataclass
+class FeatureNode:
     value: str
     children: list["FeatureNode"]
+
+    def validate(self, cfm: CFM) -> bool:
+        # Check if root feature is valid
+        root_feature = cfm.features[0]
+        if root_feature.name != self.value.split("#")[0]:
+            return False
+
+        if not self.validate_children(root_feature):
+            return False
+
+        return self.validate_constraints(cfm)
+
+    def validate_constraints(self, cfm: CFM) -> bool:
+        global_feature_count: defaultdict[str, int] = defaultdict(int)
+        self.initialize_global_feature_count(global_feature_count)
+
+        # Check require constraints
+        for constraint in cfm.require_constraints:
+            if constraint.first_cardinality.is_valid_cardinality(
+                global_feature_count[constraint.first_feature.name]
+            ) and not constraint.second_cardinality.is_valid_cardinality(
+                global_feature_count[constraint.second_feature.name]
+            ):
+                return False
+
+        # Check exclude constraints
+        for constraint in cfm.exclude_constraints:
+            if constraint.first_cardinality.is_valid_cardinality(
+                global_feature_count[constraint.first_feature.name]
+            ) and constraint.second_cardinality.is_valid_cardinality(
+                global_feature_count[constraint.second_feature.name]
+            ):
+                return False
+
+        return True
+
+    def initialize_global_feature_count(
+        self, global_feature_count: defaultdict[str, int]
+    ):
+        global_feature_count[self.value.split("#")[0]] += 1
+
+        for child in self.children:
+            child.initialize_global_feature_count(global_feature_count)
+
+    def validate_children(self, feature: Feature) -> bool:
+        if not feature.children:
+            return not self.children
+
+        # Check group instance cardinality of feature
+        if not feature.group_instance_cardinality.is_valid_cardinality(
+            len(self.children)
+        ):
+            return False
+
+        # Check group type cardinality of feature
+        partitioned_children = self.partition_children(feature)
+        if not feature.group_type_cardinality.is_valid_cardinality(
+            len([1 for i in partitioned_children if i])
+        ):
+            return False
+
+        # Check instance cardinality of children
+        for model_child, children in zip(feature.children, partitioned_children):
+            if not model_child.instance_cardinality.is_valid_cardinality(len(children)):
+                return False
+
+            # Check children recursively
+            if any(not child.validate_children(model_child) for child in children):
+                return False
+
+        return True
+
+    def partition_children(self, feature: Feature) -> list[list["FeatureNode"]]:
+        sublists = []
+        i = 0
+        for model_child in feature.children:
+            sublist = []
+            while i < len(self.children):
+                if self.children[i].value.split("#")[0] == model_child.name:
+                    sublist.append(self.children[i])
+                    i += 1
+                else:
+                    break
+            sublists.append(sublist)
+        return sublists
