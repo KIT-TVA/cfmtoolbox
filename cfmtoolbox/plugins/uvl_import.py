@@ -42,76 +42,27 @@ class CustomListener(UVLPythonListener):
         self.constraints: list[Constraint] = []
         self.constraint_types: list[ConstraintType] = []
         self.feature_map: Dict[str, Feature] = {}
-
-    def enterFeatureModel(self, ctx: UVLPythonParser.FeatureModelContext):
-        super().enterFeatureModel(ctx)
-
-    def exitFeatureModel(self, ctx: UVLPythonParser.FeatureModelContext):
-        super().exitFeatureModel(ctx)
-
-    def enterIncludes(self, ctx: UVLPythonParser.IncludesContext):
-        super().enterIncludes(ctx)
-
-    def exitIncludes(self, ctx: UVLPythonParser.IncludesContext):
-        super().exitIncludes(ctx)
-
-    def enterIncludeLine(self, ctx: UVLPythonParser.IncludeLineContext):
-        super().enterIncludeLine(ctx)
-
-    def exitIncludeLine(self, ctx: UVLPythonParser.IncludeLineContext):
-        super().exitIncludeLine(ctx)
-
-    def enterNamespace(self, ctx: UVLPythonParser.NamespaceContext):
-        super().enterNamespace(ctx)
-
-    def exitNamespace(self, ctx: UVLPythonParser.NamespaceContext):
-        super().exitNamespace(ctx)
-
-    def enterImports(self, ctx: UVLPythonParser.ImportsContext):
-        super().enterImports(ctx)
-
-    def exitImports(self, ctx: UVLPythonParser.ImportsContext):
-        super().exitImports(ctx)
-
-    def enterImportLine(self, ctx: UVLPythonParser.ImportLineContext):
-        super().enterImportLine(ctx)
-
-    def exitImportLine(self, ctx: UVLPythonParser.ImportLineContext):
-        super().exitImportLine(ctx)
-
-    def enterFeatures(self, ctx: UVLPythonParser.FeaturesContext):
-        super().enterFeatures(ctx)
-
-    def exitFeatures(self, ctx: UVLPythonParser.FeaturesContext):
-        super().exitFeatures(ctx)
-
-    def enterOrGroup(self, ctx: UVLPythonParser.OrGroupContext):
-        super().enterOrGroup(ctx)
+        self.references_set: set[str] = set()
 
     def exitOrGroup(self, ctx: UVLPythonParser.OrGroupContext):
         group_specs: list[Feature] = self.groupSpecs.pop()
         self.groups.append((Cardinality([Interval(-2, -2)]), group_specs))
 
-    def enterAlternativeGroup(self, ctx: UVLPythonParser.AlternativeGroupContext):
-        super().enterAlternativeGroup(ctx)
-
     def exitAlternativeGroup(self, ctx: UVLPythonParser.AlternativeGroupContext):
         group_specs: list[Feature] = self.groupSpecs.pop()
         self.groups.append((Cardinality([Interval(-3, -3)]), group_specs))
-
-    def enterOptionalGroup(self, ctx: UVLPythonParser.OptionalGroupContext):
-        super().enterOptionalGroup(ctx)
 
     def exitOptionalGroup(self, ctx: UVLPythonParser.OptionalGroupContext):
         group_specs: list[Feature] = self.groupSpecs.pop()
         for feature in group_specs:
             intervals = feature.instance_cardinality.intervals
-            if len(intervals) == 0 or intervals[0].upper == 0:
+            if len(intervals) >= 1 and intervals[0].lower != 0:
+                feature.instance_cardinality.intervals = [
+                    Interval(0, intervals[0].upper)
+                ]
+            elif len(intervals) == 0 or intervals[0].upper == 0:
                 feature.instance_cardinality = Cardinality([Interval(0, 1)])
         self.groups.append((Cardinality([Interval(-4, -4)]), group_specs))
-
-    def enterMandatoryGroup(self, ctx: UVLPythonParser.MandatoryGroupContext):
-        super().enterMandatoryGroup(ctx)
 
     def exitMandatoryGroup(self, ctx: UVLPythonParser.MandatoryGroupContext):
         group_specs: list[Feature] = self.groupSpecs.pop()
@@ -120,9 +71,6 @@ class CustomListener(UVLPythonListener):
             if len(intervals) == 0 or intervals[0].lower == 0:
                 feature.instance_cardinality.intervals = [Interval(1, 1)]
         self.groups.append((Cardinality([Interval(-1, -1)]), group_specs))
-
-    def enterCardinalityGroup(self, ctx: UVLPythonParser.CardinalityGroupContext):
-        super().enterCardinalityGroup(ctx)
 
     def exitCardinalityGroup(self, ctx: UVLPythonParser.CardinalityGroupContext):
         group_specs: list[Feature] = self.groupSpecs.pop()
@@ -152,6 +100,9 @@ class CustomListener(UVLPythonListener):
     def enterFeature(self, ctx: UVLPythonParser.FeatureContext):
         self.cardinalityAvailable.append(False)
         self.groupsPresent.append(len(self.groups))
+
+    def exitFeatures(self, ctx: UVLPythonParser.FeaturesContext):
+        self.references_set = set()
 
     def exitFeature(self, ctx: UVLPythonParser.FeatureContext):
         name: str = self.references.pop()
@@ -186,25 +137,30 @@ class CustomListener(UVLPythonListener):
                 for index, group in enumerate(self.groups[-new_groups:]):
                     cardinality: Cardinality = group[0]
                     features = group[1]
-                    if len(cardinality.intervals) == 0:
+                    if cardinality.intervals[0] == Interval(-1, -1):  # mandatory
+                        length = len(features)
+                        group_type_cardinality = Cardinality([Interval(length, length)])
+                        group_instance_cardinality = Cardinality(
+                            [Interval(length, None)]
+                        )
+                    elif cardinality.intervals[0] == Interval(-2, -2):  # or
+                        group_type_cardinality = Cardinality(
+                            [Interval(1, len(features))]
+                        )
+                        group_instance_cardinality = Cardinality([Interval(1, None)])
+                    elif cardinality.intervals[0] == Interval(-3, -3):  # alternative
+                        group_type_cardinality = Cardinality([Interval(1, 1)])
+                        group_instance_cardinality = Cardinality([Interval(1, None)])
+                    elif cardinality.intervals[0] == Interval(-4, -4):  # optional
+                        group_type_cardinality = Cardinality(
+                            [Interval(0, len(features))]
+                        )
+                        group_instance_cardinality = Cardinality([Interval(0, None)])
+                    else:  # group cardinality
                         group_type_cardinality = Cardinality(
                             [Interval(0, len(features))]
                         )
                         group_instance_cardinality = cardinality
-                    else:
-                        if cardinality.intervals[0] == Interval(1, None):
-                            group_type_cardinality = cardinality
-                            group_instance_cardinality = cardinality
-                        elif cardinality.intervals[0] == Interval(1, 1):
-                            group_type_cardinality = cardinality
-                            group_instance_cardinality = Cardinality(
-                                [Interval(1, None)]
-                            )
-                        else:
-                            group_type_cardinality = Cardinality(
-                                [Interval(0, len(features))]
-                            )
-                            group_instance_cardinality = cardinality
                     feature = Feature(
                         f"{name}_{index}",
                         Cardinality([]),
@@ -225,8 +181,10 @@ class CustomListener(UVLPythonListener):
                     )
                 self.feature_map[name] = parent_feature
                 self.features.append(parent_feature)
+                self.groups = self.groups[:-new_groups]
+                if len(self.groupFeaturesCount) > 0:
+                    self.groupFeaturesCount[-1] += 1
             else:
-                # group cardinality might be wrong, example is alternative, so it should be type of [1, 1], but is [0, 2]
                 group = self.groups.pop()
                 cardinality = group[0]
                 features = group[1]
@@ -259,9 +217,6 @@ class CustomListener(UVLPythonListener):
                 if len(self.groupFeaturesCount) > 0:
                     self.groupFeaturesCount[-1] += 1
 
-    def enterFeatureCardinality(self, ctx: UVLPythonParser.FeatureCardinalityContext):
-        super().enterFeatureCardinality(ctx)
-
     def exitFeatureCardinality(self, ctx: UVLPythonParser.FeatureCardinalityContext):
         text: str = ctx.getText()
         interval_str: str = text[text.index("[") + 1 : text.index("]")]
@@ -279,77 +234,6 @@ class CustomListener(UVLPythonListener):
         cardinality: Cardinality = Cardinality([interval])
         self.featureCardinalities.append(cardinality)
         self.cardinalityAvailable[-1] = True
-
-    def enterAttributes(self, ctx: UVLPythonParser.AttributesContext):
-        super().enterAttributes(ctx)
-
-    def exitAttributes(self, ctx: UVLPythonParser.AttributesContext):
-        super().exitAttributes(ctx)
-
-    def enterAttribute(self, ctx: UVLPythonParser.AttributeContext):
-        super().enterAttribute(ctx)
-
-    def exitAttribute(self, ctx: UVLPythonParser.AttributeContext):
-        super().exitAttribute(ctx)
-
-    def enterValueAttribute(self, ctx: UVLPythonParser.ValueAttributeContext):
-        super().enterValueAttribute(ctx)
-
-    def exitValueAttribute(self, ctx: UVLPythonParser.ValueAttributeContext):
-        super().exitValueAttribute(ctx)
-
-    def enterKey(self, ctx: UVLPythonParser.KeyContext):
-        super().enterKey(ctx)
-
-    def exitKey(self, ctx: UVLPythonParser.KeyContext):
-        super().exitKey(ctx)
-
-    def enterValue(self, ctx: UVLPythonParser.ValueContext):
-        super().enterValue(ctx)
-
-    def exitValue(self, ctx: UVLPythonParser.ValueContext):
-        super().exitValue(ctx)
-
-    def enterVector(self, ctx: UVLPythonParser.VectorContext):
-        super().enterVector(ctx)
-
-    def exitVector(self, ctx: UVLPythonParser.VectorContext):
-        super().exitVector(ctx)
-
-    def enterSingleConstraintAttribute(
-        self, ctx: UVLPythonParser.SingleConstraintAttributeContext
-    ):
-        super().enterSingleConstraintAttribute(ctx)
-
-    def exitSingleConstraintAttribute(
-        self, ctx: UVLPythonParser.SingleConstraintAttributeContext
-    ):
-        super().exitSingleConstraintAttribute(ctx)
-
-    def enterListConstraintAttribute(
-        self, ctx: UVLPythonParser.ListConstraintAttributeContext
-    ):
-        super().enterListConstraintAttribute(ctx)
-
-    def exitListConstraintAttribute(
-        self, ctx: UVLPythonParser.ListConstraintAttributeContext
-    ):
-        super().exitListConstraintAttribute(ctx)
-
-    def enterConstraintList(self, ctx: UVLPythonParser.ConstraintListContext):
-        super().enterConstraintList(ctx)
-
-    def exitConstraintList(self, ctx: UVLPythonParser.ConstraintListContext):
-        super().exitConstraintList(ctx)
-
-    def enterConstraints(self, ctx: UVLPythonParser.ConstraintsContext):
-        super().enterConstraints(ctx)
-
-    def exitConstraints(self, ctx: UVLPythonParser.ConstraintsContext):
-        super().exitConstraints(ctx)
-
-    def enterConstraintLine(self, ctx: UVLPythonParser.ConstraintLineContext):
-        super().enterConstraintLine(ctx)
 
     def exitConstraintLine(self, ctx: UVLPythonParser.ConstraintLineContext):
         ref_2 = self.references.pop()
@@ -388,290 +272,22 @@ class CustomListener(UVLPythonListener):
         else:
             print(f"ERROR, operation {op} not supported yet")
 
-    def enterOrConstraint(self, ctx: UVLPythonParser.OrConstraintContext):
-        super().enterOrConstraint(ctx)
-
-    def exitOrConstraint(self, ctx: UVLPythonParser.OrConstraintContext):
-        super().exitOrConstraint(ctx)
-
-    def enterEquationConstraint(self, ctx: UVLPythonParser.EquationConstraintContext):
-        super().enterEquationConstraint(ctx)
-
-    def exitEquationConstraint(self, ctx: UVLPythonParser.EquationConstraintContext):
-        super().exitEquationConstraint(ctx)
-
-    def enterLiteralConstraint(self, ctx: UVLPythonParser.LiteralConstraintContext):
-        super().enterLiteralConstraint(ctx)
-
-    def exitLiteralConstraint(self, ctx: UVLPythonParser.LiteralConstraintContext):
-        super().exitLiteralConstraint(ctx)
-
-    def enterParenthesisConstraint(
-        self, ctx: UVLPythonParser.ParenthesisConstraintContext
-    ):
-        super().enterParenthesisConstraint(ctx)
-
-    def exitParenthesisConstraint(
-        self, ctx: UVLPythonParser.ParenthesisConstraintContext
-    ):
-        super().exitParenthesisConstraint(ctx)
-
-    def enterNotConstraint(self, ctx: UVLPythonParser.NotConstraintContext):
-        super().enterNotConstraint(ctx)
-
-    def exitNotConstraint(self, ctx: UVLPythonParser.NotConstraintContext):
-        super().exitNotConstraint(ctx)
-
-    def enterAndConstraint(self, ctx: UVLPythonParser.AndConstraintContext):
-        super().enterAndConstraint(ctx)
-
-    def exitAndConstraint(self, ctx: UVLPythonParser.AndConstraintContext):
-        super().exitAndConstraint(ctx)
-
-    def enterEquivalenceConstraint(
-        self, ctx: UVLPythonParser.EquivalenceConstraintContext
-    ):
-        super().enterEquivalenceConstraint(ctx)
-
     def exitEquivalenceConstraint(
         self, ctx: UVLPythonParser.EquivalenceConstraintContext
     ):
         self.constraint_types.append(ConstraintType.EQUIVALENCE)
-
-    def enterImplicationConstraint(
-        self, ctx: UVLPythonParser.ImplicationConstraintContext
-    ):
-        super().enterImplicationConstraint(ctx)
 
     def exitImplicationConstraint(
         self, ctx: UVLPythonParser.ImplicationConstraintContext
     ):
         self.constraint_types.append(ConstraintType.IMPLICATION)
 
-    def enterEqualEquation(self, ctx: UVLPythonParser.EqualEquationContext):
-        super().enterEqualEquation(ctx)
-
-    def exitEqualEquation(self, ctx: UVLPythonParser.EqualEquationContext):
-        super().exitEqualEquation(ctx)
-
-    def enterLowerEquation(self, ctx: UVLPythonParser.LowerEquationContext):
-        super().enterLowerEquation(ctx)
-
-    def exitLowerEquation(self, ctx: UVLPythonParser.LowerEquationContext):
-        super().exitLowerEquation(ctx)
-
-    def enterGreaterEquation(self, ctx: UVLPythonParser.GreaterEquationContext):
-        super().enterGreaterEquation(ctx)
-
-    def exitGreaterEquation(self, ctx: UVLPythonParser.GreaterEquationContext):
-        super().exitGreaterEquation(ctx)
-
-    def enterLowerEqualsEquation(self, ctx: UVLPythonParser.LowerEqualsEquationContext):
-        super().enterLowerEqualsEquation(ctx)
-
-    def exitLowerEqualsEquation(self, ctx: UVLPythonParser.LowerEqualsEquationContext):
-        super().exitLowerEqualsEquation(ctx)
-
-    def enterGreaterEqualsEquation(
-        self, ctx: UVLPythonParser.GreaterEqualsEquationContext
-    ):
-        super().enterGreaterEqualsEquation(ctx)
-
-    def exitGreaterEqualsEquation(
-        self, ctx: UVLPythonParser.GreaterEqualsEquationContext
-    ):
-        super().exitGreaterEqualsEquation(ctx)
-
-    def enterNotEqualsEquation(self, ctx: UVLPythonParser.NotEqualsEquationContext):
-        super().enterNotEqualsEquation(ctx)
-
-    def exitNotEqualsEquation(self, ctx: UVLPythonParser.NotEqualsEquationContext):
-        super().exitNotEqualsEquation(ctx)
-
-    def enterBracketExpression(self, ctx: UVLPythonParser.BracketExpressionContext):
-        super().enterBracketExpression(ctx)
-
-    def exitBracketExpression(self, ctx: UVLPythonParser.BracketExpressionContext):
-        super().exitBracketExpression(ctx)
-
-    def enterAggregateFunctionExpression(
-        self, ctx: UVLPythonParser.AggregateFunctionExpressionContext
-    ):
-        super().enterAggregateFunctionExpression(ctx)
-
-    def exitAggregateFunctionExpression(
-        self, ctx: UVLPythonParser.AggregateFunctionExpressionContext
-    ):
-        super().exitAggregateFunctionExpression(ctx)
-
-    def enterFloatLiteralExpression(
-        self, ctx: UVLPythonParser.FloatLiteralExpressionContext
-    ):
-        super().enterFloatLiteralExpression(ctx)
-
-    def exitFloatLiteralExpression(
-        self, ctx: UVLPythonParser.FloatLiteralExpressionContext
-    ):
-        super().exitFloatLiteralExpression(ctx)
-
-    def enterStringLiteralExpression(
-        self, ctx: UVLPythonParser.StringLiteralExpressionContext
-    ):
-        super().enterStringLiteralExpression(ctx)
-
-    def exitStringLiteralExpression(
-        self, ctx: UVLPythonParser.StringLiteralExpressionContext
-    ):
-        super().exitStringLiteralExpression(ctx)
-
-    def enterAddExpression(self, ctx: UVLPythonParser.AddExpressionContext):
-        super().enterAddExpression(ctx)
-
-    def exitAddExpression(self, ctx: UVLPythonParser.AddExpressionContext):
-        super().exitAddExpression(ctx)
-
-    def enterIntegerLiteralExpression(
-        self, ctx: UVLPythonParser.IntegerLiteralExpressionContext
-    ):
-        super().enterIntegerLiteralExpression(ctx)
-
-    def exitIntegerLiteralExpression(
-        self, ctx: UVLPythonParser.IntegerLiteralExpressionContext
-    ):
-        super().exitIntegerLiteralExpression(ctx)
-
-    def enterLiteralExpression(self, ctx: UVLPythonParser.LiteralExpressionContext):
-        super().enterLiteralExpression(ctx)
-
-    def exitLiteralExpression(self, ctx: UVLPythonParser.LiteralExpressionContext):
-        super().exitLiteralExpression(ctx)
-
-    def enterDivExpression(self, ctx: UVLPythonParser.DivExpressionContext):
-        super().enterDivExpression(ctx)
-
-    def exitDivExpression(self, ctx: UVLPythonParser.DivExpressionContext):
-        super().exitDivExpression(ctx)
-
-    def enterSubExpression(self, ctx: UVLPythonParser.SubExpressionContext):
-        super().enterSubExpression(ctx)
-
-    def exitSubExpression(self, ctx: UVLPythonParser.SubExpressionContext):
-        super().exitSubExpression(ctx)
-
-    def enterMulExpression(self, ctx: UVLPythonParser.MulExpressionContext):
-        super().enterMulExpression(ctx)
-
-    def exitMulExpression(self, ctx: UVLPythonParser.MulExpressionContext):
-        super().exitMulExpression(ctx)
-
-    def enterSumAggregateFunction(
-        self, ctx: UVLPythonParser.SumAggregateFunctionContext
-    ):
-        super().enterSumAggregateFunction(ctx)
-
-    def exitSumAggregateFunction(
-        self, ctx: UVLPythonParser.SumAggregateFunctionContext
-    ):
-        super().exitSumAggregateFunction(ctx)
-
-    def enterAvgAggregateFunction(
-        self, ctx: UVLPythonParser.AvgAggregateFunctionContext
-    ):
-        super().enterAvgAggregateFunction(ctx)
-
-    def exitAvgAggregateFunction(
-        self, ctx: UVLPythonParser.AvgAggregateFunctionContext
-    ):
-        super().exitAvgAggregateFunction(ctx)
-
-    def enterStringAggregateFunctionExpression(
-        self, ctx: UVLPythonParser.StringAggregateFunctionExpressionContext
-    ):
-        super().enterStringAggregateFunctionExpression(ctx)
-
-    def exitStringAggregateFunctionExpression(
-        self, ctx: UVLPythonParser.StringAggregateFunctionExpressionContext
-    ):
-        super().exitStringAggregateFunctionExpression(ctx)
-
-    def enterNumericAggregateFunctionExpression(
-        self, ctx: UVLPythonParser.NumericAggregateFunctionExpressionContext
-    ):
-        super().enterNumericAggregateFunctionExpression(ctx)
-
-    def exitNumericAggregateFunctionExpression(
-        self, ctx: UVLPythonParser.NumericAggregateFunctionExpressionContext
-    ):
-        super().exitNumericAggregateFunctionExpression(ctx)
-
-    def enterLengthAggregateFunction(
-        self, ctx: UVLPythonParser.LengthAggregateFunctionContext
-    ):
-        super().enterLengthAggregateFunction(ctx)
-
-    def exitLengthAggregateFunction(
-        self, ctx: UVLPythonParser.LengthAggregateFunctionContext
-    ):
-        super().exitLengthAggregateFunction(ctx)
-
-    def enterFloorAggregateFunction(
-        self, ctx: UVLPythonParser.FloorAggregateFunctionContext
-    ):
-        super().enterFloorAggregateFunction(ctx)
-
-    def exitFloorAggregateFunction(
-        self, ctx: UVLPythonParser.FloorAggregateFunctionContext
-    ):
-        super().exitFloorAggregateFunction(ctx)
-
-    def enterCeilAggregateFunction(
-        self, ctx: UVLPythonParser.CeilAggregateFunctionContext
-    ):
-        super().enterCeilAggregateFunction(ctx)
-
-    def exitCeilAggregateFunction(
-        self, ctx: UVLPythonParser.CeilAggregateFunctionContext
-    ):
-        super().exitCeilAggregateFunction(ctx)
-
-    def enterReference(self, ctx: UVLPythonParser.ReferenceContext):
-        super().enterReference(ctx)
-
     def exitReference(self, ctx: UVLPythonParser.ReferenceContext):
         ref = ctx.getText()
-        if ref in self.feature_map:
-            raise ValueError(f"Reference {ref} already exists")
+        if ref in self.references_set:
+            raise ReferenceError(f"Reference {ref} already exists")
         self.references.append(ref)
-
-    def enterId(self, ctx: UVLPythonParser.IdContext):
-        super().enterId(ctx)
-
-    def exitId(self, ctx: UVLPythonParser.IdContext):
-        super().exitId(ctx)
-
-    def enterFeatureType(self, ctx: UVLPythonParser.FeatureTypeContext):
-        super().enterFeatureType(ctx)
-
-    def exitFeatureType(self, ctx: UVLPythonParser.FeatureTypeContext):
-        super().exitFeatureType(ctx)
-
-    def enterLanguageLevel(self, ctx: UVLPythonParser.LanguageLevelContext):
-        super().enterLanguageLevel(ctx)
-
-    def exitLanguageLevel(self, ctx: UVLPythonParser.LanguageLevelContext):
-        super().exitLanguageLevel(ctx)
-
-    def enterMajorLevel(self, ctx: UVLPythonParser.MajorLevelContext):
-        super().enterMajorLevel(ctx)
-
-    def exitMajorLevel(self, ctx: UVLPythonParser.MajorLevelContext):
-        super().exitMajorLevel(ctx)
-
-    def enterMinorLevel(self, ctx: UVLPythonParser.MinorLevelContext):
-        super().enterMinorLevel(ctx)
-
-    def exitMinorLevel(self, ctx: UVLPythonParser.MinorLevelContext):
-        super().exitMinorLevel(ctx)
+        self.references_set.add(ref)
 
 
 @app.importer(".uvl")
