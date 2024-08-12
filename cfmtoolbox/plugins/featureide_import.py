@@ -91,21 +91,17 @@ def traverse_xml(element: Element | None, cfm: CFM) -> list[Feature]:
 
 
 def parse_formula_value_and_feature(formula: Element, cfm: CFM) -> tuple[bool, Feature]:
-    if len(formula) == 0 and formula.tag == FormulaTypes.VAR.value:
+    if formula.tag == FormulaTypes.VAR.value and len(formula) == 0:
         if formula.text is None:
             raise TypeError("No valid feature name found in formula")
 
         return (True, cfm.find_feature(formula.text))
 
-    if len(formula) != 1:
-        raise TooComplexConstraintError()
-
-    if formula.tag == FormulaTypes.NOT.value:
+    if formula.tag == FormulaTypes.NOT.value and len(formula) == 1:
         value, feature = parse_formula_value_and_feature(formula[0], cfm)
         return (not value, feature)
 
-    else:
-        raise TooComplexConstraintError()
+    raise TooComplexConstraintError()
 
 
 def parse_constraints(
