@@ -388,7 +388,7 @@ def test_parse_cfm(capsys):
     tree = ET.parse("tests/data/sandwich.xml")
     root = tree.getroot()
     cfm = parse_cfm(root)
-    require_conraints = cfm.require_constraints
+    require_constraints = cfm.require_constraints
     exclude_constraints = cfm.exclude_constraints
 
     output = capsys.readouterr()
@@ -415,14 +415,14 @@ def test_parse_cfm(capsys):
     assert cfm.features[8].name == "Veggies"
     assert cfm.features[9].name == "Lettuce"
     assert cfm.features[10].name == "Tomato"
-    assert len(require_conraints) == 3
+    assert len(require_constraints) == 3
     assert len(exclude_constraints) == 1
-    assert require_conraints[0].first_feature.name == "Sourdough"
-    assert require_conraints[0].second_feature.name == "Cheddar"
-    assert require_conraints[1].first_feature.name == "Tomato"
-    assert require_conraints[1].second_feature.name == "Gouda"
-    assert require_conraints[2].first_feature.name == "Swiss"
-    assert require_conraints[2].second_feature.name == "Lettuce"
+    assert require_constraints[0].first_feature.name == "Sourdough"
+    assert require_constraints[0].second_feature.name == "Cheddar"
+    assert require_constraints[1].first_feature.name == "Tomato"
+    assert require_constraints[1].second_feature.name == "Gouda"
+    assert require_constraints[2].first_feature.name == "Swiss"
+    assert require_constraints[2].second_feature.name == "Lettuce"
     assert exclude_constraints[0].first_feature.name == "Wheat"
     assert exclude_constraints[0].second_feature.name == "Tomato"
 
