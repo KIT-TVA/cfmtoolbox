@@ -4,6 +4,7 @@ from types import ModuleType
 from typing import Annotated, Callable, Optional, TypeAlias
 
 import typer
+from typer.models import CommandFunctionType
 
 from cfmtoolbox.models import CFM
 
@@ -11,14 +12,17 @@ Importer: TypeAlias = Callable[[bytes], CFM]
 Exporter: TypeAlias = Callable[[CFM], bytes]
 
 
-class CFMToolbox(typer.Typer):
+class CFMToolbox:
     def __init__(self) -> None:
         self.registered_importers: dict[str, Importer] = {}
         self.registered_exporters: dict[str, Exporter] = {}
         self.model: CFM | None = None
         self.import_path: Path | None = None
         self.export_path: Path | None = None
-        return super().__init__(callback=self.prepare, result_callback=self.cleanup)
+        self.typer = typer.Typer(callback=self.prepare, result_callback=self.cleanup)
+
+    def __call__(self) -> None:
+        return self.typer()
 
     def prepare(
         self,
@@ -62,6 +66,15 @@ class CFMToolbox(typer.Typer):
     def exporter(self, extension: str) -> Callable[[Exporter], Exporter]:
         def decorator(func: Exporter) -> Exporter:
             self.registered_exporters[extension] = func
+            return func
+
+        return decorator
+
+    def command(
+        self, *args, **kwargs
+    ) -> Callable[[CommandFunctionType], CommandFunctionType]:
+        def decorator(func: CommandFunctionType) -> CommandFunctionType:
+            self.typer.command(*args, **kwargs)(func)
             return func
 
         return decorator
