@@ -429,6 +429,43 @@ def test_parse_cfm(capsys):
     assert dedent(expected_rule) in output.out
 
 
+def test_parse_cfm_can_parse_multiple_eliminated_constraints(capsys):
+    tree = ET.parse("tests/data/dessert.xml")
+    root = tree.getroot()
+    cfm = parse_cfm(root)
+    require_constraints = cfm.require_constraints
+    exclude_constraints = cfm.exclude_constraints
+
+    expected_rule_one = """<rule>
+			<imp>
+				<conj>
+					<var>Tart</var>
+					<var>Shortcake</var>
+				</conj>
+				<var>Choux</var>
+			</imp>
+		</rule>
+    """
+
+    expected_rule_two = """<rule>
+			<imp>
+				<disj>
+					<var>Croissant</var>
+					<var>Spongecake</var>
+				</disj>
+				<var>Eclair</var>
+			</imp>
+		</rule>
+    """
+
+    output = capsys.readouterr()
+
+    assert len(exclude_constraints) == 0
+    assert len(require_constraints) == 0
+    assert dedent(expected_rule_one) in output.out
+    assert dedent(expected_rule_two) in output.out
+
+
 def test_parse_cfm_reports_missing_struct():
     root = Element("root")
     with pytest.raises(TypeError, match="No valid Feature structure found in XML file"):
