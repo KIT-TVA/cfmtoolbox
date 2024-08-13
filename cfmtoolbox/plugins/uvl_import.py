@@ -103,6 +103,8 @@ class CustomListener(UVLPythonListener):
 
     def exitFeatures(self, ctx: UVLPythonParser.FeaturesContext):
         self.references_set = set()
+        if len(self.features) > 0:
+            self.features[0].instance_cardinality = Cardinality([Interval(1, 1)])
 
     def exitFeature(self, ctx: UVLPythonParser.FeatureContext):
         name: str = self.references.pop()
