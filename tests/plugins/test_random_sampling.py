@@ -2,10 +2,10 @@ from pathlib import Path
 
 import pytest
 
-import cfmtoolbox.plugins.json_import as json_import_plugin
 import cfmtoolbox.plugins.random_sampling as random_sampling_plugin
 from cfmtoolbox import app
 from cfmtoolbox.models import CFM, Cardinality, Feature, Interval
+from cfmtoolbox.plugins.json_import import import_json
 from cfmtoolbox.plugins.random_sampling import (
     RandomSampler,
     random_sampling,
@@ -14,7 +14,7 @@ from cfmtoolbox.plugins.random_sampling import (
 
 @pytest.fixture
 def model():
-    return json_import_plugin.import_json(Path("tests/data/sandwich.json").read_bytes())
+    return import_json(Path("tests/data/sandwich.json").read_bytes())
 
 
 @pytest.fixture
@@ -27,20 +27,23 @@ def test_plugin_can_be_loaded():
 
 
 def test_random_sampling_without_loaded_model():
-    assert random_sampling() is None
-    assert random_sampling(3) is None
+    assert random_sampling(None) is None
+    assert random_sampling(None, 3) is None
 
 
-def test_random_sampling_with_loaded_model():
-    app.import_path = Path("tests/data/sandwich.json")
-    app.import_model()
+def test_plugin_passes_though_model(model: CFM):
+    assert random_sampling(model) is model
 
-    assert random_sampling() is not None
-    random_instances = random_sampling(50)
-    assert random_instances is not None
-    assert len(random_instances) == 50
-    for instance in random_instances:
-        assert instance.validate(app.model)
+
+def test_plugin_outputs_expected_amount_of_random_samples(model: CFM, capsys):
+    random_sampling(model, 3)
+    captured = capsys.readouterr()
+    assert captured.out.count("Instance") == 3
+
+
+def test_random_sampling_with_loaded_model(model: CFM):
+    feature_node = RandomSampler(model).random_sampling()
+    assert feature_node.validate(model)
 
 
 def test_get_random_cardinality(random_sampler: RandomSampler):

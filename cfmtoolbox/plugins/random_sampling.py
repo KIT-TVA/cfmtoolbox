@@ -6,12 +6,15 @@ from cfmtoolbox.models import CFM, Cardinality, Feature, FeatureNode
 
 
 @app.command()
-def random_sampling(amount: int = 1) -> list[FeatureNode] | None:
-    if app.model is None:
+def random_sampling(model: CFM | None, amount: int = 1) -> CFM | None:
+    if model is None:
         print("No model loaded.")
         return None
 
-    return [RandomSampler(app.model).random_sampling() for _ in range(amount)]
+    for _ in range(amount):
+        RandomSampler(model).random_sampling()
+
+    return model
 
 
 class RandomSampler:
