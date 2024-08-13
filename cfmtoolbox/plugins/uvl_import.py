@@ -12,7 +12,7 @@ from cfmtoolbox.models import Cardinality, Constraint, Feature, Interval
 
 
 class CustomErrorListener(ErrorListener):
-    def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
+    def syntaxError(self, recognizer, offending_symbol, line, column, msg, e):
         if "\\t" in msg:
             print(
                 f"The UVL has the following warning that prevents reading it :Line {line}:{column} - {msg}"
@@ -32,28 +32,28 @@ class ConstraintType(Enum):
 class CustomListener(UVLPythonListener):
     def __init__(self):
         self.references: list[str] = []
-        self.featureCardinalities: list[Cardinality] = []
+        self.feature_cardinalities: list[Cardinality] = []
         self.features: list[Feature] = []
-        self.groupSpecs: list[list[Feature]] = []
+        self.group_specs: list[list[Feature]] = []
         self.groups: list[tuple[Cardinality, list[Feature]]] = []
-        self.groupFeaturesCount: list[int] = []
-        self.cardinalityAvailable: list[bool] = []
-        self.groupsPresent: list[int] = []
+        self.group_features_count: list[int] = []
+        self.cardinality_available: list[bool] = []
+        self.groups_present: list[int] = []
         self.constraints: list[Constraint] = []
         self.constraint_types: list[ConstraintType] = []
         self.feature_map: Dict[str, Feature] = {}
         self.references_set: set[str] = set()
 
     def exitOrGroup(self, ctx: UVLPythonParser.OrGroupContext):
-        group_specs: list[Feature] = self.groupSpecs.pop()
+        group_specs = self.group_specs.pop()
         self.groups.append((Cardinality([Interval(-2, -2)]), group_specs))
 
     def exitAlternativeGroup(self, ctx: UVLPythonParser.AlternativeGroupContext):
-        group_specs: list[Feature] = self.groupSpecs.pop()
+        group_specs = self.group_specs.pop()
         self.groups.append((Cardinality([Interval(-3, -3)]), group_specs))
 
     def exitOptionalGroup(self, ctx: UVLPythonParser.OptionalGroupContext):
-        group_specs: list[Feature] = self.groupSpecs.pop()
+        group_specs = self.group_specs.pop()
         for feature in group_specs:
             intervals = feature.instance_cardinality.intervals
             if len(intervals) >= 1 and intervals[0].lower != 0:
@@ -65,7 +65,7 @@ class CustomListener(UVLPythonListener):
         self.groups.append((Cardinality([Interval(-4, -4)]), group_specs))
 
     def exitMandatoryGroup(self, ctx: UVLPythonParser.MandatoryGroupContext):
-        group_specs: list[Feature] = self.groupSpecs.pop()
+        group_specs = self.group_specs.pop()
         for feature in group_specs:
             intervals = feature.instance_cardinality.intervals
             if len(intervals) == 0 or intervals[0].lower == 0:
@@ -73,7 +73,7 @@ class CustomListener(UVLPythonListener):
         self.groups.append((Cardinality([Interval(-1, -1)]), group_specs))
 
     def exitCardinalityGroup(self, ctx: UVLPythonParser.CardinalityGroupContext):
-        group_specs: list[Feature] = self.groupSpecs.pop()
+        group_specs = self.group_specs.pop()
         text = ctx.getText()
         interval_str = text[text.index("[") + 1 : text.index("]")]
         interval: Interval
@@ -90,16 +90,16 @@ class CustomListener(UVLPythonListener):
         self.groups.append((Cardinality([interval]), group_specs))
 
     def enterGroupSpec(self, ctx: UVLPythonParser.GroupSpecContext):
-        self.groupFeaturesCount.append(0)
+        self.group_features_count.append(0)
 
     def exitGroupSpec(self, ctx: UVLPythonParser.GroupSpecContext):
-        count: int = self.groupFeaturesCount.pop()
-        self.groupSpecs.append(self.features[-count:])
+        count = self.group_features_count.pop()
+        self.group_specs.append(self.features[-count:])
         self.features = self.features[:-count]
 
     def enterFeature(self, ctx: UVLPythonParser.FeatureContext):
-        self.cardinalityAvailable.append(False)
-        self.groupsPresent.append(len(self.groups))
+        self.cardinality_available.append(False)
+        self.groups_present.append(len(self.groups))
 
     def exitFeatures(self, ctx: UVLPythonParser.FeaturesContext):
         self.references_set = set()
@@ -107,15 +107,15 @@ class CustomListener(UVLPythonListener):
             self.features[0].instance_cardinality = Cardinality([Interval(1, 1)])
 
     def exitFeature(self, ctx: UVLPythonParser.FeatureContext):
-        name: str = self.references.pop()
+        name = self.references.pop()
         instance_cardinality: Cardinality
-        if self.cardinalityAvailable.pop() is True:
-            instance_cardinality = self.featureCardinalities.pop()
+        if self.cardinality_available.pop() is True:
+            instance_cardinality = self.feature_cardinalities.pop()
         else:
             instance_cardinality = Cardinality([])
         group_type_cardinality: Cardinality
         group_instance_cardinality: Cardinality
-        new_groups: int = len(self.groups) - self.groupsPresent.pop()
+        new_groups = len(self.groups) - self.groups_present.pop()
         if new_groups == 0:
             group_type_cardinality = Cardinality([])
             group_instance_cardinality = Cardinality([])
@@ -129,15 +129,15 @@ class CustomListener(UVLPythonListener):
             )
             self.feature_map[name] = feature
             self.features.append(feature)
-            if len(self.groupFeaturesCount) > 0:
-                self.groupFeaturesCount[-1] += 1
+            if len(self.group_features_count) > 0:
+                self.group_features_count[-1] += 1
         else:
             if new_groups > 1:
                 parent_feature = Feature(
                     name, instance_cardinality, Cardinality([]), Cardinality([]), [], []
                 )
                 for index, group in enumerate(self.groups[-new_groups:]):
-                    cardinality: Cardinality = group[0]
+                    cardinality = group[0]
                     features = group[1]
                     if cardinality.intervals[0] == Interval(-1, -1):  # mandatory
                         length = len(features)
@@ -184,8 +184,8 @@ class CustomListener(UVLPythonListener):
                 self.feature_map[name] = parent_feature
                 self.features.append(parent_feature)
                 self.groups = self.groups[:-new_groups]
-                if len(self.groupFeaturesCount) > 0:
-                    self.groupFeaturesCount[-1] += 1
+                if len(self.group_features_count) > 0:
+                    self.group_features_count[-1] += 1
             else:
                 group = self.groups.pop()
                 cardinality = group[0]
@@ -216,26 +216,26 @@ class CustomListener(UVLPythonListener):
                 )
                 self.feature_map[name] = feature
                 self.features.append(feature)
-                if len(self.groupFeaturesCount) > 0:
-                    self.groupFeaturesCount[-1] += 1
+                if len(self.group_features_count) > 0:
+                    self.group_features_count[-1] += 1
 
     def exitFeatureCardinality(self, ctx: UVLPythonParser.FeatureCardinalityContext):
-        text: str = ctx.getText()
-        interval_str: str = text[text.index("[") + 1 : text.index("]")]
+        text = ctx.getText()
+        interval_str = text[text.index("[") + 1 : text.index("]")]
         interval: Interval
         if ".." not in interval_str:
-            interval_int: int = int(interval_str)
+            interval_int = int(interval_str)
             interval = Interval(interval_int, interval_int)
         else:
-            lower: str = interval_str[: interval_str.index("..")]
-            upper: str = interval_str[interval_str.index("..") + 2 :]
+            lower = interval_str[: interval_str.index("..")]
+            upper = interval_str[interval_str.index("..") + 2 :]
             if upper == "*":
                 interval = Interval(int(lower), None)
             else:
                 interval = Interval(int(lower), int(upper))
-        cardinality: Cardinality = Cardinality([interval])
-        self.featureCardinalities.append(cardinality)
-        self.cardinalityAvailable[-1] = True
+        cardinality = Cardinality([interval])
+        self.feature_cardinalities.append(cardinality)
+        self.cardinality_available[-1] = True
 
     def exitConstraintLine(self, ctx: UVLPythonParser.ConstraintLineContext):
         ref_2 = self.references.pop()
@@ -294,16 +294,16 @@ class CustomListener(UVLPythonListener):
 
 @app.importer(".uvl")
 def import_uvl(data: bytes):
-    input_stream: InputStream = InputStream(data.decode("utf-8"))
-    lexer: UVLCustomLexer = UVLCustomLexer(input_stream)
+    input_stream = InputStream(data.decode("utf-8"))
+    lexer = UVLCustomLexer(input_stream)
 
     lexer.removeErrorListeners()
     lexer.addErrorListener(CustomErrorListener())
 
-    token_stream: CommonTokenStream = CommonTokenStream(lexer)
-    parser: UVLPythonParser = UVLPythonParser(token_stream)
+    token_stream = CommonTokenStream(lexer)
+    parser = UVLPythonParser(token_stream)
 
-    listener: CustomListener = CustomListener()
+    listener = CustomListener()
     parser.removeErrorListeners()
     parser.addErrorListener(CustomErrorListener())
     parser.addParseListener(listener)

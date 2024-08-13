@@ -46,9 +46,9 @@ def test_exit_feature_lowest_level(
 ):
     mock_ctx = Mock()
     listener.references = ["test"]
-    listener.cardinalityAvailable = [False]
-    listener.groupsPresent = [groups_present]
-    listener.groupFeaturesCount = group_features_count
+    listener.cardinality_available = [False]
+    listener.groups_present = [groups_present]
+    listener.group_features_count = group_features_count
 
     listener.exitFeature(mock_ctx)
 
@@ -60,16 +60,16 @@ def test_exit_feature_lowest_level(
     assert listener.features[0].group_type_cardinality == Cardinality([])
     assert listener.features[0].group_instance_cardinality == Cardinality([])
     assert listener.feature_map["test"] == listener.features[0]
-    assert len(listener.groupFeaturesCount) == count
+    assert len(listener.group_features_count) == count
 
 
 def test_exit_feature_with_instance_cardinality(listener):
     mock_ctx = Mock()
     listener.references = ["test"]
-    listener.cardinalityAvailable = [True]
-    listener.featureCardinalities = [Cardinality([Interval(1, 1)])]
-    listener.groupsPresent = [0]
-    listener.groupFeaturesCount = []
+    listener.cardinality_available = [True]
+    listener.feature_cardinalities = [Cardinality([Interval(1, 1)])]
+    listener.groups_present = [0]
+    listener.group_features_count = []
 
     listener.exitFeature(mock_ctx)
 
@@ -81,15 +81,15 @@ def test_exit_feature_with_instance_cardinality(listener):
     assert listener.features[0].group_type_cardinality == Cardinality([])
     assert listener.features[0].group_instance_cardinality == Cardinality([])
     assert listener.feature_map["test"] == listener.features[0]
-    assert len(listener.groupFeaturesCount) == 0
+    assert len(listener.group_features_count) == 0
 
 
 def test_exit_feature_with_one_mandatory_group(listener):
     mock_ctx = Mock()
     listener.references = ["test"]
-    listener.cardinalityAvailable = [False]
-    listener.groupsPresent = [0]
-    listener.groupFeaturesCount = [0]
+    listener.cardinality_available = [False]
+    listener.groups_present = [0]
+    listener.group_features_count = [0]
     features = [
         Feature(
             "test_group",
@@ -127,17 +127,17 @@ def test_exit_feature_with_one_mandatory_group(listener):
         [Interval(2, None)]
     )
     assert listener.feature_map["test"] == listener.features[0]
-    assert len(listener.groupFeaturesCount) == 1
+    assert len(listener.group_features_count) == 1
     assert len(listener.groups) == 0
 
 
 def test_exit_feature_with_one_or_group(listener):
     mock_ctx = Mock()
     listener.references = ["test"]
-    listener.cardinalityAvailable = [True]
-    listener.featureCardinalities = [Cardinality([Interval(2, 7)])]
-    listener.groupsPresent = [0]
-    listener.groupFeaturesCount = [0]
+    listener.cardinality_available = [True]
+    listener.feature_cardinalities = [Cardinality([Interval(2, 7)])]
+    listener.groups_present = [0]
+    listener.group_features_count = [0]
     features = [
         Feature(
             "test_group",
@@ -170,16 +170,16 @@ def test_exit_feature_with_one_or_group(listener):
         [Interval(1, None)]
     )
     assert listener.feature_map["test"] == listener.features[0]
-    assert len(listener.groupFeaturesCount) == 1
+    assert len(listener.group_features_count) == 1
     assert len(listener.groups) == 0
 
 
 def test_exit_feature_with_one_alternative_group(listener):
     mock_ctx = Mock()
     listener.references = ["test"]
-    listener.cardinalityAvailable = [False]
-    listener.groupsPresent = [0]
-    listener.groupFeaturesCount = [0]
+    listener.cardinality_available = [False]
+    listener.groups_present = [0]
+    listener.group_features_count = [0]
     features = [
         Feature(
             "test_group",
@@ -217,16 +217,16 @@ def test_exit_feature_with_one_alternative_group(listener):
         [Interval(1, None)]
     )
     assert listener.feature_map["test"] == listener.features[0]
-    assert len(listener.groupFeaturesCount) == 1
+    assert len(listener.group_features_count) == 1
     assert len(listener.groups) == 0
 
 
 def test_exit_feature_with_one_optional_group(listener):
     mock_ctx = Mock()
     listener.references = ["test"]
-    listener.cardinalityAvailable = [False]
-    listener.groupsPresent = [0]
-    listener.groupFeaturesCount = [0]
+    listener.cardinality_available = [False]
+    listener.groups_present = [0]
+    listener.group_features_count = [0]
     features = [
         Feature(
             "test_group",
@@ -264,16 +264,16 @@ def test_exit_feature_with_one_optional_group(listener):
         [Interval(0, None)]
     )
     assert listener.feature_map["test"] == listener.features[0]
-    assert len(listener.groupFeaturesCount) == 1
+    assert len(listener.group_features_count) == 1
     assert len(listener.groups) == 0
 
 
 def test_exit_feature_with_one_cardinality_group(listener):
     mock_ctx = Mock()
     listener.references = ["test"]
-    listener.cardinalityAvailable = [False]
-    listener.groupsPresent = [0]
-    listener.groupFeaturesCount = [0]
+    listener.cardinality_available = [False]
+    listener.groups_present = [0]
+    listener.group_features_count = [0]
     features = [
         Feature(
             "test_group",
@@ -311,15 +311,15 @@ def test_exit_feature_with_one_cardinality_group(listener):
         [Interval(3, 4)]
     )
     assert listener.feature_map["test"] == listener.features[0]
-    assert len(listener.groupFeaturesCount) == 1
+    assert len(listener.group_features_count) == 1
     assert len(listener.groups) == 0
 
 
 def test_exit_feature_with_two_groups(listener):
     mock_ctx = Mock()
     listener.references = ["test"]
-    listener.cardinalityAvailable = [False]
-    listener.groupsPresent = [0]
+    listener.cardinality_available = [False]
+    listener.groups_present = [0]
     features1 = [
         Feature(
             "test_group",
@@ -422,10 +422,10 @@ def test_exit_feature_with_two_groups(listener):
 def test_exit_feature_with_two_groups_and_instance_cardinality(listener):
     mock_ctx = Mock()
     listener.references = ["test"]
-    listener.cardinalityAvailable = [True]
-    listener.featureCardinalities = [Cardinality([Interval(3, 4)])]
-    listener.groupsPresent = [0]
-    listener.groupFeaturesCount = [0]
+    listener.cardinality_available = [True]
+    listener.feature_cardinalities = [Cardinality([Interval(3, 4)])]
+    listener.groups_present = [0]
+    listener.group_features_count = [0]
     features1 = [
         Feature(
             "test_group",
@@ -507,7 +507,7 @@ def test_exit_feature_with_two_groups_and_instance_cardinality(listener):
     assert listener.features[0].group_type_cardinality == Cardinality([])
     assert listener.features[0].group_instance_cardinality == Cardinality([])
     assert listener.feature_map["test"] == listener.features[0]
-    assert listener.groupFeaturesCount == [1]
+    assert listener.group_features_count == [1]
     assert len(listener.constraints) == 2
     assert listener.constraints[0] == Constraint(
         True,
@@ -528,7 +528,7 @@ def test_exit_feature_with_two_groups_and_instance_cardinality(listener):
 def test_exit_group_spec_one_subfeature(listener):
     mock_ctx = Mock()
     listener = CustomListener()
-    listener.groupFeaturesCount = [1]
+    listener.group_features_count = [1]
     feature = Feature(
         "test", Cardinality([Interval(1, 1)]), Cardinality([]), Cardinality([]), [], []
     )
@@ -536,14 +536,14 @@ def test_exit_group_spec_one_subfeature(listener):
 
     listener.exitGroupSpec(mock_ctx)
 
-    assert len(listener.groupFeaturesCount) == 0
-    assert listener.groupSpecs == [[feature]]
+    assert len(listener.group_features_count) == 0
+    assert listener.group_specs == [[feature]]
     assert len(listener.features) == 0
 
 
 def test_exit_group_spec_two_features(listener):
     mock_ctx = Mock()
-    listener.groupFeaturesCount = [2]
+    listener.group_features_count = [2]
     feature1 = Feature(
         "test1", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
@@ -554,14 +554,14 @@ def test_exit_group_spec_two_features(listener):
 
     listener.exitGroupSpec(mock_ctx)
 
-    assert len(listener.groupFeaturesCount) == 0
-    assert listener.groupSpecs == [[feature1, feature2]]
+    assert len(listener.group_features_count) == 0
+    assert listener.group_specs == [[feature1, feature2]]
     assert len(listener.features) == 0
 
 
 def test_exit_group_spec_three_features_two_used(listener):
     mock_ctx = Mock()
-    listener.groupFeaturesCount = [2]
+    listener.group_features_count = [2]
     feature1 = Feature(
         "test1", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
@@ -575,8 +575,8 @@ def test_exit_group_spec_three_features_two_used(listener):
 
     listener.exitGroupSpec(mock_ctx)
 
-    assert len(listener.groupFeaturesCount) == 0
-    assert listener.groupSpecs == [[feature2, feature3]]
+    assert len(listener.group_features_count) == 0
+    assert listener.group_specs == [[feature2, feature3]]
     assert listener.features == [feature1]
 
 
@@ -585,11 +585,11 @@ def test_exit_mandatory_group_one_feature_without_instance_cardinality(listener)
     feature: Feature = Feature(
         "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
-    listener.groupSpecs = [[feature]]
+    listener.group_specs = [[feature]]
 
     listener.exitMandatoryGroup(mock_ctx)
 
-    assert len(listener.groupSpecs) == 0
+    assert len(listener.group_specs) == 0
     assert len(listener.groups) == 1
     assert listener.groups[0] == (
         Cardinality([Interval(-1, -1)]),
@@ -611,11 +611,11 @@ def test_exit_mandatory_group_one_feature_with_instance_cardinality(listener):
     feature: Feature = Feature(
         "test", Cardinality([Interval(2, 2)]), Cardinality([]), Cardinality([]), [], []
     )
-    listener.groupSpecs = [[feature]]
+    listener.group_specs = [[feature]]
 
     listener.exitMandatoryGroup(mock_ctx)
 
-    assert len(listener.groupSpecs) == 0
+    assert len(listener.group_specs) == 0
     assert len(listener.groups) == 1
     assert listener.groups[0] == (Cardinality([Interval(-1, -1)]), [feature])
 
@@ -625,11 +625,11 @@ def test_exit_or_group(listener):
     feature: Feature = Feature(
         "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
-    listener.groupSpecs = [[feature]]
+    listener.group_specs = [[feature]]
 
     listener.exitOrGroup(mock_ctx)
 
-    assert len(listener.groupSpecs) == 0
+    assert len(listener.group_specs) == 0
     assert len(listener.groups) == 1
     assert listener.groups[0] == (Cardinality([Interval(-2, -2)]), [feature])
 
@@ -639,11 +639,11 @@ def test_exit_alternative_group(listener):
     feature: Feature = Feature(
         "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
-    listener.groupSpecs = [[feature]]
+    listener.group_specs = [[feature]]
 
     listener.exitAlternativeGroup(mock_ctx)
 
-    assert len(listener.groupSpecs) == 0
+    assert len(listener.group_specs) == 0
     assert len(listener.groups) == 1
     assert listener.groups[0] == (Cardinality([Interval(-3, -3)]), [feature])
 
@@ -653,11 +653,11 @@ def test_exit_optional_group_without_instance_cardinality(listener):
     feature: Feature = Feature(
         "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
-    listener.groupSpecs = [[feature]]
+    listener.group_specs = [[feature]]
 
     listener.exitOptionalGroup(mock_ctx)
 
-    assert len(listener.groupSpecs) == 0
+    assert len(listener.group_specs) == 0
     assert len(listener.groups) == 1
     assert listener.groups[0] == (Cardinality([Interval(-4, -4)]), [feature])
 
@@ -667,11 +667,11 @@ def test_exit_optional_group_with_instance_cardinality_lower_changed_to_zero(lis
     feature: Feature = Feature(
         "test", Cardinality([Interval(3, 5)]), Cardinality([]), Cardinality([]), [], []
     )
-    listener.groupSpecs = [[feature]]
+    listener.group_specs = [[feature]]
 
     listener.exitOptionalGroup(mock_ctx)
 
-    assert len(listener.groupSpecs) == 0
+    assert len(listener.group_specs) == 0
     assert len(listener.groups) == 1
     assert listener.groups[0] == (
         Cardinality([Interval(-4, -4)]),
@@ -693,11 +693,11 @@ def test_exit_optional_group_with_instance_cardinality_lower_not_changed(listene
     feature: Feature = Feature(
         "test", Cardinality([Interval(0, 5)]), Cardinality([]), Cardinality([]), [], []
     )
-    listener.groupSpecs = [[feature]]
+    listener.group_specs = [[feature]]
 
     listener.exitOptionalGroup(mock_ctx)
 
-    assert len(listener.groupSpecs) == 0
+    assert len(listener.group_specs) == 0
     assert len(listener.groups) == 1
     assert listener.groups[0] == (Cardinality([Interval(-4, -4)]), [feature])
 
@@ -708,11 +708,11 @@ def test_exit_cardinality_group_one_value(listener):
     feature: Feature = Feature(
         "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
-    listener.groupSpecs = [[feature]]
+    listener.group_specs = [[feature]]
 
     listener.exitCardinalityGroup(mock_ctx)
 
-    assert len(listener.groupSpecs) == 0
+    assert len(listener.group_specs) == 0
     assert len(listener.groups) == 1
     assert listener.groups[0] == (Cardinality([Interval(1, 1)]), [feature])
 
@@ -723,11 +723,11 @@ def test_exit_cardinality_group_multiple_values(listener):
     feature: Feature = Feature(
         "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
-    listener.groupSpecs = [[feature]]
+    listener.group_specs = [[feature]]
 
     listener.exitCardinalityGroup(mock_ctx)
 
-    assert len(listener.groupSpecs) == 0
+    assert len(listener.group_specs) == 0
     assert len(listener.groups) == 1
     assert listener.groups[0] == (Cardinality([Interval(2, 4)]), [feature])
 
@@ -738,11 +738,11 @@ def test_exit_cardinality_group_multiple_values_including_asterisk(listener):
     feature: Feature = Feature(
         "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
     )
-    listener.groupSpecs = [[feature]]
+    listener.group_specs = [[feature]]
 
     listener.exitCardinalityGroup(mock_ctx)
 
-    assert len(listener.groupSpecs) == 0
+    assert len(listener.group_specs) == 0
     assert len(listener.groups) == 1
     assert listener.groups[0] == (Cardinality([Interval(2, None)]), [feature])
 
@@ -750,40 +750,40 @@ def test_exit_cardinality_group_multiple_values_including_asterisk(listener):
 def test_exit_feature_cardinality_single_value(listener):
     mock_ctx = Mock()
     mock_ctx.getText.return_value = "cardinality [1]"
-    listener.cardinalityAvailable = [False]
+    listener.cardinality_available = [False]
 
     listener.exitFeatureCardinality(mock_ctx)
 
-    assert len(listener.featureCardinalities) == 1
-    assert listener.featureCardinalities[0].intervals == [Interval(1, 1)]
-    assert len(listener.cardinalityAvailable) == 1
-    assert listener.cardinalityAvailable[0] is True
+    assert len(listener.feature_cardinalities) == 1
+    assert listener.feature_cardinalities[0].intervals == [Interval(1, 1)]
+    assert len(listener.cardinality_available) == 1
+    assert listener.cardinality_available[0] is True
 
 
 def test_exit_feature_cardinality_multiple_values(listener):
     mock_ctx = Mock()
     mock_ctx.getText.return_value = "cardinality [2..4]"
-    listener.cardinalityAvailable = [False]
+    listener.cardinality_available = [False]
 
     listener.exitFeatureCardinality(mock_ctx)
 
-    assert len(listener.featureCardinalities) == 1
-    assert listener.featureCardinalities[0].intervals == [Interval(2, 4)]
-    assert len(listener.cardinalityAvailable) == 1
-    assert listener.cardinalityAvailable[0] is True
+    assert len(listener.feature_cardinalities) == 1
+    assert listener.feature_cardinalities[0].intervals == [Interval(2, 4)]
+    assert len(listener.cardinality_available) == 1
+    assert listener.cardinality_available[0] is True
 
 
 def test_exit_feature_cardinality_multiple_values_including_asterisk(listener):
     mock_ctx = Mock()
     mock_ctx.getText.return_value = "cardinality [2..*]"
-    listener.cardinalityAvailable = [False]
+    listener.cardinality_available = [False]
 
     listener.exitFeatureCardinality(mock_ctx)
 
-    assert len(listener.featureCardinalities) == 1
-    assert listener.featureCardinalities[0].intervals == [Interval(2, None)]
-    assert len(listener.cardinalityAvailable) == 1
-    assert listener.cardinalityAvailable[0] is True
+    assert len(listener.feature_cardinalities) == 1
+    assert listener.feature_cardinalities[0].intervals == [Interval(2, None)]
+    assert len(listener.cardinality_available) == 1
+    assert listener.cardinality_available[0] is True
 
 
 def test_enter_group_spec(listener):
@@ -791,16 +791,16 @@ def test_enter_group_spec(listener):
 
     listener.enterGroupSpec(mock_ctx)
 
-    assert listener.groupFeaturesCount == [0]
+    assert listener.group_features_count == [0]
 
 
 def test_enter_group_spec_with_value(listener):
     mock_ctx = Mock()
-    listener.groupFeaturesCount = [0]
+    listener.group_features_count = [0]
 
     listener.enterGroupSpec(mock_ctx)
 
-    assert listener.groupFeaturesCount == [0, 0]
+    assert listener.group_features_count == [0, 0]
 
 
 def test_enter_feature(listener):
@@ -808,19 +808,19 @@ def test_enter_feature(listener):
 
     listener.enterFeature(mock_ctx)
 
-    assert listener.cardinalityAvailable == [False]
-    assert listener.groupsPresent == [0]
+    assert listener.cardinality_available == [False]
+    assert listener.groups_present == [0]
 
 
 def test_enter_feature_with_value(listener):
     mock_ctx = Mock()
-    listener.cardinalityAvailable = [False]
-    listener.groupsPresent = [0]
+    listener.cardinality_available = [False]
+    listener.groups_present = [0]
 
     listener.enterFeature(mock_ctx)
 
-    assert listener.cardinalityAvailable == [False, False]
-    assert listener.groupsPresent == [0, 0]
+    assert listener.cardinality_available == [False, False]
+    assert listener.groups_present == [0, 0]
 
 
 def test_exit_equivalence_constraint(listener):
