@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+	<properties>
+		<graphics key="autolayoutconstraints" value="false"/>
+		<graphics key="legendautolayout" value="true"/>
+		<graphics key="showconstraints" value="true"/>
+		<graphics key="showshortnames" value="false"/>
+		<graphics key="layout" value="horizontal"/>
+		<graphics key="showcollapsedconstraints" value="true"/>
+		<graphics key="legendhidden" value="false"/>
+		<graphics key="layoutalgorithm" value="1"/>
+	</properties>
+	<struct>
+		<and abstract="true" mandatory="true" name="Dessert">
+			<alt mandatory="true" name="Cakes">
+				<feature name="Spongecake"/>
+				<feature name="Shortcake"/>
+			</alt>
+			<or name="Pastries">
+				<feature name="Croissant"/>
+				<feature name="Tart"/>
+				<feature name="Choux"/>
+                <feature name="Eclair"/>
+			</or>
+		</and>
+	</struct>
+	<constraints>
+		<rule>
+			<imp>
+				<conj>
+					<var>Tart</var>
+					<var>Shortcake</var>
+				</conj>
+				<var>Choux</var>
+			</imp>
+		</rule>
+        <rule>
+			<imp>
+				<disj>
+					<var>Croissant</var>
+					<var>Spongecake</var>
+				</disj>
+				<var>Eclair</var>
+			</imp>
+		</rule>
+	</constraints>
+</featureModel>
