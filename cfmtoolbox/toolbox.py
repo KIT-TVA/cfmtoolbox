@@ -1,15 +1,23 @@
+import inspect
+from functools import partial
 from importlib.metadata import entry_points
 from pathlib import Path
 from types import ModuleType
-from typing import Annotated, Callable, Optional, TypeAlias
+from typing import (
+    Annotated,
+    Callable,
+    Optional,
+    TypeAlias,
+    TypeVar,
+)
 
 import typer
-from typer.models import CommandFunctionType
 
 from cfmtoolbox.models import CFM
 
 Importer: TypeAlias = Callable[[bytes], CFM]
 Exporter: TypeAlias = Callable[[CFM], bytes]
+CommandF = TypeVar("CommandF", bound=Callable[[CFM | None], CFM | None])
 
 
 class CFMToolbox:
@@ -70,11 +78,21 @@ class CFMToolbox:
 
         return decorator
 
-    def command(
-        self, *args, **kwargs
-    ) -> Callable[[CommandFunctionType], CommandFunctionType]:
-        def decorator(func: CommandFunctionType) -> CommandFunctionType:
-            self.typer.command(*args, **kwargs)(func)
+    def command(self, *args, **kwargs) -> Callable[[CommandF], CommandF]:
+        def decorator(func: CommandF) -> CommandF:
+            partial_func = partial(func, self.model)
+
+            def lazy_partial_func(*args, **kwargs):
+                self.model = func(self.model, *args, **kwargs)
+
+            lazy_partial_func.__name__ = func.__name__
+            lazy_partial_func.__module__ = func.__module__
+            lazy_partial_func.__qualname__ = func.__qualname__
+            lazy_partial_func.__doc__ = func.__doc__
+            lazy_partial_func.__annotations__ = func.__annotations__
+            setattr(lazy_partial_func, "__signature__", inspect.signature(partial_func))
+
+            self.typer.command(*args, **kwargs)(lazy_partial_func)
             return func
 
         return decorator
