@@ -1,5 +1,8 @@
+import json
 import random
 from collections import defaultdict
+from dataclasses import asdict
+from pathlib import Path
 
 from cfmtoolbox import app
 from cfmtoolbox.models import CFM, Cardinality, Feature, FeatureNode
@@ -11,8 +14,12 @@ def random_sampling(model: CFM | None, amount: int = 1) -> CFM | None:
         print("No model loaded.")
         return None
 
+    output_path = Path("tests/data/random_samples.json")
+    all_samples = []
     for _ in range(amount):
-        RandomSampler(model).random_sampling()
+        all_samples.append(asdict(RandomSampler(model).random_sampling()))
+
+    output_path.write_bytes(json.dumps(all_samples, indent=2).encode())
 
     return model
 
