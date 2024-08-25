@@ -15,6 +15,7 @@ def random_sampling(model: CFM | None, amount: int = 1) -> CFM | None:
         return None
 
     output_path = Path("samples/random_samples.json")
+    Path("samples").mkdir(parents=True, exist_ok=True)
     all_samples = []
     for _ in range(amount):
         all_samples.append(asdict(RandomSampler(model).random_sampling()))
