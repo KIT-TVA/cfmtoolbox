@@ -1,5 +1,7 @@
+import json
 import random
 from collections import defaultdict
+from dataclasses import asdict
 
 from cfmtoolbox import app
 from cfmtoolbox.models import CFM, Cardinality, Feature, FeatureNode
@@ -11,8 +13,11 @@ def random_sampling(model: CFM | None, amount: int = 1) -> CFM | None:
         print("No model loaded.")
         return None
 
-    for _ in range(amount):
-        RandomSampler(model).random_sampling()
+    all_samples = [
+        asdict(RandomSampler(model).random_sampling()) for _ in range(amount)
+    ]
+
+    print(json.dumps(all_samples, indent=2))
 
     return model
 
@@ -37,7 +42,6 @@ class RandomSampler:
                 break
             self.global_feature_count = defaultdict(int)
 
-        print("Instance", random_feature_node)
         return random_feature_node
 
     def get_global_upper_bound(self, feature: Feature):
