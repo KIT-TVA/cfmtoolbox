@@ -117,5 +117,4 @@ def parse_cfm(data: JSON) -> CFM:
 
 @app.importer(".json")
 def import_json(raw_data: bytes) -> CFM:
-    # print("Importing JSON")
     return parse_cfm(json.loads(raw_data))
