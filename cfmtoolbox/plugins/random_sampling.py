@@ -13,9 +13,9 @@ def random_sampling(model: CFM | None, amount: int = 1) -> CFM | None:
         print("No model loaded.")
         return None
 
-    all_samples = []
-    for _ in range(amount):
-        all_samples.append(asdict(RandomSampler(model).random_sampling()))
+    all_samples = [
+        asdict(RandomSampler(model).random_sampling()) for _ in range(amount)
+    ]
 
     print(json.dumps(all_samples, indent=2))
 
