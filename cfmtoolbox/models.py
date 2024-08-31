@@ -62,7 +62,7 @@ class Constraint:
     second_cardinality: Cardinality
 
     def __str__(self) -> str:
-        return f"{self.first_feature.name} -> {self.second_feature.name}"
+        return f"{self.first_feature.name} => {self.second_feature.name}"
 
 
 @dataclass

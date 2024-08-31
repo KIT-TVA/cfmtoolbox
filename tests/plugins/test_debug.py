@@ -4,7 +4,7 @@ import pytest
 
 import cfmtoolbox.plugins.debug as debug_plugin
 from cfmtoolbox.models import CFM, Cardinality, Constraint, Feature, Interval
-from cfmtoolbox.plugins.debug import debug, stringfy_cfm, stringify_list
+from cfmtoolbox.plugins.debug import debug, stringify_cfm, stringify_list
 from cfmtoolbox.plugins.featureide_import import import_featureide
 from cfmtoolbox.toolbox import CFMToolbox
 
@@ -60,8 +60,8 @@ Tomato: instance [0..1], group type [0..0], group instance [0..0]
 - parents: Veggies 
 - children:  
 
-- Required constraints: Sourdough -> Cheddar, Tomato -> Gouda, Swiss -> Lettuce 
-- Excluded constraints: Wheat -> Tomato"""
+- Require constraints: Sourdough => Cheddar, Tomato => Gouda, Swiss => Lettuce 
+- Exclude constraints: Wheat => Tomato"""
 
     path = Path("tests/data/sandwich.xml")
     cfm = import_featureide(path.read_bytes())
@@ -91,8 +91,8 @@ Sandwich: instance [1..0], group type [1..3], group instance [2..2]
 - parents:  
 - children:  
 
-- Required constraints: Sandwich -> Sandwich 
-- Excluded constraints: """
+- Require constraints: Sandwich => Sandwich 
+- Exclude constraints:"""
 
     feature = Feature(
         "Sandwich",
@@ -108,4 +108,5 @@ Sandwich: instance [1..0], group type [1..3], group instance [2..2]
         [Constraint(True, feature, Cardinality([]), feature, Cardinality([]))],
         [],
     )
-    assert cfm_str in stringfy_cfm(cfm)
+    print(stringify_cfm(cfm))
+    assert cfm_str in stringify_cfm(cfm)
