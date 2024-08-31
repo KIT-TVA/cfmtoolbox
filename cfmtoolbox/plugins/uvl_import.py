@@ -224,8 +224,8 @@ class CustomListener(UVLPythonListener):
         interval_str = text[text.index("[") + 1 : text.index("]")]
         interval: Interval
         if ".." not in interval_str:
-            interval_int = int(interval_str)
-            interval = Interval(interval_int, interval_int)
+            lower = upper = int(interval_str)
+            interval = Interval(lower, upper)
         else:
             lower = interval_str[: interval_str.index("..")]
             upper = interval_str[interval_str.index("..") + 2 :]
