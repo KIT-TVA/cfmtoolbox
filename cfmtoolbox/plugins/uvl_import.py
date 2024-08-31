@@ -229,10 +229,7 @@ class CustomListener(UVLPythonListener):
         else:
             lower = interval_str[: interval_str.index("..")]
             upper = interval_str[interval_str.index("..") + 2 :]
-            if upper == "*":
-                interval = Interval(int(lower), None)
-            else:
-                interval = Interval(int(lower), int(upper))
+            interval = Interval(int(lower), None if upper == "*" else int(upper))
         cardinality = Cardinality([interval])
         self.feature_cardinalities.append(cardinality)
         self.cardinality_available[-1] = True
