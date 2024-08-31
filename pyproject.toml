@@ -27,6 +27,7 @@ uvl-import = "cfmtoolbox.plugins.uvl_import"
 json-import = "cfmtoolbox.plugins.json_import"
 json-export = "cfmtoolbox.plugins.json_export"
 featureide-import = "cfmtoolbox.plugins.featureide_import"
+debug = "cfmtoolbox.plugins.debug"
 
 [tool.ruff.lint]
 extend-select = ["I"]
