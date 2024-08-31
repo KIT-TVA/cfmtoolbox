@@ -85,7 +85,7 @@ def test_constraint_string():
     cardinality = Cardinality([])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
     constraint = Constraint(True, feature, cardinality, feature, cardinality)
-    assert str(constraint) == "Cheese -> Cheese"
+    assert str(constraint) == "Cheese => Cheese"
 
 
 def test_cardinality_is_valid():
