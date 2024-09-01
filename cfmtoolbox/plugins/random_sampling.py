@@ -53,7 +53,8 @@ class RandomSampler:
         if local_upper_bound is None:
             return 0
 
-        # Recursively calculate the global upper bound by multiplying the upper bounds all paths from the root feature
+        # Recursively calculate the global upper bound by multiplying the upper bounds all of paths
+        # from the root feature excluding paths that contain a feature with an infinite upper bound
         for child in feature.children:
             global_upper_bound = max(
                 global_upper_bound,
