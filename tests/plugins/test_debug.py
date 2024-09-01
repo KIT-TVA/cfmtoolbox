@@ -108,5 +108,9 @@ Sandwich: instance [1..0], group type [1..3], group instance [2..2]
         [Constraint(True, feature, Cardinality([]), feature, Cardinality([]))],
         [],
     )
-    print(stringify_cfm(cfm))
+
     assert cfm_str in stringify_cfm(cfm)
+
+
+def test_stringify_cfm_can_stringify_none_cfm():
+    assert stringify_cfm(None) == "CFM:\nNone"
