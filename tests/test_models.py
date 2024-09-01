@@ -346,6 +346,20 @@ def test_validate_children(feature_instance: FeatureNode, expectation: bool):
             FeatureNode(
                 "Sandwich#0",
                 [
+                    FeatureNode(
+                        "Bread#0",
+                        [FeatureNode("Wheat#0", []), FeatureNode("Wheat#0", [])],
+                    ),
+                    FeatureNode("Bread#1", []),
+                    FeatureNode("Cheese#0", []),
+                ],
+            ),
+            False,
+        ),
+        (
+            FeatureNode(
+                "Sandwich#0",
+                [
                     FeatureNode("Bread#0", [FeatureNode("Wheat#0", [])]),
                     FeatureNode("Bread#1", [FeatureNode("Wheat#0", [])]),
                     FeatureNode("Cheese#0", []),
