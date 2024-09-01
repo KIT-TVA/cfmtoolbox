@@ -34,6 +34,7 @@ class RandomSampler:
             self.model.features[0], global_upper_bound
         )
 
+        # Generate samples until the constraints are satisfied
         while True:
             random_feature_node = self.generate_random_feature_node(
                 self.model.features[0]
@@ -48,9 +49,11 @@ class RandomSampler:
         global_upper_bound = feature.instance_cardinality.intervals[-1].upper
         local_upper_bound = global_upper_bound
 
+        # Terminate calculation if the upper bound is infinite
         if local_upper_bound is None:
             return 0
 
+        # Recursively calculate the global upper bound by multiplying the upper bounds all paths from the root feature
         for child in feature.children:
             global_upper_bound = max(
                 global_upper_bound,
@@ -127,6 +130,8 @@ class RandomSampler:
         random_group_type_cardinality = self.get_random_cardinality(
             feature.group_type_cardinality
         )
+
+        # Seperate required and optional children to only randomize the optional children
         required_children = self.get_required_children(feature)
         amount_of_optional_children = random_group_type_cardinality - len(
             required_children
