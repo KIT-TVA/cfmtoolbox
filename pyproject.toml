@@ -16,6 +16,7 @@ ruff = "^0.4.4"
 pre-commit = "^3.7.0"
 mypy = "^1.10.0"
 pytest = "^8.2.0"
+pytest-cov = "^5.0.0"
 
 [tool.poetry.scripts]
 cfmtoolbox = "cfmtoolbox.__main__:__name__"
@@ -31,6 +32,9 @@ debug = "cfmtoolbox.plugins.debug"
 
 [tool.ruff.lint]
 extend-select = ["I"]
+
+[tool.pytest.ini_options]
+addopts = "--cov=cfmtoolbox --cov-report term-missing --cov-report html"
 
 [build-system]
 requires = ["poetry-core"]
