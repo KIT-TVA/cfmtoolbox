@@ -14,6 +14,11 @@ from cfmtoolbox.plugins.random_sampling import (
 
 @pytest.fixture
 def model():
+    return import_json(Path("tests/data/sandwich_bounded.json").read_bytes())
+
+
+@pytest.fixture
+def unbounded_model():
     return import_json(Path("tests/data/sandwich.json").read_bytes())
 
 
@@ -29,6 +34,12 @@ def test_plugin_can_be_loaded():
 def test_random_sampling_without_loaded_model():
     assert random_sampling(None) is None
     assert random_sampling(None, 3) is None
+
+
+def test_random_sampling_with_unbounded_model(unbounded_model: CFM, capsys):
+    random_sampling(unbounded_model) is unbounded_model
+    captured = capsys.readouterr()
+    assert "Model is unbounded. Please apply big-m global bound first." in captured.out
 
 
 def test_plugin_passes_though_model(model: CFM):
@@ -311,8 +322,3 @@ def test_generate_random_children_with_random_cardinality(
         assert child.instance_cardinality.is_valid_cardinality(
             random_instance_cardinality
         )
-
-
-def test_get_global_upper_bound(model: CFM, random_sampler: RandomSampler):
-    feature = model.features[0]
-    assert random_sampler.get_global_upper_bound(feature) == 12
