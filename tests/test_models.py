@@ -140,6 +140,74 @@ def test_feature_is_required():
     assert not feature.is_required()
 
 
+@pytest.mark.parametrize(
+    ["feature", "expectation"],
+    [
+        (
+            Feature(
+                "Cheese",
+                Cardinality([Interval(0, None)]),
+                Cardinality([]),
+                Cardinality([]),
+                [],
+                [],
+            ),
+            True,
+        ),
+        (
+            Feature(
+                "Cheese",
+                Cardinality([Interval(0, 3)]),
+                Cardinality([]),
+                Cardinality([]),
+                [],
+                [
+                    Feature(
+                        "Gouda",
+                        Cardinality([Interval(0, None)]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                ],
+            ),
+            True,
+        ),
+        (
+            Feature(
+                "Cheese",
+                Cardinality([Interval(0, 3)]),
+                Cardinality([]),
+                Cardinality([]),
+                [],
+                [
+                    Feature(
+                        "Gouda",
+                        Cardinality([Interval(0, 4)]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                    Feature(
+                        "Swiss",
+                        Cardinality([Interval(0, 3)]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    ),
+                ],
+            ),
+            False,
+        ),
+    ],
+)
+def test_feature_is_unbounded(feature: Feature, expectation: bool):
+    assert feature.is_unbounded() is expectation
+
+
 def test_add_feature():
     cfm = CFM([], [], [])
     feature = Feature(
@@ -167,6 +235,49 @@ def test_find_feature():
     )
     cfm.add_feature(feature)
     assert cfm.find_feature("Cheese") == feature
+
+
+@pytest.mark.parametrize(
+    ["cfm", "expectation"],
+    [
+        (
+            CFM(
+                [
+                    Feature(
+                        "Cheese",
+                        Cardinality([Interval(0, None)]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    )
+                ],
+                [],
+                [],
+            ),
+            True,
+        ),
+        (
+            CFM(
+                [
+                    Feature(
+                        "Cheese",
+                        Cardinality([Interval(0, 4)]),
+                        Cardinality([]),
+                        Cardinality([]),
+                        [],
+                        [],
+                    )
+                ],
+                [],
+                [],
+            ),
+            False,
+        ),
+    ],
+)
+def test_cfm_is_unbounded(cfm: CFM, expectation: bool):
+    assert cfm.is_unbounded() is expectation
 
 
 def test_find_feature_raises_missing_features_on_empty_feature_list():

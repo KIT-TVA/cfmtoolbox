@@ -52,6 +52,11 @@ class Feature:
         if child not in self.children:
             self.children.append(child)
 
+    def is_unbounded(self) -> bool:
+        return self.instance_cardinality.intervals[-1].upper is None or any(
+            child.is_unbounded() for child in self.children
+        )
+
 
 @dataclass
 class Constraint:
@@ -80,6 +85,9 @@ class CFM:
             if feature.name == name:
                 return feature
         raise ValueError(f"Feature {name} not found")
+
+    def is_unbounded(self) -> bool:
+        return self.features[0].is_unbounded()
 
 
 @dataclass
