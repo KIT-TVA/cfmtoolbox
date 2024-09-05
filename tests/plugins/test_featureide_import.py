@@ -77,6 +77,14 @@ def test_parse_group_cardinality_can_parse_structure_with_multiple_and_no_mandat
     assert parse_group_cardinality(root) == expectation
 
 
+def test_parse_group_cardinality_can_parse_structure_with_mandatory_is_false_children():
+    root = Element("and")
+    SubElement(root, "Bread", mandatory="false")
+    SubElement(root, "Cheese", mandatory="false")
+    SubElement(root, "Veggies", mandatory="false")
+    assert parse_group_cardinality(root) == Cardinality([Interval(0, 3)])
+
+
 @pytest.mark.parametrize(
     ["node_type", "expectation"],
     [
@@ -122,6 +130,39 @@ def test_parse_group_cardinality_raises_node_type_unknown():
 
 def test_parse_feature():
     root = Element("feature", name="Sandwich")
+    feature = parse_feature(root)
+
+    assert feature.name == "Sandwich"
+    assert feature.instance_cardinality == Cardinality([Interval(0, 1)])
+    assert feature.group_instance_cardinality == Cardinality([])
+    assert feature.parents == []
+    assert feature.children == []
+
+
+def test_parse_feature_can_parse_with_mandatory_feature():
+    root = Element("feature", name="Sandwich", mandatory="true")
+    feature = parse_feature(root)
+
+    assert feature.name == "Sandwich"
+    assert feature.instance_cardinality == Cardinality([Interval(1, 1)])
+    assert feature.group_instance_cardinality == Cardinality([])
+    assert feature.parents == []
+    assert feature.children == []
+
+
+def test_parse_feature_can_parse_with_mandatory_is_false():
+    root = Element("feature", name="Sandwich", mandatory="false")
+    feature = parse_feature(root)
+
+    assert feature.name == "Sandwich"
+    assert feature.instance_cardinality == Cardinality([Interval(0, 1)])
+    assert feature.group_instance_cardinality == Cardinality([])
+    assert feature.parents == []
+    assert feature.children == []
+
+
+def test_parse_feature_can_parse_with_mandatory_is_none():
+    root = Element("feature", name="Sandwich", mandatory="")
     feature = parse_feature(root)
 
     assert feature.name == "Sandwich"

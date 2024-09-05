@@ -41,7 +41,7 @@ def parse_group_cardinality(feature: Element) -> Cardinality:
         upper = len(feature)
 
         for child in feature:
-            if "mandatory" in child.attrib:
+            if "mandatory" in child.attrib and child.attrib["mandatory"] == "true":
                 lower += 1
 
         if feature.tag == NodeTypes.OR.value and lower == 0:
@@ -62,7 +62,9 @@ def parse_group_cardinality(feature: Element) -> Cardinality:
 
 def parse_feature(feature: Element) -> Feature:
     name = feature.attrib["name"]
-    feature_cardinality = parse_instance_cardinality("mandatory" in feature.attrib)
+    feature_cardinality = parse_instance_cardinality(
+        "mandatory" in feature.attrib and feature.attrib["mandatory"] == "true"
+    )
     group_cardinality = parse_group_cardinality(feature)
 
     return Feature(
