@@ -111,7 +111,7 @@ def test_parse_group_cardinality_can_parse_structure_with_single_not_mandatory_c
 
 def test_parse_group_cardinality_can_parse_node_type_feature():
     root = Element("feature")
-    assert parse_group_cardinality(root) == Cardinality([Interval(0, 0)])
+    assert parse_group_cardinality(root) == Cardinality([])
 
 
 def test_parse_group_cardinality_raises_node_type_unknown():
@@ -126,7 +126,7 @@ def test_parse_feature():
 
     assert feature.name == "Sandwich"
     assert feature.instance_cardinality == Cardinality([Interval(0, 1)])
-    assert feature.group_instance_cardinality == Cardinality([Interval(0, 0)])
+    assert feature.group_instance_cardinality == Cardinality([])
     assert feature.parents == []
     assert feature.children == []
 

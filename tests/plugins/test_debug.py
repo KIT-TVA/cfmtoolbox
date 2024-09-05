@@ -24,11 +24,11 @@ Bread: instance [1..1], group type [1..1], group instance [1..1]
 - parents: Sandwich 
 - children: Sourdough, Wheat 
 
-Sourdough: instance [0..1], group type [0..0], group instance [0..0]
+Sourdough: instance [0..1], group type [], group instance []
 - parents: Bread 
 - children:  
 
-Wheat: instance [0..1], group type [0..0], group instance [0..0]
+Wheat: instance [0..1], group type [], group instance []
 - parents: Bread 
 - children:  
 
@@ -36,15 +36,15 @@ CheeseMix: instance [0..1], group type [1..3], group instance [1..3]
 - parents: Sandwich 
 - children: Cheddar, Swiss, Gouda 
 
-Cheddar: instance [0..1], group type [0..0], group instance [0..0]
+Cheddar: instance [0..1], group type [], group instance []
 - parents: CheeseMix 
 - children:  
 
-Swiss: instance [0..1], group type [0..0], group instance [0..0]
+Swiss: instance [0..1], group type [], group instance []
 - parents: CheeseMix 
 - children:  
 
-Gouda: instance [0..1], group type [0..0], group instance [0..0]
+Gouda: instance [0..1], group type [], group instance []
 - parents: CheeseMix 
 - children:  
 
@@ -52,11 +52,11 @@ Veggies: instance [0..1], group type [1..2], group instance [1..2]
 - parents: Sandwich 
 - children: Lettuce, Tomato 
 
-Lettuce: instance [0..1], group type [0..0], group instance [0..0]
+Lettuce: instance [0..1], group type [], group instance []
 - parents: Veggies 
 - children:  
 
-Tomato: instance [0..1], group type [0..0], group instance [0..0]
+Tomato: instance [0..1], group type [], group instance []
 - parents: Veggies 
 - children:  
 
@@ -69,7 +69,6 @@ Tomato: instance [0..1], group type [0..0], group instance [0..0]
     debug(cfm)
 
     output = capsys.readouterr()
-    print(output.out)
     assert expected_output in output.out
 
 
