@@ -204,8 +204,8 @@ def test_feature_is_required():
         ),
     ],
 )
-def test_feature_is_unbounded(feature: Feature, expectation: bool):
-    assert feature.is_unbounded() is expectation
+def test_feature_is_unbound(feature: Feature, expectation: bool):
+    assert feature.is_unbound() is expectation
 
 
 def test_add_feature():
@@ -276,8 +276,8 @@ def test_find_feature():
         ),
     ],
 )
-def test_cfm_is_unbounded(cfm: CFM, expectation: bool):
-    assert cfm.is_unbounded() is expectation
+def test_cfm_is_unbound(cfm: CFM, expectation: bool):
+    assert cfm.is_unbound() is expectation
 
 
 def test_find_feature_raises_missing_features_on_empty_feature_list():

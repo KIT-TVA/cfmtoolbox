@@ -13,8 +13,8 @@ def random_sampling(model: CFM | None, amount: int = 1) -> CFM | None:
         print("No model loaded.")
         return None
 
-    if model.is_unbounded():
-        print("Model is unbounded. Please apply big-m global bound first.")
+    if model.is_unbound():
+        print("Model is unbound. Please apply big-m global bound first.")
         return model
 
     all_samples = [
