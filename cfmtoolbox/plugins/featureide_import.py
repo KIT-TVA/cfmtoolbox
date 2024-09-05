@@ -52,8 +52,7 @@ def parse_group_cardinality(feature: Element) -> Cardinality:
         upper = 1
 
     elif feature.tag == NodeTypes.FEATURE.value:
-        lower = 0
-        upper = 0
+        return Cardinality([])
 
     else:
         raise TypeError(f"Unknown group type: {feature.tag}")
