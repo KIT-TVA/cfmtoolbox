@@ -52,6 +52,11 @@ class Feature:
         if child not in self.children:
             self.children.append(child)
 
+    def is_unbound(self) -> bool:
+        return self.instance_cardinality.intervals[-1].upper is None or any(
+            child.is_unbound() for child in self.children
+        )
+
 
 @dataclass
 class Constraint:
@@ -62,7 +67,7 @@ class Constraint:
     second_cardinality: Cardinality
 
     def __str__(self) -> str:
-        return f"{self.first_feature.name} -> {self.second_feature.name}"
+        return f"{self.first_feature.name} => {self.second_feature.name}"
 
 
 @dataclass
@@ -80,6 +85,9 @@ class CFM:
             if feature.name == name:
                 return feature
         raise ValueError(f"Feature {name} not found")
+
+    def is_unbound(self) -> bool:
+        return self.features[0].is_unbound()
 
 
 @dataclass

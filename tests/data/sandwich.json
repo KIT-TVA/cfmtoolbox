@@ -68,7 +68,7 @@
         { 
           "name": "veggies",  
           "instance_cardinality": { "intervals": [{"lower": 0, "upper": 1}] },
-          "group_type_cardinality": { "intervals": [{"lower" : 1, "upper": 2}] },
+          "group_type_cardinality": { "intervals": [{"lower" : 1, "upper": 3}] },
           "group_instance_cardinality": { "intervals": [{"lower" : 1, "upper": null}] },
           "parents": [], 
           "children": [
@@ -83,6 +83,14 @@
             { 
               "name": "tomato", 
               "instance_cardinality": { "intervals": [{"lower": 0, "upper": null}] },
+              "group_type_cardinality": { "intervals": [] },
+              "group_instance_cardinality": { "intervals": [] },
+              "parents": [], 
+              "children": [] 
+            },
+            { 
+              "name": "onion", 
+              "instance_cardinality": { "intervals": [{"lower": 0, "upper": 2}] },
               "group_type_cardinality": { "intervals": [] },
               "group_instance_cardinality": { "intervals": [] },
               "parents": [], 

@@ -16,5 +16,5 @@ def test_json_export():
     output = export_json(cfm)
 
     assert output.decode() == json.dumps(
-        {"features": [], "require_constraints": [], "exclude_constraints": []}
+        {"features": [], "require_constraints": [], "exclude_constraints": []}, indent=2
     )

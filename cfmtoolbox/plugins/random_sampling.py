@@ -1,17 +1,29 @@
+import json
 import random
 from collections import defaultdict
+from dataclasses import asdict
 
 from cfmtoolbox import app
 from cfmtoolbox.models import CFM, Cardinality, Feature, FeatureNode
 
 
 @app.command()
-def random_sampling(amount: int = 1) -> list[FeatureNode] | None:
-    if app.model is None:
+def random_sampling(model: CFM | None, amount: int = 1) -> CFM | None:
+    if model is None:
         print("No model loaded.")
         return None
 
-    return [RandomSampler(app.model).random_sampling() for _ in range(amount)]
+    if model.is_unbound():
+        print("Model is unbound. Please apply big-m global bound first.")
+        return model
+
+    all_samples = [
+        asdict(RandomSampler(model).random_sampling()) for _ in range(amount)
+    ]
+
+    print(json.dumps(all_samples, indent=2))
+
+    return model
 
 
 class RandomSampler:
@@ -20,47 +32,15 @@ class RandomSampler:
         self.model = model
 
     def random_sampling(self) -> FeatureNode:
-        global_upper_bound = self.get_global_upper_bound(self.model.features[0])
-
-        self.replace_infinite_upper_bound_with_global_upper_bound(
-            self.model.features[0], global_upper_bound
-        )
-
         while True:
+            self.global_feature_count = defaultdict(int)
             random_feature_node = self.generate_random_feature_node(
                 self.model.features[0]
             )
             if random_feature_node.validate(self.model):
                 break
-            self.global_feature_count = defaultdict(int)
 
-        print("Instance", random_feature_node)
         return random_feature_node
-
-    def get_global_upper_bound(self, feature: Feature):
-        global_upper_bound = feature.instance_cardinality.intervals[-1].upper
-        local_upper_bound = global_upper_bound
-
-        if local_upper_bound is None:
-            return 0
-
-        for child in feature.children:
-            global_upper_bound = max(
-                global_upper_bound,
-                local_upper_bound * self.get_global_upper_bound(child),
-            )
-
-        return global_upper_bound
-
-    def replace_infinite_upper_bound_with_global_upper_bound(
-        self, feature: Feature, global_upper_bound: int
-    ):
-        for child in feature.children:
-            if child.instance_cardinality.intervals[-1].upper is None:
-                child.instance_cardinality.intervals[-1].upper = global_upper_bound
-            self.replace_infinite_upper_bound_with_global_upper_bound(
-                child, global_upper_bound
-            )
 
     def get_random_cardinality(self, cardinality_list: Cardinality):
         random_interval = random.choice(cardinality_list.intervals)
@@ -120,6 +100,8 @@ class RandomSampler:
         random_group_type_cardinality = self.get_random_cardinality(
             feature.group_type_cardinality
         )
+
+        # Seperate required and optional children to only randomize the optional children
         required_children = self.get_required_children(feature)
         amount_of_optional_children = random_group_type_cardinality - len(
             required_children

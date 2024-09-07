@@ -27,4 +27,49 @@
 			</or>
 		</and>
 	</struct>
+	<constraints>
+		<rule>
+			<imp>
+				<var>Sourdough</var>
+				<var>Cheddar</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<not>
+					<var>Wheat</var>
+				</not>
+				<var>Tomato</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<not>
+					<var>Gouda</var>
+				</not>
+				<not>
+					<var>Tomato</var>
+				</not>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<not>
+					<not>
+						<var>Swiss</var>
+					</not>
+				</not>
+				<var>Lettuce</var>
+			</imp>
+		</rule>
+		<rule>
+			<imp>
+				<conj>
+					<var>Bread</var>
+					<var>Swiss</var>
+				</conj>
+				<var>Tomato</var>
+			</imp>
+		</rule>
+	</constraints>
 </featureModel>

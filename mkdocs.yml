@@ -1,0 +1,43 @@
+site_name: CFM Toolbox
+site_description: "A plugin-based toolbox for working with cardinality-based feature models."
+site_url: https://kit-tva.github.io/cfmtoolbox/
+repo_url: https://github.com/KIT-TVA/cfmtoolbox/
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.instant
+    - navigation.tracking
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      use_pygments: true
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.superfences
+  - pymdownx.details
+
+nav:
+  - Introduction: index.md
+  - Getting Started: getting-started.md
+  - Plugins:
+    - Plugin Overview: plugins/index.md
+    - Core Plugins:
+      - FeatureIDE Import: plugins/featureide-import.md
+      - UVL Import: plugins/uvl-import.md
+      - UVL Export: plugins/uvl-export.md
+      - JSON Impex: plugins/json-impex.md
+      - Random Sampling: plugins/random-sampling.md
+      - Debugging: plugins/debugging.md
+  - Framework:
+    - Architecture: framework/index.md
+    - Writing Plugins: framework/writing-plugins.md

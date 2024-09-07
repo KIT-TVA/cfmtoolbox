@@ -1,6 +1,6 @@
 include
-    Boolean.group-cardinality
     Arithmetic.feature-cardinality
+    Boolean.group-cardinality
 
 features
     sandwich cardinality [1]

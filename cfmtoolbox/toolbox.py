@@ -1,7 +1,15 @@
+import inspect
+from functools import partial
 from importlib.metadata import entry_points
 from pathlib import Path
 from types import ModuleType
-from typing import Annotated, Callable, Optional, TypeAlias
+from typing import (
+    Annotated,
+    Callable,
+    Optional,
+    TypeAlias,
+    TypeVar,
+)
 
 import typer
 
@@ -9,16 +17,20 @@ from cfmtoolbox.models import CFM
 
 Importer: TypeAlias = Callable[[bytes], CFM]
 Exporter: TypeAlias = Callable[[CFM], bytes]
+CommandF = TypeVar("CommandF", bound=Callable[[CFM | None], CFM | None])
 
 
-class CFMToolbox(typer.Typer):
+class CFMToolbox:
     def __init__(self) -> None:
         self.registered_importers: dict[str, Importer] = {}
         self.registered_exporters: dict[str, Exporter] = {}
         self.model: CFM | None = None
         self.import_path: Path | None = None
         self.export_path: Path | None = None
-        return super().__init__(callback=self.prepare, result_callback=self.cleanup)
+        self.typer = typer.Typer(callback=self.prepare, result_callback=self.cleanup)
+
+    def __call__(self) -> None:
+        return self.typer()
 
     def prepare(
         self,
@@ -62,6 +74,25 @@ class CFMToolbox(typer.Typer):
     def exporter(self, extension: str) -> Callable[[Exporter], Exporter]:
         def decorator(func: Exporter) -> Exporter:
             self.registered_exporters[extension] = func
+            return func
+
+        return decorator
+
+    def command(self, *args, **kwargs) -> Callable[[CommandF], CommandF]:
+        def decorator(func: CommandF) -> CommandF:
+            partial_func = partial(func, self.model)
+
+            def lazy_partial_func(*args, **kwargs):
+                self.model = func(self.model, *args, **kwargs)
+
+            lazy_partial_func.__name__ = func.__name__
+            lazy_partial_func.__module__ = func.__module__
+            lazy_partial_func.__qualname__ = func.__qualname__
+            lazy_partial_func.__doc__ = func.__doc__
+            lazy_partial_func.__annotations__ = func.__annotations__
+            setattr(lazy_partial_func, "__signature__", inspect.signature(partial_func))
+
+            self.typer.command(*args, **kwargs)(lazy_partial_func)
             return func
 
         return decorator

@@ -19,3 +19,7 @@ This repository contains the `cfmtoolbox` itself and a few first party plugins d
 2. `poetry run ruff check .`
 3. `poetry run mypy .`
 4. `poetry run pytest`
+
+### Previewing the documentation
+
+1. `poetry run mkdocs serve`
