@@ -61,7 +61,7 @@ def serialize_root_feature(root: Feature) -> str:
     return f"features\n\t{root.name}\n\t\t[{root.group_instance_cardinality.intervals[0]}]\n"
 
 
-def serialize_features(feature: Feature, export: str, depth: int) -> str:
+def serialize_features(feature: Feature, depth: int) -> str:
     if (
         len(feature.instance_cardinality.intervals) > 1
         or len(feature.group_instance_cardinality.intervals) > 1
@@ -71,10 +71,11 @@ def serialize_features(feature: Feature, export: str, depth: int) -> str:
 
     group_type_cardinality = serialize_group_cardinality(feature)
 
-    export += (
+    export = (
         "\t" * depth
         + f"{feature.name} {Groups.CARDINALITY.value} [{feature.instance_cardinality.intervals[0]}]\n"
     )
+
     export += (
         "\t" * (depth + 1) + f"{group_type_cardinality}\n"
         if group_type_cardinality is not None
@@ -82,7 +83,7 @@ def serialize_features(feature: Feature, export: str, depth: int) -> str:
     )
 
     for child in feature.children:
-        export = serialize_features(child, export, depth + 2)
+        export += serialize_features(child, depth + 2)
 
     return export
 
@@ -141,7 +142,7 @@ def export_uvl(cfm: CFM) -> bytes:
     root = serialize_root_feature(root_feature)
 
     feature_strings = [
-        serialize_features(child, "", depth=3) for child in root_feature.children
+        serialize_features(child, depth=3) for child in root_feature.children
     ]
 
     features = "".join(feature_strings) + "\n"
