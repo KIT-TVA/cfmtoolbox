@@ -1,16 +1,16 @@
 include
-    Arithmetic.feature-cardinality
     Boolean.group-cardinality
+    Arithmetic.feature-cardinality
 
 features
-    sandwich
+    sandwich cardinality [1]
         [2..7]
             bread cardinality [2]
                 alternative
                     sourdough cardinality [0..1]
                     wheat cardinality [0..1]
-            cheeseMix cardinality [2..4]
-                [3]
+            cheesemix cardinality [2..4]
+                or
                     cheddar cardinality [0..1]
                     swiss cardinality [0..2]
                     gouda cardinality [0..3]
@@ -18,3 +18,7 @@ features
                 or
                     lettuce cardinality [0..*]
                     tomato cardinality [0..*]
+
+constraints
+    wheat => lettuce
+    cheddar => sourdough

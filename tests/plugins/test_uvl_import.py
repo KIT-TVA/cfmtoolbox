@@ -1,8 +1,10 @@
+import copy
 from unittest.mock import Mock
 
 import pytest
 
 import cfmtoolbox.plugins.uvl_import as uvl_import_plugin
+from cfmtoolbox import CFM
 from cfmtoolbox.models import Cardinality, Constraint, Feature, Interval
 from cfmtoolbox.plugins.uvl_import import ConstraintType, CustomListener
 from cfmtoolbox.toolbox import CFMToolbox
@@ -15,7 +17,7 @@ def test_plugin_can_be_loaded():
 
 @pytest.fixture()
 def listener():
-    return CustomListener()
+    return CustomListener(CFM([], [], []))
 
 
 def test_exit_reference(listener):
@@ -56,7 +58,7 @@ def test_exit_feature_lowest_level(
     assert listener.features[0].name == "test"
     assert listener.features[0].children == []
     assert listener.features[0].parents == []
-    assert listener.features[0].instance_cardinality == Cardinality([])
+    assert listener.features[0].instance_cardinality == Cardinality([Interval(0, None)])
     assert listener.features[0].group_type_cardinality == Cardinality([])
     assert listener.features[0].group_instance_cardinality == Cardinality([])
     assert listener.feature_map["test"] == listener.features[0]
@@ -121,7 +123,7 @@ def test_exit_feature_with_one_mandatory_group(listener):
     assert listener.features[0].name == "test"
     assert listener.features[0].children == features
     assert listener.features[0].parents == []
-    assert listener.features[0].instance_cardinality == Cardinality([])
+    assert listener.features[0].instance_cardinality == Cardinality([Interval(0, None)])
     assert listener.features[0].group_type_cardinality == Cardinality([Interval(2, 2)])
     assert listener.features[0].group_instance_cardinality == Cardinality(
         [Interval(2, None)]
@@ -211,7 +213,7 @@ def test_exit_feature_with_one_alternative_group(listener):
     assert listener.features[0].name == "test"
     assert listener.features[0].children == features
     assert listener.features[0].parents == []
-    assert listener.features[0].instance_cardinality == Cardinality([])
+    assert listener.features[0].instance_cardinality == Cardinality([Interval(0, None)])
     assert listener.features[0].group_type_cardinality == Cardinality([Interval(1, 1)])
     assert listener.features[0].group_instance_cardinality == Cardinality(
         [Interval(1, None)]
@@ -258,7 +260,7 @@ def test_exit_feature_with_one_optional_group(listener):
     assert listener.features[0].name == "test"
     assert listener.features[0].children == features
     assert listener.features[0].parents == []
-    assert listener.features[0].instance_cardinality == Cardinality([])
+    assert listener.features[0].instance_cardinality == Cardinality([Interval(0, None)])
     assert listener.features[0].group_type_cardinality == Cardinality([Interval(0, 2)])
     assert listener.features[0].group_instance_cardinality == Cardinality(
         [Interval(0, None)]
@@ -305,7 +307,7 @@ def test_exit_feature_with_one_cardinality_group(listener):
     assert listener.features[0].name == "test"
     assert listener.features[0].children == features
     assert listener.features[0].parents == []
-    assert listener.features[0].instance_cardinality == Cardinality([])
+    assert listener.features[0].instance_cardinality == Cardinality([Interval(0, None)])
     assert listener.features[0].group_type_cardinality == Cardinality([Interval(0, 2)])
     assert listener.features[0].group_instance_cardinality == Cardinality(
         [Interval(3, 4)]
@@ -372,47 +374,49 @@ def test_exit_feature_with_two_groups(listener):
     assert len(listener.features) == 1
     assert listener.features[0].name == "test"
 
-    parent_feature = Feature(
-        "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
-    )
+    mock_parent = copy.deepcopy(listener.cfm.require_constraints[0].first_feature)
 
     feature1 = Feature(
         "test_0",
-        Cardinality([]),
+        Cardinality([Interval(0, None)]),
         Cardinality([Interval(2, 2)]),
         Cardinality([Interval(2, None)]),
-        [],
+        [mock_parent],
         features1,
     )
 
     feature2 = Feature(
         "test_1",
-        Cardinality([]),
+        Cardinality([Interval(0, None)]),
         Cardinality([Interval(1, 2)]),
         Cardinality([Interval(1, None)]),
-        [],
+        [mock_parent],
         features2,
     )
 
-    parent_feature.children = [feature1, feature2]
+    mock_parent.children = [feature1, feature2]
+    for child in listener.cfm.require_constraints[0].first_feature.children:
+        child.parents = [mock_parent]
 
     assert listener.features[0].parents == []
-    assert listener.features[0].instance_cardinality == Cardinality([])
-    assert listener.features[0].group_type_cardinality == Cardinality([])
-    assert listener.features[0].group_instance_cardinality == Cardinality([])
+    assert listener.features[0].instance_cardinality == Cardinality([Interval(0, None)])
+    assert listener.features[0].group_type_cardinality == Cardinality([Interval(0, 2)])
+    assert listener.features[0].group_instance_cardinality == Cardinality(
+        [Interval(2, 2)]
+    )
     assert listener.feature_map["test"] == listener.features[0]
     assert len(listener.groups) == 0
-    assert len(listener.constraints) == 2
-    assert listener.constraints[0] == Constraint(
+    assert len(listener.cfm.require_constraints) == 2
+    assert listener.cfm.require_constraints[0] == Constraint(
         True,
-        parent_feature,
+        mock_parent,
         Cardinality([Interval(1, None)]),
         feature1,
         Cardinality([Interval(1, None)]),
     )
-    assert listener.constraints[1] == Constraint(
+    assert listener.cfm.require_constraints[1] == Constraint(
         True,
-        parent_feature,
+        mock_parent,
         Cardinality([Interval(1, None)]),
         feature2,
         Cardinality([Interval(1, None)]),
@@ -478,56 +482,319 @@ def test_exit_feature_with_two_groups_and_instance_cardinality(listener):
     assert len(listener.features) == 1
     assert listener.features[0].name == "test"
 
-    parent_feature = Feature(
-        "test", Cardinality([Interval(3, 4)]), Cardinality([]), Cardinality([]), [], []
-    )
+    mock_parent = copy.deepcopy(listener.cfm.require_constraints[0].first_feature)
 
     feature1 = Feature(
         "test_0",
-        Cardinality([]),
+        Cardinality([Interval(0, None)]),
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(1, None)]),
-        [],
+        [mock_parent],
         features1,
     )
 
     feature2 = Feature(
         "test_1",
-        Cardinality([]),
+        Cardinality([Interval(0, None)]),
         Cardinality([Interval(0, 2)]),
         Cardinality([Interval(0, None)]),
-        [],
+        [mock_parent],
         features2,
     )
 
-    parent_feature.children = [feature1, feature2]
+    mock_parent.children = [feature1, feature2]
+    for child in listener.cfm.require_constraints[0].first_feature.children:
+        child.parents = [mock_parent]
 
     assert listener.features[0].parents == []
     assert listener.features[0].instance_cardinality == Cardinality([Interval(3, 4)])
-    assert listener.features[0].group_type_cardinality == Cardinality([])
-    assert listener.features[0].group_instance_cardinality == Cardinality([])
+    assert listener.features[0].group_type_cardinality == Cardinality([Interval(0, 2)])
+    assert listener.features[0].group_instance_cardinality == Cardinality(
+        [Interval(0, 2)]
+    )
     assert listener.feature_map["test"] == listener.features[0]
     assert listener.group_features_count == [1]
-    assert len(listener.constraints) == 2
-    assert listener.constraints[0] == Constraint(
+    assert len(listener.cfm.require_constraints) == 2
+    assert listener.cfm.require_constraints[0] == Constraint(
         True,
-        parent_feature,
+        mock_parent,
         Cardinality([Interval(1, None)]),
         feature1,
         Cardinality([Interval(1, None)]),
     )
-    assert listener.constraints[1] == Constraint(
+    assert listener.cfm.require_constraints[1] == Constraint(
         True,
-        parent_feature,
+        mock_parent,
         Cardinality([Interval(1, None)]),
         feature2,
         Cardinality([Interval(1, None)]),
     )
 
 
+def test_exit_feature_with_two_groups_including_group_cardinality(listener):
+    mock_ctx = Mock()
+    listener.references = ["test"]
+    listener.cardinality_available = [False]
+    listener.groups_present = [0]
+    listener.group_features_count = [0]
+    features1 = [
+        Feature(
+            "test_group",
+            Cardinality([]),
+            Cardinality([]),
+            Cardinality([]),
+            [],
+            [],
+        ),
+        Feature(
+            "test_group2",
+            Cardinality([]),
+            Cardinality([]),
+            Cardinality([]),
+            [],
+            [],
+        ),
+    ]
+    features2 = [
+        Feature(
+            "test_group3",
+            Cardinality([]),
+            Cardinality([]),
+            Cardinality([]),
+            [],
+            [],
+        ),
+        Feature(
+            "test_group4",
+            Cardinality([]),
+            Cardinality([]),
+            Cardinality([]),
+            [],
+            [],
+        ),
+    ]
+    listener.groups = [
+        (
+            Cardinality([Interval(3, 4)]),
+            features1,
+        ),
+        (
+            Cardinality([Interval(1, 2)]),
+            features2,
+        ),
+    ]
+
+    listener.exitFeature(mock_ctx)
+
+    assert len(listener.features) == 1
+    assert listener.features[0].name == "test"
+
+    mock_parent = copy.deepcopy(listener.cfm.require_constraints[0].first_feature)
+
+    feature1 = Feature(
+        "test_0",
+        Cardinality([Interval(0, None)]),
+        Cardinality([Interval(0, 2)]),
+        Cardinality([Interval(3, 4)]),
+        [mock_parent],
+        features1,
+    )
+
+    feature2 = Feature(
+        "test_1",
+        Cardinality([Interval(0, None)]),
+        Cardinality([Interval(0, 2)]),
+        Cardinality([Interval(1, 2)]),
+        [mock_parent],
+        features2,
+    )
+
+    mock_parent.children = [feature1, feature2]
+    for child in listener.cfm.require_constraints[0].first_feature.children:
+        child.parents = [mock_parent]
+
+    assert listener.features[0].parents == []
+    assert listener.features[0].instance_cardinality == Cardinality([Interval(0, None)])
+    assert listener.features[0].group_type_cardinality == Cardinality([Interval(0, 2)])
+    assert listener.features[0].group_instance_cardinality == Cardinality(
+        [Interval(0, None)]
+    )
+    assert listener.feature_map["test"] == listener.features[0]
+    assert listener.group_features_count == [1]
+    assert len(listener.cfm.require_constraints) == 2
+    assert listener.cfm.require_constraints[0] == Constraint(
+        True,
+        mock_parent,
+        Cardinality([Interval(1, None)]),
+        feature1,
+        Cardinality([Interval(1, None)]),
+    )
+    assert listener.cfm.require_constraints[1] == Constraint(
+        True,
+        mock_parent,
+        Cardinality([Interval(1, None)]),
+        feature2,
+        Cardinality([Interval(1, None)]),
+    )
+
+
+def test_exit_feature_with_two_groups_including_group_cardinality_with_instances(
+    listener,
+):
+    mock_ctx = Mock()
+    listener.references = ["test"]
+    listener.cardinality_available = [False]
+    listener.groups_present = [0]
+    listener.group_features_count = [0]
+    features1 = [
+        Feature(
+            "test_group",
+            Cardinality([Interval(3, 5)]),
+            Cardinality([]),
+            Cardinality([]),
+            [],
+            [],
+        ),
+        Feature(
+            "test_group2",
+            Cardinality([Interval(2, 3)]),
+            Cardinality([]),
+            Cardinality([]),
+            [],
+            [],
+        ),
+    ]
+    features2 = [
+        Feature(
+            "test_group3",
+            Cardinality([Interval(0, None)]),
+            Cardinality([]),
+            Cardinality([]),
+            [],
+            [],
+        ),
+        Feature(
+            "test_group4",
+            Cardinality([Interval(3, 3)]),
+            Cardinality([]),
+            Cardinality([]),
+            [],
+            [],
+        ),
+    ]
+    listener.groups = [
+        (
+            Cardinality([Interval(3, 4)]),
+            features1,
+        ),
+        (
+            Cardinality([Interval(1, 2)]),
+            features2,
+        ),
+    ]
+
+    listener.exitFeature(mock_ctx)
+
+    assert len(listener.features) == 1
+    assert listener.features[0].name == "test"
+
+    mock_parent = copy.deepcopy(listener.cfm.require_constraints[0].first_feature)
+
+    feature1 = Feature(
+        "test_0",
+        Cardinality([Interval(0, None)]),
+        Cardinality([Interval(2, 2)]),
+        Cardinality([Interval(3, 4)]),
+        [mock_parent],
+        features1,
+    )
+
+    feature2 = Feature(
+        "test_1",
+        Cardinality([Interval(0, None)]),
+        Cardinality([Interval(1, 2)]),
+        Cardinality([Interval(1, 2)]),
+        [mock_parent],
+        features2,
+    )
+
+    mock_parent.children = [feature1, feature2]
+    for child in listener.cfm.require_constraints[0].first_feature.children:
+        child.parents = [mock_parent]
+
+    assert listener.features[0].parents == []
+    assert listener.features[0].instance_cardinality == Cardinality([Interval(0, None)])
+    assert listener.features[0].group_type_cardinality == Cardinality([Interval(0, 2)])
+    assert listener.features[0].group_instance_cardinality == Cardinality(
+        [Interval(8, None)]
+    )
+    assert listener.feature_map["test"] == listener.features[0]
+    assert listener.group_features_count == [1]
+    assert len(listener.cfm.require_constraints) == 2
+    assert listener.cfm.require_constraints[0] == Constraint(
+        True,
+        mock_parent,
+        Cardinality([Interval(1, None)]),
+        feature1,
+        Cardinality([Interval(1, None)]),
+    )
+    assert listener.cfm.require_constraints[1] == Constraint(
+        True,
+        mock_parent,
+        Cardinality([Interval(1, None)]),
+        feature2,
+        Cardinality([Interval(1, None)]),
+    )
+
+
+def test_exit_features_with_one_group_with_group_cardinality(listener):
+    mock_ctx = Mock()
+    listener.references = ["test"]
+    listener.cardinality_available = [False]
+    listener.groups_present = [0]
+    listener.group_features_count = [0]
+    features1 = [
+        Feature(
+            "test_group",
+            Cardinality([Interval(3, 5)]),
+            Cardinality([]),
+            Cardinality([]),
+            [],
+            [],
+        ),
+        Feature(
+            "test_group2",
+            Cardinality([Interval(2, 3)]),
+            Cardinality([]),
+            Cardinality([]),
+            [],
+            [],
+        ),
+    ]
+    listener.groups = [
+        (
+            Cardinality([Interval(3, 4)]),
+            features1,
+        ),
+    ]
+
+    listener.exitFeature(mock_ctx)
+
+    assert len(listener.features) == 1
+    assert listener.features[0].name == "test"
+    assert listener.features[0].parents == []
+    assert listener.features[0].instance_cardinality == Cardinality([Interval(0, None)])
+    assert listener.features[0].group_type_cardinality == Cardinality([Interval(2, 2)])
+    assert listener.features[0].group_instance_cardinality == Cardinality(
+        [Interval(3, 4)]
+    )
+    assert listener.feature_map["test"] == listener.features[0]
+    assert listener.group_features_count == [1]
+    assert len(listener.cfm.require_constraints) == 0
+
+
 def test_exit_group_spec_one_subfeature(listener):
     mock_ctx = Mock()
-    listener = CustomListener()
     listener.group_features_count = [1]
     feature = Feature(
         "test", Cardinality([Interval(1, 1)]), Cardinality([]), Cardinality([]), [], []
@@ -876,7 +1143,7 @@ def test_exit_constraint_line_equivalence(listener):
 
     listener.exitConstraintLine(mock_ctx)
 
-    assert len(listener.constraints) == 2
+    assert len(listener.cfm.require_constraints) == 2
 
 
 def test_exit_constraint_line_implication(listener):
@@ -894,4 +1161,18 @@ def test_exit_constraint_line_implication(listener):
 
     listener.exitConstraintLine(mock_ctx)
 
-    assert len(listener.constraints) == 1
+    assert len(listener.cfm.require_constraints) == 1
+
+
+def test_exit_features(listener):
+    mock_ctx = Mock()
+    listener.references_set = {"test1", "test2"}
+    feature1 = Feature(
+        "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+    )
+    listener.features = [feature1]
+
+    listener.exitFeatures(mock_ctx)
+
+    assert feature1.instance_cardinality == Cardinality([Interval(1, 1)])
+    assert listener.references_set == set()
