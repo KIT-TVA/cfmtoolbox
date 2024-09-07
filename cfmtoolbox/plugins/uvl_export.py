@@ -55,10 +55,13 @@ def serialize_includes() -> str:
 
 
 def serialize_root_feature(root: Feature) -> str:
-    if len(root.group_instance_cardinality.intervals) > 1:
-        raise TypeError("UVL cannot handle compound cardinalities")
+    if (
+        len(root.group_instance_cardinality.intervals) > 1
+        or len(root.group_type_cardinality.intervals) > 1
+    ):
+        raise TypeError("UVL cannot handle compounded cardinalities")
 
-    return f"features\n\t{root.name}\n\t\t[{root.group_instance_cardinality.intervals[0]}]\n"
+    return f"features\n\t{root.name}\n\t\t{serialize_group_cardinality(root)}\n"
 
 
 def serialize_features(feature: Feature, depth: int) -> str:

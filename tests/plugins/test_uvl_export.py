@@ -163,11 +163,22 @@ def test_serialize_root_feature():
         [],
         [],
     )
+
+    cheese = Feature(
+        "Cheese",
+        Cardinality([Interval(0, 2)]),
+        Cardinality([]),
+        Cardinality([]),
+        [root],
+        [],
+    )
+
+    root.add_child(cheese)
     root_export = serialize_root_feature(root)
     assert expectation in root_export
 
 
-def test_serialize_root_raises_type_error_on_group_instance_compounded_cardinality():
+def test_serialize_root_feature_raises_type_error_on_group_instance_compounded_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -177,10 +188,10 @@ def test_serialize_root_raises_type_error_on_group_instance_compounded_cardinali
         [],
     )
     with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
-        serialize_features(sandwich, depth=0)
+        serialize_root_feature(sandwich)
 
 
-def test_serialize_root_raises_type_error_on_group_type_compounded_cardinality():
+def test_serialize_root_feature_raises_type_error_on_group_type_compounded_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -190,7 +201,7 @@ def test_serialize_root_raises_type_error_on_group_type_compounded_cardinality()
         [],
     )
     with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
-        serialize_features(sandwich, depth=0)
+        serialize_root_feature(sandwich)
 
 
 def test_serialize_features_raises_type_error_on_compounded_cardinality():
@@ -517,7 +528,7 @@ def test_export_uvl_from_featureide_cfm(capsys):
 
 features
 \tSandwich
-\t\t[1..3]
+\t\tor
 \t\t\tBread cardinality [1..1]
 \t\t\t\talternative
 \t\t\t\t\tSourdough cardinality [0..1]
