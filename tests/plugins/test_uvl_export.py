@@ -6,14 +6,14 @@ import cfmtoolbox.plugins.uvl_export as uvl_export_plugin
 from cfmtoolbox.models import Cardinality, Constraint, Feature, Interval
 from cfmtoolbox.plugins.featureide_import import import_featureide
 from cfmtoolbox.plugins.uvl_export import (
-    export_constraints,
-    export_features,
-    export_group_cardinality,
-    export_includes,
-    export_root_feature,
     export_uvl,
-    format_constraint,
-    stringify_constraints,
+    serialize_all_constraints,
+    serialize_constraint,
+    serialize_constraints,
+    serialize_features,
+    serialize_group_cardinality,
+    serialize_includes,
+    serialize_root_feature,
 )
 from cfmtoolbox.toolbox import CFMToolbox
 
@@ -23,7 +23,7 @@ def test_plugin_can_be_loaded():
     assert uvl_export_plugin in app.load_plugins()
 
 
-def test_export_group_cardinality_can_export_to_alternative():
+def test_serialize_group_cardinality_can_export_to_alternative():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -44,10 +44,10 @@ def test_export_group_cardinality_can_export_to_alternative():
 
     sandwich.children = [cheese]
 
-    assert export_group_cardinality(sandwich) == "alternative"
+    assert serialize_group_cardinality(sandwich) == "alternative"
 
 
-def test_export_group_cardinality_can_export_to_or():
+def test_serialize_group_cardinality_can_export_to_or():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -78,10 +78,10 @@ def test_export_group_cardinality_can_export_to_or():
     sandwich.add_child(cheese)
     sandwich.add_child(veggies)
 
-    assert export_group_cardinality(sandwich) == "or"
+    assert serialize_group_cardinality(sandwich) == "or"
 
 
-def test_export_group_cardinality_can_export_to_one_numbered_cardinality():
+def test_serialize_group_cardinality_can_export_to_one_numbered_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -102,10 +102,10 @@ def test_export_group_cardinality_can_export_to_one_numbered_cardinality():
 
     sandwich.children = [cheese]
 
-    assert export_group_cardinality(sandwich) == "[2]"
+    assert serialize_group_cardinality(sandwich) == "[2]"
 
 
-def test_export_group_cardinality_can_export_to_cardinality():
+def test_serialize_group_cardinality_can_export_to_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -126,10 +126,10 @@ def test_export_group_cardinality_can_export_to_cardinality():
 
     sandwich.children = [cheese]
 
-    assert export_group_cardinality(sandwich) == "[1..3]"
+    assert serialize_group_cardinality(sandwich) == "[1..3]"
 
 
-def test_export_group_cardinality_can_export_to_nothing():
+def test_serialize_group_cardinality_can_export_to_nothing():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -139,19 +139,19 @@ def test_export_group_cardinality_can_export_to_nothing():
         [],
     )
 
-    assert export_group_cardinality(sandwich) == ""
+    assert serialize_group_cardinality(sandwich) is None
 
 
-def test_export_includes():
+def test_serialize_includes():
     expectation = """include
 \tArithmetic.feature-cardinality
 \tBoolean.group-cardinality
 """
-    includes = export_includes()
+    includes = serialize_includes()
     assert expectation in includes
 
 
-def test_export_root_feature():
+def test_serialize_root_feature():
     expectation = """features
 \tSandwich
 \t\t[0..2]"""
@@ -163,11 +163,37 @@ def test_export_root_feature():
         [],
         [],
     )
-    root_export = export_root_feature(root)
+    root_export = serialize_root_feature(root)
     assert expectation in root_export
 
 
-def test_export_features_raises_type_error_on_compounded_cardinality():
+def test_serialize_root_raises_type_error_on_group_instance_compounded_cardinality():
+    sandwich = Feature(
+        "Sandwich",
+        Cardinality([Interval(1, 1)]),
+        Cardinality([Interval(0, 2)]),
+        Cardinality([Interval(0, 2), Interval(2, 2)]),
+        [],
+        [],
+    )
+    with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
+        serialize_features(sandwich, depth=0)
+
+
+def test_serialize_root_raises_type_error_on_group_type_compounded_cardinality():
+    sandwich = Feature(
+        "Sandwich",
+        Cardinality([Interval(1, 1)]),
+        Cardinality([Interval(0, 2), Interval(2, 2)]),
+        Cardinality([Interval(0, 2)]),
+        [],
+        [],
+    )
+    with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
+        serialize_features(sandwich, depth=0)
+
+
+def test_serialize_features_raises_type_error_on_compounded_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -177,10 +203,10 @@ def test_export_features_raises_type_error_on_compounded_cardinality():
         [],
     )
     with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
-        export_features(sandwich, "", 0)
+        serialize_features(sandwich, "", 0)
 
 
-def test_export_features_can_export_single_child_feature():
+def test_serialize_features_can_export_single_child_feature():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -205,11 +231,11 @@ def test_export_features_can_export_single_child_feature():
 \t[0..2]
 \t\tCheese cardinality [0..2]"""
 
-    export = export_features(sandwich, "", 0)
+    export = serialize_features(sandwich, "", 0)
     assert expectation in export
 
 
-def test_export_features():
+def test_serialize_features():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -330,7 +356,7 @@ def test_export_features():
 \t\t\t\tLettuce cardinality [0..*]
 \t\t\t\tTomato cardinality [0..*]"""
 
-    export = export_features(sandwich, "", 0)
+    export = serialize_features(sandwich, "", 0)
     assert expectation in export
 
 
@@ -341,7 +367,7 @@ def test_export_features():
         (Cardinality([Interval(1, 2)]), "((Sandwich >= 1) & (Sandwich <= 2))"),
     ],
 )
-def test_format_constraint(constraint: Cardinality, expectation: str):
+def test_serialize_constraint(constraint: Cardinality, expectation: str):
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -351,7 +377,7 @@ def test_format_constraint(constraint: Cardinality, expectation: str):
         [],
     )
 
-    formatted_constraint = format_constraint(sandwich, constraint)
+    formatted_constraint = serialize_constraint(sandwich, constraint)
     assert formatted_constraint == expectation
 
 
@@ -362,7 +388,7 @@ def test_format_constraint(constraint: Cardinality, expectation: str):
         (False, "\t!((Sandwich = 3) & ((Bread >= 0) & (Bread <= 2)))\n"),
     ],
 )
-def test_stringify_constraints(is_required: bool, expectation: str):
+def test_serialize_constraints(is_required: bool, expectation: str):
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -389,10 +415,10 @@ def test_stringify_constraints(is_required: bool, expectation: str):
         Constraint(True, sandwich, sandwich_cardinality, bread, bread_cardinality)
     ]
 
-    assert stringify_constraints(is_required, constraints) == expectation
+    assert serialize_constraints(constraints, is_required) == expectation
 
 
-def test_stringify_constraints_raises_type_error_on_compounded_cardinality_on_first_feature_cardinality():
+def test_serialize_constraints_raises_type_error_on_compounded_cardinality_on_first_feature_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -414,10 +440,10 @@ def test_stringify_constraints_raises_type_error_on_compounded_cardinality_on_fi
     )
 
     with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
-        stringify_constraints(True, [constraint])
+        serialize_constraints([constraint], is_required=True)
 
 
-def test_stringify_constraints_raises_type_error_on_compounded_cardinality_on_second_feature_cardinality():
+def test_serialize_constraints_raises_type_error_on_compounded_cardinality_on_second_feature_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -439,10 +465,10 @@ def test_stringify_constraints_raises_type_error_on_compounded_cardinality_on_se
     )
 
     with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
-        stringify_constraints(True, [constraint])
+        serialize_constraints([constraint], is_required=True)
 
 
-def test_export_constraints():
+def test_serialize_all_constraints():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -472,7 +498,7 @@ def test_export_constraints():
     require_constraints = constraints
     exclude_constraints = constraints
 
-    export = export_constraints(require_constraints, exclude_constraints)
+    export = serialize_all_constraints(require_constraints, exclude_constraints)
 
     expectation = """constraints
 \t(Sandwich = 3) => ((Bread >= 0) & (Bread <= 2))
