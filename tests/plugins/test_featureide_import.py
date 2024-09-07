@@ -467,7 +467,7 @@ def test_parse_cfm(capsys):
     assert exclude_constraints[0].first_feature.name == "Wheat"
     assert exclude_constraints[0].second_feature.name == "Tomato"
 
-    assert dedent(expected_rule) in output.out
+    assert dedent(expected_rule) in output.err
 
 
 def test_parse_cfm_can_parse_multiple_eliminated_constraints(capsys):
@@ -503,8 +503,20 @@ def test_parse_cfm_can_parse_multiple_eliminated_constraints(capsys):
 
     assert len(exclude_constraints) == 0
     assert len(require_constraints) == 0
-    assert dedent(expected_rule_one) in output.out
-    assert dedent(expected_rule_two) in output.out
+    assert dedent(expected_rule_one) in output.err
+    assert dedent(expected_rule_two) in output.err
+
+
+def test_parse_cfm_does_not_print_extermination_without_eliminated_constraints(capsys):
+    root = Element("featuremodel")
+    struct = SubElement(root, "struct", name="Sandwich", mandatory="true")
+    SubElement(struct, "feature", name="Sandwich", mandatory="true")
+
+    parse_cfm(root)
+    output = capsys.readouterr()
+    extermination_string = "The following constraints were exterminated:"
+
+    assert extermination_string not in output.err
 
 
 def test_parse_cfm_reports_missing_struct():

@@ -1,3 +1,4 @@
+import sys
 from enum import Enum
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
@@ -181,11 +182,14 @@ def parse_cfm(root: Element) -> CFM:
     formatted_eliminated_constraints = [
         ElementTree.tostring(e, encoding="unicode") for e in eliminated_constraints
     ]
-    print(
-        "The following constraints were exterminated:",
-        *formatted_eliminated_constraints,
-        sep="\n",
-    )
+
+    if formatted_eliminated_constraints:
+        print(
+            "The following constraints were exterminated:",
+            *formatted_eliminated_constraints,
+            sep="\n",
+            file=sys.stderr,
+        )
 
     return CFM(features, require_constraints, exclude_constraints)
 
