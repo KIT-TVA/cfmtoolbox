@@ -520,7 +520,7 @@ def test_serialize_all_constraints():
 
 def test_export_uvl_from_featureide_cfm(capsys):
     cfm = import_featureide(Path("tests/data/sandwich.xml").read_bytes())
-    export_uvl(cfm)
+    export = export_uvl(cfm)
 
     expectation = """include
 \tArithmetic.feature-cardinality
@@ -550,6 +550,5 @@ constraints
 \t!(((Wheat >= 0) & (Wheat <= 1)) & ((Tomato >= 0) & (Tomato <= 1)))"""
 
     output = capsys.readouterr()
-
     assert "Exporting UVL\n" in output.out
-    assert expectation in output.out
+    assert expectation in export.decode()

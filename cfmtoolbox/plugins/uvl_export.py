@@ -31,18 +31,22 @@ def serialize_group_cardinality(feature: Feature) -> str | None:
     group_type_interval = group_type_cardinality[0]
     group_instance_interval = group_instance_cardinality[0]
 
-    if group_type_interval.lower == group_type_interval.upper:
-        if group_type_interval.upper == 1:
-            return Groups.ALTERNATIVE.value
+    if (
+        group_type_interval.lower == group_type_interval.upper
+        and group_type_interval.upper == 1
+    ):
+        return Groups.ALTERNATIVE.value
 
-    if group_type_interval.upper == len(feature.children):
-        if group_type_interval.lower == 1:
-            return Groups.OR.value
+    if (
+        group_type_interval.upper == len(feature.children)
+        and group_type_interval.lower == 1
+    ):
+        return Groups.OR.value
 
     if group_instance_interval.lower == group_instance_interval.upper:
         return f"[{group_instance_interval.upper}]"
 
-    return f"[{str(group_instance_interval)}]"
+    return f"[{group_instance_interval}]"
 
 
 def serialize_includes() -> str:
@@ -155,5 +159,4 @@ def export_uvl(cfm: CFM) -> bytes:
 
     export = includes + root + features + constraints
 
-    print(export)
     return export.encode()
