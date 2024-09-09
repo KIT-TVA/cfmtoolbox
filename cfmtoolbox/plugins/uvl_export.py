@@ -139,7 +139,6 @@ def serialize_all_constraints(
 
 @app.exporter(".uvl")
 def export_uvl(cfm: CFM) -> bytes:
-    print("Exporting UVL")
     root_feature = cfm.features[0]
 
     includes = serialize_includes()
