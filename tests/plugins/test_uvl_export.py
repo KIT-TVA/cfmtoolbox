@@ -214,7 +214,7 @@ def test_serialize_features_raises_type_error_on_compounded_cardinality():
         [],
     )
     with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
-        serialize_features(sandwich, depth=0)
+        serialize_features(sandwich)
 
 
 def test_serialize_features_can_export_single_child_feature():
@@ -242,7 +242,7 @@ def test_serialize_features_can_export_single_child_feature():
 \t[0..2]
 \t\tCheese cardinality [0..2]"""
 
-    export = serialize_features(sandwich, depth=0)
+    export = serialize_features(sandwich)
     assert expectation in export
 
 
@@ -367,7 +367,7 @@ def test_serialize_features():
 \t\t\t\tLettuce cardinality [0..*]
 \t\t\t\tTomato cardinality [0..*]"""
 
-    export = serialize_features(sandwich, depth=0)
+    export = serialize_features(sandwich)
     assert expectation in export
 
 
