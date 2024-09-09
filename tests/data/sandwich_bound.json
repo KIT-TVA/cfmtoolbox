@@ -1,299 +1,272 @@
 {
-  "features": [
-    {
-      "name": "sandwich",
-      "instance_cardinality": {
-        "intervals": [
-          {
-            "lower": 1,
-            "upper": 1
-          }
-        ]
-      },
-      "group_type_cardinality": {
-        "intervals": [
-          {
-            "lower": 1,
-            "upper": 3
-          }
-        ]
-      },
-      "group_instance_cardinality": {
-        "intervals": [
-          {
-            "lower": 2,
-            "upper": 7
-          }
-        ]
-      },
-      "parents": [],
-      "children": [
+  "root": {
+    "name": "sandwich",
+    "instance_cardinality": {
+      "intervals": [
         {
-          "name": "bread",
-          "instance_cardinality": {
-            "intervals": [
-              {
-                "lower": 2,
-                "upper": 2
-              }
-            ]
-          },
-          "group_type_cardinality": {
-            "intervals": [
-              {
-                "lower": 1,
-                "upper": 1
-              }
-            ]
-          },
-          "group_instance_cardinality": {
-            "intervals": [
-              {
-                "lower": 1,
-                "upper": 1
-              }
-            ]
-          },
-          "parents": [],
-          "children": [
-            {
-              "name": "sourdough",
-              "instance_cardinality": {
-                "intervals": [
-                  {
-                    "lower": 0,
-                    "upper": 1
-                  }
-                ]
-              },
-              "group_type_cardinality": {
-                "intervals": []
-              },
-              "group_instance_cardinality": {
-                "intervals": []
-              },
-              "parents": [],
-              "children": []
-            },
-            {
-              "name": "wheat",
-              "instance_cardinality": {
-                "intervals": [
-                  {
-                    "lower": 0,
-                    "upper": 1
-                  }
-                ]
-              },
-              "group_type_cardinality": {
-                "intervals": []
-              },
-              "group_instance_cardinality": {
-                "intervals": []
-              },
-              "parents": [],
-              "children": []
-            }
-          ]
-        },
-        {
-          "name": "cheese-mix",
-          "instance_cardinality": {
-            "intervals": [
-              {
-                "lower": 0,
-                "upper": 0
-              },
-              {
-                "lower": 2,
-                "upper": 4
-              }
-            ]
-          },
-          "group_type_cardinality": {
-            "intervals": [
-              {
-                "lower": 1,
-                "upper": 3
-              }
-            ]
-          },
-          "group_instance_cardinality": {
-            "intervals": [
-              {
-                "lower": 3,
-                "upper": 3
-              }
-            ]
-          },
-          "parents": [],
-          "children": [
-            {
-              "name": "cheddar",
-              "instance_cardinality": {
-                "intervals": [
-                  {
-                    "lower": 0,
-                    "upper": 1
-                  }
-                ]
-              },
-              "group_type_cardinality": {
-                "intervals": []
-              },
-              "group_instance_cardinality": {
-                "intervals": []
-              },
-              "parents": [],
-              "children": []
-            },
-            {
-              "name": "swiss",
-              "instance_cardinality": {
-                "intervals": [
-                  {
-                    "lower": 0,
-                    "upper": 2
-                  }
-                ]
-              },
-              "group_type_cardinality": {
-                "intervals": []
-              },
-              "group_instance_cardinality": {
-                "intervals": []
-              },
-              "parents": [],
-              "children": []
-            },
-            {
-              "name": "gouda",
-              "instance_cardinality": {
-                "intervals": [
-                  {
-                    "lower": 0,
-                    "upper": 3
-                  }
-                ]
-              },
-              "group_type_cardinality": {
-                "intervals": []
-              },
-              "group_instance_cardinality": {
-                "intervals": []
-              },
-              "parents": [],
-              "children": []
-            }
-          ]
-        },
-        {
-          "name": "veggies",
-          "instance_cardinality": {
-            "intervals": [
-              {
-                "lower": 0,
-                "upper": 1
-              }
-            ]
-          },
-          "group_type_cardinality": {
-            "intervals": [
-              {
-                "lower": 1,
-                "upper": 3
-              }
-            ]
-          },
-          "group_instance_cardinality": {
-            "intervals": [
-              {
-                "lower": 1,
-                "upper": 26
-              }
-            ]
-          },
-          "parents": [],
-          "children": [
-            {
-              "name": "lettuce",
-              "instance_cardinality": {
-                "intervals": [
-                  {
-                    "lower": 0,
-                    "upper": 12
-                  }
-                ]
-              },
-              "group_type_cardinality": {
-                "intervals": []
-              },
-              "group_instance_cardinality": {
-                "intervals": []
-              },
-              "parents": [],
-              "children": []
-            },
-            {
-              "name": "tomato",
-              "instance_cardinality": {
-                "intervals": [
-                  {
-                    "lower": 0,
-                    "upper": 12
-                  }
-                ]
-              },
-              "group_type_cardinality": {
-                "intervals": []
-              },
-              "group_instance_cardinality": {
-                "intervals": []
-              },
-              "parents": [],
-              "children": []
-            },
-            {
-              "name": "onion",
-              "instance_cardinality": {
-                "intervals": [
-                  {
-                    "lower": 0,
-                    "upper": 2
-                  }
-                ]
-              },
-              "group_type_cardinality": {
-                "intervals": []
-              },
-              "group_instance_cardinality": {
-                "intervals": []
-              },
-              "parents": [],
-              "children": []
-            }
-          ]
+          "lower": 1,
+          "upper": 1
         }
       ]
-    }
-  ],
-  "require_constraints": [
-    {
-      "require": true,
-      "first_feature": {
-        "name": "wheat",
+    },
+    "group_type_cardinality": {
+      "intervals": [
+        {
+          "lower": 1,
+          "upper": 3
+        }
+      ]
+    },
+    "group_instance_cardinality": {
+      "intervals": [
+        {
+          "lower": 2,
+          "upper": 7
+        }
+      ]
+    },
+    "children": [
+      {
+        "name": "bread",
         "instance_cardinality": {
-          "intervals": []
+          "intervals": [
+            {
+              "lower": 2,
+              "upper": 2
+            }
+          ]
         },
         "group_type_cardinality": {
-          "intervals": []
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
         },
         "group_instance_cardinality": {
-          "intervals": []
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
         },
-        "parents": [],
-        "children": []
+        "children": [
+          {
+            "name": "sourdough",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "wheat",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          }
+        ]
       },
+      {
+        "name": "cheese-mix",
+        "instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 0,
+              "upper": 0
+            },
+            {
+              "lower": 2,
+              "upper": 4
+            }
+          ]
+        },
+        "group_type_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 3
+            }
+          ]
+        },
+        "group_instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 3,
+              "upper": 3
+            }
+          ]
+        },
+        "children": [
+          {
+            "name": "cheddar",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "swiss",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 2
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "gouda",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 3
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "veggies",
+        "instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 0,
+              "upper": 1
+            }
+          ]
+        },
+        "group_type_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 3
+            }
+          ]
+        },
+        "group_instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 26
+            }
+          ]
+        },
+        "children": [
+          {
+            "name": "lettuce",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 12
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "tomato",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 12
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "onion",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 2
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "require": true,
+      "first_feature_name": "wheat",
       "first_cardinality": {
         "intervals": [
           {
@@ -302,20 +275,7 @@
           }
         ]
       },
-      "second_feature": {
-        "name": "lettuce",
-        "instance_cardinality": {
-          "intervals": []
-        },
-        "group_type_cardinality": {
-          "intervals": []
-        },
-        "group_instance_cardinality": {
-          "intervals": []
-        },
-        "parents": [],
-        "children": []
-      },
+      "second_feature_name": "lettuce",
       "second_cardinality": {
         "intervals": [
           {
@@ -327,20 +287,7 @@
     },
     {
       "require": true,
-      "first_feature": {
-        "name": "cheddar",
-        "instance_cardinality": {
-          "intervals": []
-        },
-        "group_type_cardinality": {
-          "intervals": []
-        },
-        "group_instance_cardinality": {
-          "intervals": []
-        },
-        "parents": [],
-        "children": []
-      },
+      "first_feature_name": "cheddar",
       "first_cardinality": {
         "intervals": [
           {
@@ -349,20 +296,7 @@
           }
         ]
       },
-      "second_feature": {
-        "name": "sourdough",
-        "instance_cardinality": {
-          "intervals": []
-        },
-        "group_type_cardinality": {
-          "intervals": []
-        },
-        "group_instance_cardinality": {
-          "intervals": []
-        },
-        "parents": [],
-        "children": []
-      },
+      "second_feature_name": "sourdough",
       "second_cardinality": {
         "intervals": [
           {
@@ -371,25 +305,10 @@
           }
         ]
       }
-    }
-  ],
-  "exclude_constraints": [
+    },
     {
       "require": false,
-      "first_feature": {
-        "name": "tomato",
-        "instance_cardinality": {
-          "intervals": []
-        },
-        "group_type_cardinality": {
-          "intervals": []
-        },
-        "group_instance_cardinality": {
-          "intervals": []
-        },
-        "parents": [],
-        "children": []
-      },
+      "first_feature_name": "tomato",
       "first_cardinality": {
         "intervals": [
           {
@@ -398,20 +317,7 @@
           }
         ]
       },
-      "second_feature": {
-        "name": "gouda",
-        "instance_cardinality": {
-          "intervals": []
-        },
-        "group_type_cardinality": {
-          "intervals": []
-        },
-        "group_instance_cardinality": {
-          "intervals": []
-        },
-        "parents": [],
-        "children": []
-      },
+      "second_feature_name": "gouda",
       "second_cardinality": {
         "intervals": [
           {
