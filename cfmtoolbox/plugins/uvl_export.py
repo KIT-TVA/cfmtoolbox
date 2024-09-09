@@ -1,4 +1,5 @@
 from enum import Enum
+from textwrap import indent
 
 from cfmtoolbox import CFM, app
 from cfmtoolbox.models import Cardinality, Constraint, Feature
@@ -68,7 +69,7 @@ def serialize_root_feature(root: Feature) -> str:
     return f"features\n\t{root.name}\n\t\t{serialize_group_cardinality(root)}\n"
 
 
-def serialize_features(feature: Feature, depth: int) -> str:
+def serialize_features(feature: Feature) -> str:
     if (
         len(feature.instance_cardinality.intervals) > 1
         or len(feature.group_instance_cardinality.intervals) > 1
@@ -78,19 +79,15 @@ def serialize_features(feature: Feature, depth: int) -> str:
 
     group_type_cardinality = serialize_group_cardinality(feature)
 
-    export = (
-        "\t" * depth
-        + f"{feature.name} {Groups.CARDINALITY.value} [{feature.instance_cardinality.intervals[0]}]\n"
-    )
-
+    export = f"{feature.name} {Groups.CARDINALITY.value} [{feature.instance_cardinality.intervals[0]}]\n"
     export += (
-        "\t" * (depth + 1) + f"{group_type_cardinality}\n"
+        indent(f"{group_type_cardinality}\n", "\t")
         if group_type_cardinality is not None
         else ""
     )
 
     for child in feature.children:
-        export += serialize_features(child, depth + 2)
+        export += indent(serialize_features(child), "\t\t")
 
     return export
 
@@ -149,7 +146,7 @@ def export_uvl(cfm: CFM) -> bytes:
     root = serialize_root_feature(root_feature)
 
     feature_strings = [
-        serialize_features(child, depth=3) for child in root_feature.children
+        indent(serialize_features(child), "\t\t\t") for child in root_feature.children
     ]
 
     features = "".join(feature_strings) + "\n"
