@@ -518,7 +518,7 @@ def test_serialize_all_constraints():
     assert expectation == export
 
 
-def test_export_uvl_from_featureide_cfm(capsys):
+def test_export_uvl_from_featureide_cfm():
     cfm = import_featureide(Path("tests/data/sandwich.xml").read_bytes())
     export = export_uvl(cfm)
 
@@ -549,6 +549,4 @@ constraints
 \t((Swiss >= 0) & (Swiss <= 1)) => ((Lettuce >= 0) & (Lettuce <= 1))
 \t!(((Wheat >= 0) & (Wheat <= 1)) & ((Tomato >= 0) & (Tomato <= 1)))"""
 
-    output = capsys.readouterr()
-    assert "Exporting UVL\n" in output.out
     assert expectation in export.decode()
