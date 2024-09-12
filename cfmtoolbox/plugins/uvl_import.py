@@ -3,6 +3,7 @@ from typing import Dict
 
 from antlr4 import CommonTokenStream, InputStream
 from antlr4.error.ErrorListener import ErrorListener
+from colorama import Fore
 from uvl.UVLCustomLexer import UVLCustomLexer
 from uvl.UVLPythonListener import UVLPythonListener
 from uvl.UVLPythonParser import UVLPythonParser
@@ -32,27 +33,19 @@ class ConstraintType(Enum):
 
 class CustomListener(UVLPythonListener):
     def __init__(self, cfm: CFM):
-        self.cfm = cfm  # empty cfm model
-        self.references: list[str] = []  # names of features
-        self.feature_cardinalities: list[
-            Cardinality
-        ] = []  # instance cardinalities of features
-        self.features: list[Feature] = []  # current features to look at
-        self.group_specs: list[list[Feature]] = []  # features in a group
-        self.groups: list[
-            tuple[Cardinality, list[Feature]]
-        ] = []  # cardinality and features in a group
-        self.group_features_count: list[int] = []  # numbe of features in group
-        self.cardinality_available: list[bool] = []  # cardinality defined in model
-        self.groups_present: list[
-            int
-        ] = []  # how many groups exist in the current context
-        self.constraint_types: list[ConstraintType] = []  # type of constraint
-        self.feature_map: Dict[
-            str, Feature
-        ] = {}  # map to reference existing features in constraints
-        self.references_set: set[str] = set()  # allow no duplicates in references
-        self.warning_printed: Dict[str, bool] = {}  # print warning only once
+        self.cfm = cfm
+        self.references: list[str] = []
+        self.feature_cardinalities: list[Cardinality] = []
+        self.features: list[Feature] = []
+        self.group_specs: list[list[Feature]] = []
+        self.groups: list[tuple[Cardinality, list[Feature]]] = []
+        self.group_features_count: list[int] = []
+        self.cardinality_available: list[bool] = []
+        self.groups_present: list[int] = []
+        self.constraint_types: list[ConstraintType] = []
+        self.feature_map: Dict[str, Feature] = {}
+        self.references_set: set[str] = set()
+        self.warning_printed: Dict[str, bool] = {}
 
     def exitOrGroup(self, ctx: UVLPythonParser.OrGroupContext):
         group_specs = self.group_specs.pop()
@@ -158,7 +151,7 @@ class CustomListener(UVLPythonListener):
                 if not self.warning_printed.get("groups", False):
                     self.warning_printed["groups"] = True
                     print(
-                        "\033[93mSome information will be lost, due to the fact that CFM does not support multiple groups in a feature\033[0m"
+                        f"{Fore.YELLOW}Some information will be lost, due to the fact that CFM does not support multiple groups in a feature{Fore.RESET}"
                     )
 
                 parent_feature = Feature(
@@ -350,7 +343,7 @@ class CustomListener(UVLPythonListener):
                 )
             )
         else:
-            print(f"\033[91mERROR, operation {op} not supported yet\033[0m")
+            print(f"{Fore.YELLOW} ERROR, operation {op} not supported yet{Fore.RESET}")
 
     def exitEquivalenceConstraint(
         self, ctx: UVLPythonParser.EquivalenceConstraintContext
@@ -373,7 +366,7 @@ class CustomListener(UVLPythonListener):
     def exitAttributes(self, ctx: UVLPythonParser.AttributesContext):
         if not self.warning_printed.get("attributes", False):
             self.warning_printed["attributes"] = True
-            print("\033[93mText is not supported in CFM\033[0m")
+            print(f"{Fore.YELLOW}Text is not supported in CFM{Fore.RESET}")
 
 
 @app.importer(".uvl")

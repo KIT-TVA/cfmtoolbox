@@ -10,14 +10,14 @@ from cfmtoolbox.plugins.uvl_import import ConstraintType, CustomListener
 from cfmtoolbox.toolbox import CFMToolbox
 
 
-def test_plugin_can_be_loaded():
-    app = CFMToolbox()
-    assert uvl_import_plugin in app.load_plugins()
-
-
 @pytest.fixture()
 def listener():
     return CustomListener(CFM([], [], []))
+
+
+def test_plugin_can_be_loaded():
+    app = CFMToolbox()
+    assert uvl_import_plugin in app.load_plugins()
 
 
 def test_exit_reference(listener):
@@ -94,20 +94,20 @@ def test_exit_feature_with_one_mandatory_group(listener):
     listener.group_features_count = [0]
     features = [
         Feature(
-            "test_group",
-            Cardinality([Interval(1, 1)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group",
+            instance_cardinality=Cardinality([Interval(1, 1)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         Feature(
-            "test_group2",
-            Cardinality([Interval(1, 1)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group2",
+            instance_cardinality=Cardinality([Interval(1, 1)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     ]
     listener.groups = [
@@ -142,15 +142,20 @@ def test_exit_feature_with_one_or_group(listener):
     listener.group_features_count = [0]
     features = [
         Feature(
-            "test_group",
-            Cardinality([Interval(3, 5)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group",
+            instance_cardinality=Cardinality([Interval(3, 5)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         Feature(
-            "test_group2", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+            name="test_group2",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     ]
     listener.groups = [
@@ -184,20 +189,20 @@ def test_exit_feature_with_one_alternative_group(listener):
     listener.group_features_count = [0]
     features = [
         Feature(
-            "test_group",
-            Cardinality([]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         Feature(
-            "test_group2",
-            Cardinality([Interval(1, 1)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group2",
+            instance_cardinality=Cardinality([Interval(1, 1)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     ]
     listener.groups = [
@@ -231,20 +236,20 @@ def test_exit_feature_with_one_optional_group(listener):
     listener.group_features_count = [0]
     features = [
         Feature(
-            "test_group",
-            Cardinality([Interval(0, 1)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group",
+            instance_cardinality=Cardinality([Interval(0, 1)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         Feature(
-            "test_group2",
-            Cardinality([Interval(0, 1)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group2",
+            instance_cardinality=Cardinality([Interval(0, 1)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     ]
     listener.groups = [
@@ -278,20 +283,20 @@ def test_exit_feature_with_one_cardinality_group(listener):
     listener.group_features_count = [0]
     features = [
         Feature(
-            "test_group",
-            Cardinality([]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         Feature(
-            "test_group2",
-            Cardinality([]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group2",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     ]
     listener.groups = [
@@ -324,38 +329,38 @@ def test_exit_feature_with_two_groups(listener):
     listener.groups_present = [0]
     features1 = [
         Feature(
-            "test_group",
-            Cardinality([Interval(1, 1)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group",
+            instance_cardinality=Cardinality([Interval(1, 1)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         Feature(
-            "test_group2",
-            Cardinality([Interval(1, 1)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group2",
+            instance_cardinality=Cardinality([Interval(1, 1)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     ]
     features2 = [
         Feature(
-            "test_group3",
-            Cardinality([]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group3",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         Feature(
-            "test_group4",
-            Cardinality([]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group4",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     ]
     listener.groups = [
@@ -377,21 +382,21 @@ def test_exit_feature_with_two_groups(listener):
     mock_parent = copy.deepcopy(listener.cfm.require_constraints[0].first_feature)
 
     feature1 = Feature(
-        "test_0",
-        Cardinality([Interval(0, None)]),
-        Cardinality([Interval(2, 2)]),
-        Cardinality([Interval(2, None)]),
-        [mock_parent],
-        features1,
+        name="test_0",
+        instance_cardinality=Cardinality([Interval(0, None)]),
+        group_type_cardinality=Cardinality([Interval(2, 2)]),
+        group_instance_cardinality=Cardinality([Interval(2, None)]),
+        parents=[mock_parent],
+        children=features1,
     )
 
     feature2 = Feature(
-        "test_1",
-        Cardinality([Interval(0, None)]),
-        Cardinality([Interval(1, 2)]),
-        Cardinality([Interval(1, None)]),
-        [mock_parent],
-        features2,
+        name="test_1",
+        instance_cardinality=Cardinality([Interval(0, None)]),
+        group_type_cardinality=Cardinality([Interval(1, 2)]),
+        group_instance_cardinality=Cardinality([Interval(1, None)]),
+        parents=[mock_parent],
+        children=features2,
     )
 
     mock_parent.children = [feature1, feature2]
@@ -408,18 +413,18 @@ def test_exit_feature_with_two_groups(listener):
     assert len(listener.groups) == 0
     assert len(listener.cfm.require_constraints) == 2
     assert listener.cfm.require_constraints[0] == Constraint(
-        True,
-        mock_parent,
-        Cardinality([Interval(1, None)]),
-        feature1,
-        Cardinality([Interval(1, None)]),
+        require=True,
+        first_feature=mock_parent,
+        first_cardinality=Cardinality([Interval(1, None)]),
+        second_feature=feature1,
+        second_cardinality=Cardinality([Interval(1, None)]),
     )
     assert listener.cfm.require_constraints[1] == Constraint(
-        True,
-        mock_parent,
-        Cardinality([Interval(1, None)]),
-        feature2,
-        Cardinality([Interval(1, None)]),
+        require=True,
+        first_feature=mock_parent,
+        first_cardinality=Cardinality([Interval(1, None)]),
+        second_feature=feature2,
+        second_cardinality=Cardinality([Interval(1, None)]),
     )
 
 
@@ -432,38 +437,38 @@ def test_exit_feature_with_two_groups_and_instance_cardinality(listener):
     listener.group_features_count = [0]
     features1 = [
         Feature(
-            "test_group",
-            Cardinality([]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         Feature(
-            "test_group2",
-            Cardinality([]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group2",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     ]
     features2 = [
         Feature(
-            "test_group3",
-            Cardinality([Interval(0, 1)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group3",
+            instance_cardinality=Cardinality([Interval(0, 1)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         Feature(
-            "test_group4",
-            Cardinality([Interval(0, 1)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group4",
+            instance_cardinality=Cardinality([Interval(0, 1)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     ]
     listener.groups = [
@@ -485,21 +490,21 @@ def test_exit_feature_with_two_groups_and_instance_cardinality(listener):
     mock_parent = copy.deepcopy(listener.cfm.require_constraints[0].first_feature)
 
     feature1 = Feature(
-        "test_0",
-        Cardinality([Interval(0, None)]),
-        Cardinality([Interval(1, 1)]),
-        Cardinality([Interval(1, None)]),
-        [mock_parent],
-        features1,
+        name="test_0",
+        instance_cardinality=Cardinality([Interval(0, None)]),
+        group_type_cardinality=Cardinality([Interval(1, 1)]),
+        group_instance_cardinality=Cardinality([Interval(1, None)]),
+        parents=[mock_parent],
+        children=features1,
     )
 
     feature2 = Feature(
-        "test_1",
-        Cardinality([Interval(0, None)]),
-        Cardinality([Interval(0, 2)]),
-        Cardinality([Interval(0, None)]),
-        [mock_parent],
-        features2,
+        name="test_1",
+        instance_cardinality=Cardinality([Interval(0, None)]),
+        group_type_cardinality=Cardinality([Interval(0, 2)]),
+        group_instance_cardinality=Cardinality([Interval(0, None)]),
+        parents=[mock_parent],
+        children=features2,
     )
 
     mock_parent.children = [feature1, feature2]
@@ -516,18 +521,18 @@ def test_exit_feature_with_two_groups_and_instance_cardinality(listener):
     assert listener.group_features_count == [1]
     assert len(listener.cfm.require_constraints) == 2
     assert listener.cfm.require_constraints[0] == Constraint(
-        True,
-        mock_parent,
-        Cardinality([Interval(1, None)]),
-        feature1,
-        Cardinality([Interval(1, None)]),
+        require=True,
+        first_feature=mock_parent,
+        first_cardinality=Cardinality([Interval(1, None)]),
+        second_feature=feature1,
+        second_cardinality=Cardinality([Interval(1, None)]),
     )
     assert listener.cfm.require_constraints[1] == Constraint(
-        True,
-        mock_parent,
-        Cardinality([Interval(1, None)]),
-        feature2,
-        Cardinality([Interval(1, None)]),
+        require=True,
+        first_feature=mock_parent,
+        first_cardinality=Cardinality([Interval(1, None)]),
+        second_feature=feature2,
+        second_cardinality=Cardinality([Interval(1, None)]),
     )
 
 
@@ -539,38 +544,38 @@ def test_exit_feature_with_two_groups_including_group_cardinality(listener):
     listener.group_features_count = [0]
     features1 = [
         Feature(
-            "test_group",
-            Cardinality([]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         Feature(
-            "test_group2",
-            Cardinality([]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group2",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     ]
     features2 = [
         Feature(
-            "test_group3",
-            Cardinality([]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group3",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         Feature(
-            "test_group4",
-            Cardinality([]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group4",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     ]
     listener.groups = [
@@ -592,21 +597,21 @@ def test_exit_feature_with_two_groups_including_group_cardinality(listener):
     mock_parent = copy.deepcopy(listener.cfm.require_constraints[0].first_feature)
 
     feature1 = Feature(
-        "test_0",
-        Cardinality([Interval(0, None)]),
-        Cardinality([Interval(0, 2)]),
-        Cardinality([Interval(3, 4)]),
-        [mock_parent],
-        features1,
+        name="test_0",
+        instance_cardinality=Cardinality([Interval(0, None)]),
+        group_type_cardinality=Cardinality([Interval(0, 2)]),
+        group_instance_cardinality=Cardinality([Interval(3, 4)]),
+        parents=[mock_parent],
+        children=features1,
     )
 
     feature2 = Feature(
-        "test_1",
-        Cardinality([Interval(0, None)]),
-        Cardinality([Interval(0, 2)]),
-        Cardinality([Interval(1, 2)]),
-        [mock_parent],
-        features2,
+        name="test_1",
+        instance_cardinality=Cardinality([Interval(0, None)]),
+        group_type_cardinality=Cardinality([Interval(0, 2)]),
+        group_instance_cardinality=Cardinality([Interval(1, 2)]),
+        parents=[mock_parent],
+        children=features2,
     )
 
     mock_parent.children = [feature1, feature2]
@@ -623,18 +628,18 @@ def test_exit_feature_with_two_groups_including_group_cardinality(listener):
     assert listener.group_features_count == [1]
     assert len(listener.cfm.require_constraints) == 2
     assert listener.cfm.require_constraints[0] == Constraint(
-        True,
-        mock_parent,
-        Cardinality([Interval(1, None)]),
-        feature1,
-        Cardinality([Interval(1, None)]),
+        require=True,
+        first_feature=mock_parent,
+        first_cardinality=Cardinality([Interval(1, None)]),
+        second_feature=feature1,
+        second_cardinality=Cardinality([Interval(1, None)]),
     )
     assert listener.cfm.require_constraints[1] == Constraint(
-        True,
-        mock_parent,
-        Cardinality([Interval(1, None)]),
-        feature2,
-        Cardinality([Interval(1, None)]),
+        require=True,
+        first_feature=mock_parent,
+        first_cardinality=Cardinality([Interval(1, None)]),
+        second_feature=feature2,
+        second_cardinality=Cardinality([Interval(1, None)]),
     )
 
 
@@ -648,38 +653,38 @@ def test_exit_feature_with_two_groups_including_group_cardinality_with_instances
     listener.group_features_count = [0]
     features1 = [
         Feature(
-            "test_group",
-            Cardinality([Interval(3, 5)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group",
+            instance_cardinality=Cardinality([Interval(3, 5)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         Feature(
-            "test_group2",
-            Cardinality([Interval(2, 3)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group2",
+            instance_cardinality=Cardinality([Interval(2, 3)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     ]
     features2 = [
         Feature(
-            "test_group3",
-            Cardinality([Interval(0, None)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group3",
+            instance_cardinality=Cardinality([Interval(0, None)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         Feature(
-            "test_group4",
-            Cardinality([Interval(3, 3)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group4",
+            instance_cardinality=Cardinality([Interval(3, 3)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     ]
     listener.groups = [
@@ -701,21 +706,21 @@ def test_exit_feature_with_two_groups_including_group_cardinality_with_instances
     mock_parent = copy.deepcopy(listener.cfm.require_constraints[0].first_feature)
 
     feature1 = Feature(
-        "test_0",
-        Cardinality([Interval(0, None)]),
-        Cardinality([Interval(2, 2)]),
-        Cardinality([Interval(3, 4)]),
-        [mock_parent],
-        features1,
+        name="test_0",
+        instance_cardinality=Cardinality([Interval(0, None)]),
+        group_type_cardinality=Cardinality([Interval(2, 2)]),
+        group_instance_cardinality=Cardinality([Interval(3, 4)]),
+        parents=[mock_parent],
+        children=features1,
     )
 
     feature2 = Feature(
-        "test_1",
-        Cardinality([Interval(0, None)]),
-        Cardinality([Interval(1, 2)]),
-        Cardinality([Interval(1, 2)]),
-        [mock_parent],
-        features2,
+        name="test_1",
+        instance_cardinality=Cardinality([Interval(0, None)]),
+        group_type_cardinality=Cardinality([Interval(1, 2)]),
+        group_instance_cardinality=Cardinality([Interval(1, 2)]),
+        parents=[mock_parent],
+        children=features2,
     )
 
     mock_parent.children = [feature1, feature2]
@@ -732,18 +737,18 @@ def test_exit_feature_with_two_groups_including_group_cardinality_with_instances
     assert listener.group_features_count == [1]
     assert len(listener.cfm.require_constraints) == 2
     assert listener.cfm.require_constraints[0] == Constraint(
-        True,
-        mock_parent,
-        Cardinality([Interval(1, None)]),
-        feature1,
-        Cardinality([Interval(1, None)]),
+        require=True,
+        first_feature=mock_parent,
+        first_cardinality=Cardinality([Interval(1, None)]),
+        second_feature=feature1,
+        second_cardinality=Cardinality([Interval(1, None)]),
     )
     assert listener.cfm.require_constraints[1] == Constraint(
-        True,
-        mock_parent,
-        Cardinality([Interval(1, None)]),
-        feature2,
-        Cardinality([Interval(1, None)]),
+        require=True,
+        first_feature=mock_parent,
+        first_cardinality=Cardinality([Interval(1, None)]),
+        second_feature=feature2,
+        second_cardinality=Cardinality([Interval(1, None)]),
     )
 
 
@@ -755,20 +760,20 @@ def test_exit_features_with_one_group_with_group_cardinality(listener):
     listener.group_features_count = [0]
     features1 = [
         Feature(
-            "test_group",
-            Cardinality([Interval(3, 5)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group",
+            instance_cardinality=Cardinality([Interval(3, 5)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         Feature(
-            "test_group2",
-            Cardinality([Interval(2, 3)]),
-            Cardinality([]),
-            Cardinality([]),
-            [],
-            [],
+            name="test_group2",
+            instance_cardinality=Cardinality([Interval(2, 3)]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     ]
     listener.groups = [
@@ -797,7 +802,12 @@ def test_exit_group_spec_one_subfeature(listener):
     mock_ctx = Mock()
     listener.group_features_count = [1]
     feature = Feature(
-        "test", Cardinality([Interval(1, 1)]), Cardinality([]), Cardinality([]), [], []
+        name="test",
+        instance_cardinality=Cardinality([Interval(1, 1)]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     listener.features = [feature]
 
@@ -812,10 +822,20 @@ def test_exit_group_spec_two_features(listener):
     mock_ctx = Mock()
     listener.group_features_count = [2]
     feature1 = Feature(
-        "test1", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        name="test1",
+        instance_cardinality=Cardinality([]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     feature2 = Feature(
-        "test2", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        name="test2",
+        instance_cardinality=Cardinality([]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     listener.features = [feature1, feature2]
 
@@ -830,13 +850,28 @@ def test_exit_group_spec_three_features_two_used(listener):
     mock_ctx = Mock()
     listener.group_features_count = [2]
     feature1 = Feature(
-        "test1", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        name="test1",
+        instance_cardinality=Cardinality([]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     feature2 = Feature(
-        "test2", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        name="test2",
+        instance_cardinality=Cardinality([]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     feature3 = Feature(
-        "test3", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        name="test3",
+        instance_cardinality=Cardinality([]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     listener.features = [feature1, feature2, feature3]
 
@@ -850,7 +885,12 @@ def test_exit_group_spec_three_features_two_used(listener):
 def test_exit_mandatory_group_one_feature_without_instance_cardinality(listener):
     mock_ctx = Mock()
     feature: Feature = Feature(
-        "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        name="test",
+        instance_cardinality=Cardinality([]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     listener.group_specs = [[feature]]
 
@@ -862,12 +902,12 @@ def test_exit_mandatory_group_one_feature_without_instance_cardinality(listener)
         Cardinality([Interval(-1, -1)]),
         [
             Feature(
-                "test",
-                Cardinality([Interval(1, 1)]),
-                Cardinality([]),
-                Cardinality([]),
-                [],
-                [],
+                name="test",
+                instance_cardinality=Cardinality([Interval(1, 1)]),
+                group_type_cardinality=Cardinality([]),
+                group_instance_cardinality=Cardinality([]),
+                parents=[],
+                children=[],
             )
         ],
     )
@@ -876,7 +916,12 @@ def test_exit_mandatory_group_one_feature_without_instance_cardinality(listener)
 def test_exit_mandatory_group_one_feature_with_instance_cardinality(listener):
     mock_ctx = Mock()
     feature: Feature = Feature(
-        "test", Cardinality([Interval(2, 2)]), Cardinality([]), Cardinality([]), [], []
+        name="test",
+        instance_cardinality=Cardinality([Interval(2, 2)]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     listener.group_specs = [[feature]]
 
@@ -890,7 +935,12 @@ def test_exit_mandatory_group_one_feature_with_instance_cardinality(listener):
 def test_exit_or_group(listener):
     mock_ctx = Mock()
     feature: Feature = Feature(
-        "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        name="test",
+        instance_cardinality=Cardinality([]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     listener.group_specs = [[feature]]
 
@@ -904,7 +954,12 @@ def test_exit_or_group(listener):
 def test_exit_alternative_group(listener):
     mock_ctx = Mock()
     feature: Feature = Feature(
-        "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        name="test",
+        instance_cardinality=Cardinality([]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     listener.group_specs = [[feature]]
 
@@ -918,7 +973,12 @@ def test_exit_alternative_group(listener):
 def test_exit_optional_group_without_instance_cardinality(listener):
     mock_ctx = Mock()
     feature: Feature = Feature(
-        "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        name="test",
+        instance_cardinality=Cardinality([]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     listener.group_specs = [[feature]]
 
@@ -932,7 +992,12 @@ def test_exit_optional_group_without_instance_cardinality(listener):
 def test_exit_optional_group_with_instance_cardinality_lower_changed_to_zero(listener):
     mock_ctx = Mock()
     feature: Feature = Feature(
-        "test", Cardinality([Interval(3, 5)]), Cardinality([]), Cardinality([]), [], []
+        name="test",
+        instance_cardinality=Cardinality([Interval(3, 5)]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     listener.group_specs = [[feature]]
 
@@ -944,12 +1009,12 @@ def test_exit_optional_group_with_instance_cardinality_lower_changed_to_zero(lis
         Cardinality([Interval(-4, -4)]),
         [
             Feature(
-                "test",
-                Cardinality([Interval(0, 5)]),
-                Cardinality([]),
-                Cardinality([]),
-                [],
-                [],
+                name="test",
+                instance_cardinality=Cardinality([Interval(0, 5)]),
+                group_type_cardinality=Cardinality([]),
+                group_instance_cardinality=Cardinality([]),
+                parents=[],
+                children=[],
             )
         ],
     )
@@ -958,7 +1023,12 @@ def test_exit_optional_group_with_instance_cardinality_lower_changed_to_zero(lis
 def test_exit_optional_group_with_instance_cardinality_lower_not_changed(listener):
     mock_ctx = Mock()
     feature: Feature = Feature(
-        "test", Cardinality([Interval(0, 5)]), Cardinality([]), Cardinality([]), [], []
+        name="test",
+        instance_cardinality=Cardinality([Interval(0, 5)]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     listener.group_specs = [[feature]]
 
@@ -973,7 +1043,12 @@ def test_exit_cardinality_group_one_value(listener):
     mock_ctx = Mock()
     mock_ctx.getText.return_value = "[1]"
     feature: Feature = Feature(
-        "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        name="test",
+        instance_cardinality=Cardinality([]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     listener.group_specs = [[feature]]
 
@@ -988,7 +1063,12 @@ def test_exit_cardinality_group_multiple_values(listener):
     mock_ctx = Mock()
     mock_ctx.getText.return_value = "[2..4]"
     feature: Feature = Feature(
-        "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        name="test",
+        instance_cardinality=Cardinality([]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     listener.group_specs = [[feature]]
 
@@ -1003,7 +1083,12 @@ def test_exit_cardinality_group_multiple_values_including_asterisk(listener):
     mock_ctx = Mock()
     mock_ctx.getText.return_value = "[2..*]"
     feature: Feature = Feature(
-        "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        name="test",
+        instance_cardinality=Cardinality([]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     listener.group_specs = [[feature]]
 
@@ -1134,10 +1219,20 @@ def test_exit_constraint_line_equivalence(listener):
     listener.constraint_types = [ConstraintType.EQUIVALENCE]
     listener.feature_map = {
         "test1": Feature(
-            "test1", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+            name="test1",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         "test2": Feature(
-            "test2", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+            name="test2",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     }
 
@@ -1152,10 +1247,20 @@ def test_exit_constraint_line_implication(listener):
     listener.constraint_types = [ConstraintType.IMPLICATION]
     listener.feature_map = {
         "test1": Feature(
-            "test1", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+            name="test1",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
         "test2": Feature(
-            "test2", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+            name="test2",
+            instance_cardinality=Cardinality([]),
+            group_type_cardinality=Cardinality([]),
+            group_instance_cardinality=Cardinality([]),
+            parents=[],
+            children=[],
         ),
     }
 
@@ -1168,7 +1273,12 @@ def test_exit_features(listener):
     mock_ctx = Mock()
     listener.references_set = {"test1", "test2"}
     feature1 = Feature(
-        "test", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        name="test",
+        instance_cardinality=Cardinality([]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parents=[],
+        children=[],
     )
     listener.features = [feature1]
 
