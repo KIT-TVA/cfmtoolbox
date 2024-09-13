@@ -2,6 +2,7 @@ import json
 import random
 from collections import defaultdict
 from dataclasses import asdict
+from typing import NamedTuple
 
 import typer
 
@@ -133,11 +134,12 @@ class OneWiseSampler:
     def generate_random_children_with_random_cardinality_with_assignment(
         self, feature: Feature
     ):
+        ChildAndCardinalityPair = NamedTuple(
+            "ChildAndCardinalityPair", [("child", Feature), ("cardinality", int)]
+        )
         summed_random_instance_cardinality = 0
         summed_random_group_type_cardinality = 0
-        child_with_random_instance_cardinality: list[
-            tuple[Feature, int]
-        ] = []  # List of tuples (child, random_instance_cardinality)
+        child_with_random_instance_cardinality: list[ChildAndCardinalityPair] = []
 
         for child in feature.children:
             # Enforces the feature of the chosen assignment to have the chosen amount of instances
@@ -151,7 +153,7 @@ class OneWiseSampler:
                 summed_random_group_type_cardinality += 1
             summed_random_instance_cardinality += random_instance_cardinality
             child_with_random_instance_cardinality.append(
-                (child, random_instance_cardinality)
+                ChildAndCardinalityPair(child, random_instance_cardinality)
             )
 
         return (
