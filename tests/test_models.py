@@ -36,45 +36,29 @@ def test_cardinality_string(intervals: list[Interval], expectation: str):
 
 def test_feature_string():
     feature = Feature(
-        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
     assert str(feature) == "Cheese"
 
 
-def test_add_parent():
-    feature = Feature(
-        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
-    )
-    parent = Feature("Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], [])
-    feature.add_parent(parent)
-    assert parent in feature.parents
-
-
-def test_add_parent_ignores_already_added_parents():
-    feature = Feature(
-        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
-    )
-    parent = Feature("Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], [])
-    feature.add_parent(parent)
-    feature.add_parent(parent)
-    assert len(feature.parents) == 1
-    assert parent in feature.parents
-
-
 def test_add_child():
     feature = Feature(
-        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
-    child = Feature("Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], [])
+    child = Feature(
+        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
+    )
     feature.add_child(child)
     assert child in feature.children
 
 
 def test_add_child_ignores_already_added_children():
     feature = Feature(
-        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
-    child = Feature("Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], [])
+    child = Feature(
+        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
+    )
     feature.add_child(child)
     feature.add_child(child)
     assert len(feature.children) == 1
@@ -83,7 +67,7 @@ def test_add_child_ignores_already_added_children():
 
 def test_constraint_string():
     cardinality = Cardinality([])
-    feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
+    feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
     constraint = Constraint(True, feature, cardinality, feature, cardinality)
     assert str(constraint) == "Cheese => Cheese"
 
@@ -100,43 +84,43 @@ def test_cardinality_is_valid():
 
 def test_feature_is_required():
     cardinality = Cardinality([Interval(1, 10)])
-    feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
+    feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
     assert feature.is_required()
 
     cardinality = Cardinality([Interval(0, 10)])
-    feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
+    feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
     assert not feature.is_required()
 
     cardinality = Cardinality([Interval(0, 0)])
-    feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
+    feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
     assert not feature.is_required()
 
     cardinality = Cardinality([Interval(1, 1)])
-    feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
+    feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
     assert feature.is_required()
 
     cardinality = Cardinality([Interval(0, 1)])
-    feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
+    feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
     assert not feature.is_required()
 
     cardinality = Cardinality([Interval(1, 10), Interval(20, 30), Interval(40, 50)])
-    feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
+    feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
     assert feature.is_required()
 
     cardinality = Cardinality([Interval(0, 10), Interval(20, 30), Interval(40, 50)])
-    feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
+    feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
     assert not feature.is_required()
 
     cardinality = Cardinality([Interval(0, 0), Interval(20, 30), Interval(40, 50)])
-    feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
+    feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
     assert not feature.is_required()
 
     cardinality = Cardinality([Interval(1, 1), Interval(20, 30), Interval(40, 50)])
-    feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
+    feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
     assert feature.is_required()
 
     cardinality = Cardinality([Interval(0, 1), Interval(20, 30), Interval(40, 50)])
-    feature = Feature("Cheese", cardinality, cardinality, cardinality, [], [])
+    feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
     assert not feature.is_required()
 
 
@@ -149,7 +133,7 @@ def test_feature_is_required():
                 Cardinality([Interval(0, None)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             True,
@@ -160,14 +144,14 @@ def test_feature_is_required():
                 Cardinality([Interval(0, 3)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [
                     Feature(
                         "Gouda",
                         Cardinality([Interval(0, None)]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                 ],
@@ -180,14 +164,14 @@ def test_feature_is_required():
                 Cardinality([Interval(0, 3)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [
                     Feature(
                         "Gouda",
                         Cardinality([Interval(0, 4)]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Feature(
@@ -195,7 +179,7 @@ def test_feature_is_required():
                         Cardinality([Interval(0, 3)]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                 ],
@@ -211,7 +195,7 @@ def test_feature_is_unbound(feature: Feature, expectation: bool):
 def test_add_feature():
     cfm = CFM([], [], [])
     feature = Feature(
-        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
     cfm.add_feature(feature)
     assert feature in cfm.features
@@ -220,7 +204,7 @@ def test_add_feature():
 def test_add_feature_ignores_already_added_features():
     cfm = CFM([], [], [])
     feature = Feature(
-        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
     cfm.add_feature(feature)
     cfm.add_feature(feature)
@@ -231,7 +215,7 @@ def test_add_feature_ignores_already_added_features():
 def test_find_feature():
     cfm = CFM([], [], [])
     feature = Feature(
-        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
     cfm.add_feature(feature)
     assert cfm.find_feature("Cheese") == feature
@@ -248,7 +232,7 @@ def test_find_feature():
                         Cardinality([Interval(0, None)]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     )
                 ],
@@ -265,7 +249,7 @@ def test_find_feature():
                         Cardinality([Interval(0, 4)]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     )
                 ],
@@ -288,7 +272,7 @@ def test_find_feature_raises_missing_features_on_empty_feature_list():
 
 def test_find_feature_raises_missing_features():
     bread_feature = Feature(
-        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
     cfm = CFM([bread_feature], [], [])
 
@@ -302,13 +286,17 @@ def test_partition_children():
         Cardinality([]),
         Cardinality([]),
         Cardinality([]),
-        [],
+        None,
         [
-            Feature("Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []),
             Feature(
-                "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+                "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
             ),
-            Feature("Meat", Cardinality([]), Cardinality([]), Cardinality([]), [], []),
+            Feature(
+                "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
+            ),
+            Feature(
+                "Meat", Cardinality([]), Cardinality([]), Cardinality([]), None, []
+            ),
         ],
     )
     feature_node = FeatureNode(
@@ -340,7 +328,7 @@ def test_partition_children():
                 Cardinality([]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             FeatureNode("Sandwich#0", []),
@@ -352,7 +340,7 @@ def test_partition_children():
                 Cardinality([]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             FeatureNode("Sandwich#0", [FeatureNode("Bread#0", [])]),
@@ -415,14 +403,14 @@ def test_validate_children(feature_instance: FeatureNode, expectation: bool):
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(2, 3)]),
         Cardinality([Interval(3, 4)]),
-        [],
+        None,
         [
             Feature(
                 "Bread",
                 Cardinality([Interval(2, 2)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -430,7 +418,7 @@ def test_validate_children(feature_instance: FeatureNode, expectation: bool):
                 Cardinality([Interval(0, 1)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -438,7 +426,7 @@ def test_validate_children(feature_instance: FeatureNode, expectation: bool):
                 Cardinality([Interval(0, 1)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
         ],
@@ -486,21 +474,21 @@ def test_validate_feature_instance(feature_instance: FeatureNode, expectation: b
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(2, 3)]),
         Cardinality([Interval(3, 4)]),
-        [],
+        None,
         [
             Feature(
                 "Bread",
                 Cardinality([Interval(2, 2)]),
                 Cardinality([Interval(1, 1)]),
                 Cardinality([Interval(1, 1)]),
-                [],
+                None,
                 [
                     Feature(
                         "Wheat",
                         Cardinality([Interval(0, 1)]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Feature(
@@ -508,7 +496,7 @@ def test_validate_feature_instance(feature_instance: FeatureNode, expectation: b
                         Cardinality([Interval(0, 1)]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                 ],
@@ -518,7 +506,7 @@ def test_validate_feature_instance(feature_instance: FeatureNode, expectation: b
                 Cardinality([Interval(0, 1)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -526,7 +514,7 @@ def test_validate_feature_instance(feature_instance: FeatureNode, expectation: b
                 Cardinality([Interval(0, 1)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
         ],
@@ -614,7 +602,7 @@ def test_initialize_global_feature_count(
                         Cardinality([]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Cardinality([Interval(1, 1)]),
@@ -623,7 +611,7 @@ def test_initialize_global_feature_count(
                         Cardinality([]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Cardinality([Interval(1, 1)]),
@@ -641,7 +629,7 @@ def test_initialize_global_feature_count(
                         Cardinality([]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Cardinality([Interval(2, 2)]),
@@ -650,7 +638,7 @@ def test_initialize_global_feature_count(
                         Cardinality([]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Cardinality([Interval(2, 2)]),
@@ -668,7 +656,7 @@ def test_initialize_global_feature_count(
                         Cardinality([]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Cardinality([Interval(2, 2)]),
@@ -677,7 +665,7 @@ def test_initialize_global_feature_count(
                         Cardinality([]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Cardinality([Interval(1, None)]),
@@ -696,7 +684,7 @@ def test_initialize_global_feature_count(
                         Cardinality([]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Cardinality([Interval(4, None)]),
@@ -705,7 +693,7 @@ def test_initialize_global_feature_count(
                         Cardinality([]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Cardinality([Interval(1, None)]),
@@ -723,7 +711,7 @@ def test_initialize_global_feature_count(
                         Cardinality([]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Cardinality([Interval(2, None)]),
@@ -732,7 +720,7 @@ def test_initialize_global_feature_count(
                         Cardinality([]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Cardinality([Interval(1, None)]),
@@ -749,7 +737,7 @@ def test_initialize_global_feature_count(
                         Cardinality([]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Cardinality([Interval(2, 2)]),
@@ -758,7 +746,7 @@ def test_initialize_global_feature_count(
                         Cardinality([]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Cardinality([Interval(1, None)]),
@@ -772,7 +760,7 @@ def test_initialize_global_feature_count(
                         Cardinality([]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Cardinality([Interval(4, None)]),
@@ -781,7 +769,7 @@ def test_initialize_global_feature_count(
                         Cardinality([]),
                         Cardinality([]),
                         Cardinality([]),
-                        [],
+                        None,
                         [],
                     ),
                     Cardinality([Interval(1, None)]),

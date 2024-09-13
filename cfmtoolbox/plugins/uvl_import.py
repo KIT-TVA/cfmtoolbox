@@ -136,7 +136,7 @@ class CustomListener(UVLPythonListener):
                 instance_cardinality,
                 group_type_cardinality,
                 group_instance_cardinality,
-                [],
+                None,
                 [],
             )
             self.feature_map[name] = feature
@@ -158,7 +158,7 @@ class CustomListener(UVLPythonListener):
                     instance_cardinality,
                     Cardinality([Interval(0, new_groups)]),
                     Cardinality([]),
-                    [],
+                    None,
                     [],
                 )
                 min_cardinality = 0
@@ -200,7 +200,7 @@ class CustomListener(UVLPythonListener):
                         Cardinality([Interval(0, None)]),
                         group_type_cardinality,
                         group_instance_cardinality,
-                        [],
+                        None,
                         features,
                     )
                     parent_feature.children.append(feature)
@@ -214,7 +214,7 @@ class CustomListener(UVLPythonListener):
                         )
                     )
                     for child in features:
-                        child.parents = [feature]
+                        child.parent = feature
                         if len(child.instance_cardinality.intervals) > 0:
                             min_cardinality += child.instance_cardinality.intervals[
                                 0
@@ -225,7 +225,7 @@ class CustomListener(UVLPythonListener):
                             else:
                                 max_cardinality = None
                 for child in parent_feature.children:
-                    child.parents = [parent_feature]
+                    child.parent = parent_feature
                 parent_feature.group_instance_cardinality = Cardinality(
                     [
                         Interval(
@@ -275,11 +275,11 @@ class CustomListener(UVLPythonListener):
                     instance_cardinality,
                     group_type_cardinality,
                     group_instance_cardinality,
-                    [],
+                    None,
                     features,
                 )
                 for child in feature.children:
-                    child.parents = [feature]
+                    child.parent = feature
                 self.feature_map[name] = feature
                 self.features.append(feature)
                 self.cfm.features.append(feature)

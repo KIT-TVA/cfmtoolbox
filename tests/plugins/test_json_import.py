@@ -125,14 +125,12 @@ def test_parse_root_returns_all_features_in_the_tree():
             "instance_cardinality": {"intervals": []},
             "group_type_cardinality": {"intervals": []},
             "group_instance_cardinality": {"intervals": []},
-            "parents": [],
             "children": [
                 {
                     "name": "meat",
                     "instance_cardinality": {"intervals": []},
                     "group_type_cardinality": {"intervals": []},
                     "group_instance_cardinality": {"intervals": []},
-                    "parents": [],
                     "children": [],
                 },
                 {
@@ -140,14 +138,12 @@ def test_parse_root_returns_all_features_in_the_tree():
                     "instance_cardinality": {"intervals": []},
                     "group_type_cardinality": {"intervals": []},
                     "group_instance_cardinality": {"intervals": []},
-                    "parents": [],
                     "children": [
                         {
                             "name": "sourdough",
                             "instance_cardinality": {"intervals": []},
                             "group_type_cardinality": {"intervals": []},
                             "group_instance_cardinality": {"intervals": []},
-                            "parents": [],
                             "children": [],
                         },
                         {
@@ -155,7 +151,6 @@ def test_parse_root_returns_all_features_in_the_tree():
                             "instance_cardinality": {"intervals": []},
                             "group_type_cardinality": {"intervals": []},
                             "group_instance_cardinality": {"intervals": []},
-                            "parents": [],
                             "children": [],
                         },
                     ],
@@ -187,7 +182,7 @@ def test_parse_root_returns_all_features_in_the_tree():
 )
 def test_parse_feature_requires_feature_to_be_an_object(feature, expectation):
     with expectation:
-        json_import.parse_feature(feature, [])
+        json_import.parse_feature(feature, parent=None)
 
 
 @pytest.mark.parametrize(
@@ -205,7 +200,7 @@ def test_parse_feature_requires_feature_to_be_an_object(feature, expectation):
 )
 def test_parse_feature_requires_name_to_be_a_string(name, expectation):
     with expectation:
-        json_import.parse_feature({"name": name}, parents=[])
+        json_import.parse_feature({"name": name}, parent=None)
 
 
 @pytest.mark.parametrize(
@@ -223,9 +218,7 @@ def test_parse_feature_requires_name_to_be_a_string(name, expectation):
 )
 def test_parse_feature_requires_children_to_be_a_list(children, expectation):
     with expectation:
-        json_import.parse_feature(
-            {"name": "name", "parents": [], "children": children}, []
-        )
+        json_import.parse_feature({"name": "name", "children": children}, None)
 
 
 def test_parse_feature_parses_features_and_adds_relatives():
@@ -245,14 +238,14 @@ def test_parse_feature_parses_features_and_adds_relatives():
                 }
             ],
         },
-        [],
+        parent=None,
     )
 
     assert feature.name == "sandwich"
     assert feature.instance_cardinality == Cardinality(intervals=[])
     assert feature.group_type_cardinality == Cardinality(intervals=[])
     assert feature.group_instance_cardinality == Cardinality(intervals=[])
-    assert len(feature.parents) == 0
+    assert feature.parent is None
     assert len(feature.children) == 1
 
     child = feature.children[0]
@@ -260,7 +253,7 @@ def test_parse_feature_parses_features_and_adds_relatives():
     assert child.instance_cardinality == Cardinality(intervals=[])
     assert child.group_type_cardinality == Cardinality(intervals=[])
     assert child.group_instance_cardinality == Cardinality(intervals=[])
-    assert child.parents == [feature]
+    assert child.parent == feature
     assert len(child.children) == 0
 
 
@@ -590,7 +583,7 @@ def test_parse_constraint_returns_constraint_with_inserted_features():
             instance_cardinality=Cardinality(intervals=[]),
             group_type_cardinality=Cardinality(intervals=[]),
             group_instance_cardinality=Cardinality(intervals=[]),
-            parents=[],
+            parent=None,
             children=[],
         ),
         Feature(
@@ -598,7 +591,7 @@ def test_parse_constraint_returns_constraint_with_inserted_features():
             instance_cardinality=Cardinality(intervals=[]),
             group_type_cardinality=Cardinality(intervals=[]),
             group_instance_cardinality=Cardinality(intervals=[]),
-            parents=[],
+            parent=None,
             children=[],
         ),
     ]
@@ -630,7 +623,7 @@ def test_parse_constraint_requires_named_features_to_exist():
             instance_cardinality=Cardinality(intervals=[]),
             group_type_cardinality=Cardinality(intervals=[]),
             group_instance_cardinality=Cardinality(intervals=[]),
-            parents=[],
+            parent=None,
             children=[],
         ),
     ]
@@ -654,7 +647,7 @@ def test_require_feature_returns_first_match():
         instance_cardinality=Cardinality(intervals=[]),
         group_type_cardinality=Cardinality(intervals=[]),
         group_instance_cardinality=Cardinality(intervals=[]),
-        parents=[],
+        parent=None,
         children=[],
     )
 
@@ -663,7 +656,7 @@ def test_require_feature_returns_first_match():
         instance_cardinality=Cardinality(intervals=[]),
         group_type_cardinality=Cardinality(intervals=[]),
         group_instance_cardinality=Cardinality(intervals=[]),
-        parents=[],
+        parent=None,
         children=[],
     )
 
@@ -677,7 +670,7 @@ def test_require_feature_raises_error_when_there_is_no_match():
         instance_cardinality=Cardinality(intervals=[]),
         group_type_cardinality=Cardinality(intervals=[]),
         group_instance_cardinality=Cardinality(intervals=[]),
-        parents=[],
+        parent=None,
         children=[],
     )
 

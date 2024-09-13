@@ -35,7 +35,7 @@ class Feature:
     instance_cardinality: Cardinality
     group_type_cardinality: Cardinality
     group_instance_cardinality: Cardinality
-    parents: list["Feature"]
+    parent: "Feature | None"
     children: list["Feature"]
 
     def __str__(self) -> str:
@@ -43,10 +43,6 @@ class Feature:
 
     def is_required(self) -> bool:
         return self.instance_cardinality.intervals[0].lower != 0
-
-    def add_parent(self, parent: "Feature"):
-        if parent not in self.parents:
-            self.parents.append(parent)
 
     def add_child(self, child: "Feature"):
         if child not in self.children:

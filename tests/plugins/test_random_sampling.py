@@ -78,7 +78,7 @@ def test_get_sorted_sample(random_sampler: RandomSampler):
             Cardinality([Interval(0, 1)]),
             Cardinality([]),
             Cardinality([]),
-            [],
+            None,
             [],
         ),
         Feature(
@@ -86,7 +86,7 @@ def test_get_sorted_sample(random_sampler: RandomSampler):
             Cardinality([Interval(0, 2)]),
             Cardinality([]),
             Cardinality([]),
-            [],
+            None,
             [],
         ),
         Feature(
@@ -94,7 +94,7 @@ def test_get_sorted_sample(random_sampler: RandomSampler):
             Cardinality([Interval(0, 3)]),
             Cardinality([]),
             Cardinality([]),
-            [],
+            None,
             [],
         ),
     ]
@@ -113,14 +113,14 @@ def test_get_required_children(random_sampler: RandomSampler):
         Cardinality([]),
         Cardinality([]),
         Cardinality([]),
-        [],
+        None,
         [
             Feature(
                 "Milk",
                 Cardinality([Interval(1, 1)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             )
         ],
@@ -131,14 +131,14 @@ def test_get_required_children(random_sampler: RandomSampler):
         Cardinality([]),
         Cardinality([]),
         Cardinality([]),
-        [],
+        None,
         [
             Feature(
                 "Milk",
                 Cardinality([Interval(2, 2)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -146,14 +146,14 @@ def test_get_required_children(random_sampler: RandomSampler):
                 Cardinality([Interval(1, 4)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
         ],
     )
     assert len(random_sampler.get_required_children(feature)) == 2
     feature = Feature(
-        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
     assert len(random_sampler.get_required_children(feature)) == 0
     feature = Feature(
@@ -161,14 +161,14 @@ def test_get_required_children(random_sampler: RandomSampler):
         Cardinality([]),
         Cardinality([]),
         Cardinality([]),
-        [],
+        None,
         [
             Feature(
                 "Milk",
                 Cardinality([Interval(0, 5)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             )
         ],
@@ -182,14 +182,14 @@ def test_get_optional_children(random_sampler: RandomSampler):
         Cardinality([]),
         Cardinality([]),
         Cardinality([]),
-        [],
+        None,
         [
             Feature(
                 "Milk",
                 Cardinality([Interval(0, 1)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -197,7 +197,7 @@ def test_get_optional_children(random_sampler: RandomSampler):
                 Cardinality([Interval(1, 4)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
         ],
@@ -208,14 +208,14 @@ def test_get_optional_children(random_sampler: RandomSampler):
         Cardinality([]),
         Cardinality([]),
         Cardinality([]),
-        [],
+        None,
         [
             Feature(
                 "Milk",
                 Cardinality([Interval(0, 2)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -223,14 +223,14 @@ def test_get_optional_children(random_sampler: RandomSampler):
                 Cardinality([Interval(0, 4)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
         ],
     )
     assert len(random_sampler.get_optional_children(feature)) == 2
     feature = Feature(
-        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
     assert len(random_sampler.get_optional_children(feature)) == 0
     feature = Feature(
@@ -238,14 +238,14 @@ def test_get_optional_children(random_sampler: RandomSampler):
         Cardinality([]),
         Cardinality([]),
         Cardinality([]),
-        [],
+        None,
         [
             Feature(
                 "Milk",
                 Cardinality([Interval(1, 5)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             )
         ],
@@ -256,14 +256,14 @@ def test_get_optional_children(random_sampler: RandomSampler):
         Cardinality([]),
         Cardinality([]),
         Cardinality([]),
-        [],
+        None,
         [
             Feature(
                 "Milk",
                 Cardinality([Interval(3, 5)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -271,7 +271,7 @@ def test_get_optional_children(random_sampler: RandomSampler):
                 Cardinality([Interval(2, 5)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
         ],
@@ -287,14 +287,14 @@ def test_generate_random_children_with_random_cardinality(
         Cardinality([]),
         Cardinality([Interval(1, 3)]),
         Cardinality([Interval(3, 3)]),
-        [],
+        None,
         [
             Feature(
                 "Cheddar",
                 Cardinality([Interval(0, 1)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -302,7 +302,7 @@ def test_generate_random_children_with_random_cardinality(
                 Cardinality([Interval(0, 2)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -310,7 +310,7 @@ def test_generate_random_children_with_random_cardinality(
                 Cardinality([Interval(0, 3)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
         ],

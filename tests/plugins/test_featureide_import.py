@@ -135,7 +135,7 @@ def test_parse_feature():
     assert feature.name == "Sandwich"
     assert feature.instance_cardinality == Cardinality([Interval(0, 1)])
     assert feature.group_instance_cardinality == Cardinality([])
-    assert feature.parents == []
+    assert feature.parent is None
     assert feature.children == []
 
 
@@ -146,7 +146,7 @@ def test_parse_feature_can_parse_with_mandatory_feature():
     assert feature.name == "Sandwich"
     assert feature.instance_cardinality == Cardinality([Interval(1, 1)])
     assert feature.group_instance_cardinality == Cardinality([])
-    assert feature.parents == []
+    assert feature.parent is None
     assert feature.children == []
 
 
@@ -157,7 +157,7 @@ def test_parse_feature_can_parse_with_mandatory_is_false():
     assert feature.name == "Sandwich"
     assert feature.instance_cardinality == Cardinality([Interval(0, 1)])
     assert feature.group_instance_cardinality == Cardinality([])
-    assert feature.parents == []
+    assert feature.parent is None
     assert feature.children == []
 
 
@@ -168,7 +168,7 @@ def test_parse_feature_can_parse_with_mandatory_is_none():
     assert feature.name == "Sandwich"
     assert feature.instance_cardinality == Cardinality([Interval(0, 1)])
     assert feature.group_instance_cardinality == Cardinality([])
-    assert feature.parents == []
+    assert feature.parent is None
     assert feature.children == []
 
 
@@ -187,7 +187,7 @@ def test_traverse_xml():
 
     assert len(feature_list) == 11
     assert feature_list[0].name == "Sandwich"
-    assert feature_list[0].parents == []
+    assert feature_list[0].parent is None
     assert feature_list[0].children == [
         feature_list[1],
         feature_list[4],
@@ -195,19 +195,19 @@ def test_traverse_xml():
     ]
 
     assert feature_list[1].name == "Bread"
-    assert feature_list[1].parents == [feature_list[0]]
+    assert feature_list[1].parent == feature_list[0]
     assert feature_list[1].children == [feature_list[2], feature_list[3]]
 
     assert feature_list[2].name == "Sourdough"
-    assert feature_list[2].parents == [feature_list[1]]
+    assert feature_list[2].parent == feature_list[1]
     assert feature_list[2].children == []
 
     assert feature_list[3].name == "Wheat"
-    assert feature_list[3].parents == [feature_list[1]]
+    assert feature_list[3].parent == feature_list[1]
     assert feature_list[3].children == []
 
     assert feature_list[4].name == "CheeseMix"
-    assert feature_list[4].parents == [feature_list[0]]
+    assert feature_list[4].parent == feature_list[0]
     assert feature_list[4].children == [
         feature_list[5],
         feature_list[6],
@@ -215,27 +215,27 @@ def test_traverse_xml():
     ]
 
     assert feature_list[5].name == "Cheddar"
-    assert feature_list[5].parents == [feature_list[4]]
+    assert feature_list[5].parent == feature_list[4]
     assert feature_list[5].children == []
 
     assert feature_list[6].name == "Swiss"
-    assert feature_list[6].parents == [feature_list[4]]
+    assert feature_list[6].parent == feature_list[4]
     assert feature_list[6].children == []
 
     assert feature_list[7].name == "Gouda"
-    assert feature_list[7].parents == [feature_list[4]]
+    assert feature_list[7].parent == feature_list[4]
     assert feature_list[7].children == []
 
     assert feature_list[8].name == "Veggies"
-    assert feature_list[8].parents == [feature_list[0]]
+    assert feature_list[8].parent == feature_list[0]
     assert feature_list[8].children == [feature_list[9], feature_list[10]]
 
     assert feature_list[9].name == "Lettuce"
-    assert feature_list[9].parents == [feature_list[8]]
+    assert feature_list[9].parent == feature_list[8]
     assert feature_list[9].children == []
 
     assert feature_list[10].name == "Tomato"
-    assert feature_list[10].parents == [feature_list[8]]
+    assert feature_list[10].parent == feature_list[8]
     assert feature_list[10].children == []
 
 
@@ -249,7 +249,7 @@ def test_parse_formula_value_and_feature():
     root.text = "Bread"
 
     feature = Feature(
-        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
 
     value, formula = parse_formula_value_and_feature(root, CFM([feature], [], []))
@@ -268,7 +268,7 @@ def test_parse_formula_value_and_feature_can_parse_more_complex_formula_with_eve
     SubElement(element, "var").text = "Bread"
 
     feature = Feature(
-        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
 
     formula = parse_formula_value_and_feature(root, CFM([feature], [], []))
@@ -281,7 +281,7 @@ def test_parse_formula_value_and_feature_can_parse_more_complex_formula_with_odd
     SubElement(SubElement(subelement, "not"), "var").text = "Bread"
 
     feature = Feature(
-        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
 
     formula = parse_formula_value_and_feature(root, CFM([feature], [], []))
@@ -337,7 +337,7 @@ def test_parse_constraint_can_parse_constraint_with_one_require_rule():
     SubElement(imp, "var").text = "Bread"
     SubElement(imp, "var").text = "Bread"
     feature = Feature(
-        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
     cfm = CFM([feature], [], [])
 
@@ -364,7 +364,7 @@ def test_parse_constraint_can_parse_constraint_with_one_exclude_rule():
     SubElement(negation, "var").text = "Bread"
     SubElement(imp, "var").text = "Bread"
     feature = Feature(
-        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
     cfm = CFM([feature], [], [])
 
@@ -393,11 +393,11 @@ def test_parse_constraint_can_parse_constraint_with_both_formulas_negative():
     SubElement(second_negation, "var").text = "Cheese"
 
     bread_feature = Feature(
-        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
 
     cheese_feature = Feature(
-        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), [], []
+        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
 
     constraint = Constraint(
