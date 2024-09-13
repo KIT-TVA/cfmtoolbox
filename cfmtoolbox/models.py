@@ -44,10 +44,6 @@ class Feature:
     def is_required(self) -> bool:
         return self.instance_cardinality.intervals[0].lower != 0
 
-    def add_child(self, child: "Feature"):
-        if child not in self.children:
-            self.children.append(child)
-
     def is_unbound(self) -> bool:
         return self.instance_cardinality.intervals[-1].upper is None or any(
             child.is_unbound() for child in self.children

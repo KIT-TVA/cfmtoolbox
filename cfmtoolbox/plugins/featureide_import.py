@@ -85,7 +85,7 @@ def traverse_xml(element: Element | None, cfm: CFM) -> list[Feature]:
         for child in element:
             feature = parse_feature(child)
             feature.parent = parent
-            parent.add_child(feature)
+            parent.children.append(feature)
             cfm.add_feature(feature)
             traverse_xml(child, cfm)
 
