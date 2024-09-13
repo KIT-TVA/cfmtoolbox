@@ -209,7 +209,7 @@ def test_serialize_features_raises_type_error_on_compounded_cardinality():
         "Sandwich",
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(0, 2)]),
-        Cardinality([0, 2]),
+        Cardinality([Interval(0, 2), Interval(2, 2)]),
         [],
         [],
     )
