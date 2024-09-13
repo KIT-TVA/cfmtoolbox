@@ -3,16 +3,16 @@ from textwrap import dedent
 
 import pytest
 
-import cfmtoolbox.plugins.debug as debug_plugin
+import cfmtoolbox.plugins.debugging as debugging_plugin
 from cfmtoolbox.models import CFM, Cardinality, Constraint, Feature, Interval
-from cfmtoolbox.plugins.debug import debug, stringify_cfm, stringify_list
+from cfmtoolbox.plugins.debugging import debug, stringify_cfm, stringify_list
 from cfmtoolbox.plugins.featureide_import import import_featureide
 from cfmtoolbox.toolbox import CFMToolbox
 
 
 def test_plugin_can_be_loaded():
     app = CFMToolbox()
-    assert debug_plugin in app.load_plugins()
+    assert debugging_plugin in app.load_plugins()
 
 
 def test_debug(capsys):
