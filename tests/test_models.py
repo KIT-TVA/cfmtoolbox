@@ -41,30 +41,6 @@ def test_feature_string():
     assert str(feature) == "Cheese"
 
 
-def test_add_child():
-    feature = Feature(
-        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
-    )
-    child = Feature(
-        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
-    )
-    feature.add_child(child)
-    assert child in feature.children
-
-
-def test_add_child_ignores_already_added_children():
-    feature = Feature(
-        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
-    )
-    child = Feature(
-        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
-    )
-    feature.add_child(child)
-    feature.add_child(child)
-    assert len(feature.children) == 1
-    assert child in feature.children
-
-
 def test_constraint_string():
     cardinality = Cardinality([])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])

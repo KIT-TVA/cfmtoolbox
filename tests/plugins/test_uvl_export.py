@@ -75,8 +75,8 @@ def test_serialize_group_cardinality_can_export_to_or():
         [],
     )
 
-    sandwich.add_child(cheese)
-    sandwich.add_child(veggies)
+    sandwich.children.append(cheese)
+    sandwich.children.append(veggies)
 
     assert serialize_group_cardinality(sandwich) == "or"
 
@@ -173,7 +173,7 @@ def test_serialize_root_feature():
         [],
     )
 
-    root.add_child(cheese)
+    root.children.append(cheese)
     root_export = serialize_root_feature(root)
     assert expectation in root_export
 
@@ -236,7 +236,7 @@ def test_serialize_features_can_export_single_child_feature():
         [],
     )
 
-    sandwich.add_child(cheese)
+    sandwich.children.append(cheese)
 
     expectation = """Sandwich cardinality [1..1]
 \t[0..2]
