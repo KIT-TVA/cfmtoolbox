@@ -884,7 +884,7 @@ def test_exit_group_spec_three_features_two_used(listener):
 
 def test_exit_mandatory_group_one_feature_without_instance_cardinality(listener):
     mock_ctx = Mock()
-    feature: Feature = Feature(
+    feature = Feature(
         name="test",
         instance_cardinality=Cardinality([]),
         group_type_cardinality=Cardinality([]),
@@ -915,7 +915,7 @@ def test_exit_mandatory_group_one_feature_without_instance_cardinality(listener)
 
 def test_exit_mandatory_group_one_feature_with_instance_cardinality(listener):
     mock_ctx = Mock()
-    feature: Feature = Feature(
+    feature = Feature(
         name="test",
         instance_cardinality=Cardinality([Interval(2, 2)]),
         group_type_cardinality=Cardinality([]),
@@ -934,7 +934,7 @@ def test_exit_mandatory_group_one_feature_with_instance_cardinality(listener):
 
 def test_exit_or_group(listener):
     mock_ctx = Mock()
-    feature: Feature = Feature(
+    feature = Feature(
         name="test",
         instance_cardinality=Cardinality([]),
         group_type_cardinality=Cardinality([]),
@@ -953,7 +953,7 @@ def test_exit_or_group(listener):
 
 def test_exit_alternative_group(listener):
     mock_ctx = Mock()
-    feature: Feature = Feature(
+    feature = Feature(
         name="test",
         instance_cardinality=Cardinality([]),
         group_type_cardinality=Cardinality([]),
@@ -972,7 +972,7 @@ def test_exit_alternative_group(listener):
 
 def test_exit_optional_group_without_instance_cardinality(listener):
     mock_ctx = Mock()
-    feature: Feature = Feature(
+    feature = Feature(
         name="test",
         instance_cardinality=Cardinality([]),
         group_type_cardinality=Cardinality([]),
@@ -991,7 +991,7 @@ def test_exit_optional_group_without_instance_cardinality(listener):
 
 def test_exit_optional_group_with_instance_cardinality_lower_changed_to_zero(listener):
     mock_ctx = Mock()
-    feature: Feature = Feature(
+    feature = Feature(
         name="test",
         instance_cardinality=Cardinality([Interval(3, 5)]),
         group_type_cardinality=Cardinality([]),
@@ -1022,7 +1022,7 @@ def test_exit_optional_group_with_instance_cardinality_lower_changed_to_zero(lis
 
 def test_exit_optional_group_with_instance_cardinality_lower_not_changed(listener):
     mock_ctx = Mock()
-    feature: Feature = Feature(
+    feature = Feature(
         name="test",
         instance_cardinality=Cardinality([Interval(0, 5)]),
         group_type_cardinality=Cardinality([]),
@@ -1042,7 +1042,7 @@ def test_exit_optional_group_with_instance_cardinality_lower_not_changed(listene
 def test_exit_cardinality_group_one_value(listener):
     mock_ctx = Mock()
     mock_ctx.getText.return_value = "[1]"
-    feature: Feature = Feature(
+    feature = Feature(
         name="test",
         instance_cardinality=Cardinality([]),
         group_type_cardinality=Cardinality([]),
@@ -1062,7 +1062,7 @@ def test_exit_cardinality_group_one_value(listener):
 def test_exit_cardinality_group_multiple_values(listener):
     mock_ctx = Mock()
     mock_ctx.getText.return_value = "[2..4]"
-    feature: Feature = Feature(
+    feature = Feature(
         name="test",
         instance_cardinality=Cardinality([]),
         group_type_cardinality=Cardinality([]),
@@ -1082,7 +1082,7 @@ def test_exit_cardinality_group_multiple_values(listener):
 def test_exit_cardinality_group_multiple_values_including_asterisk(listener):
     mock_ctx = Mock()
     mock_ctx.getText.return_value = "[2..*]"
-    feature: Feature = Feature(
+    feature = Feature(
         name="test",
         instance_cardinality=Cardinality([]),
         group_type_cardinality=Cardinality([]),

@@ -1,12 +1,11 @@
 from enum import Enum
 from typing import Dict
 
-from antlr4 import CommonTokenStream, InputStream
-from antlr4.error.ErrorListener import ErrorListener
-from colorama import Fore
-from uvl.UVLCustomLexer import UVLCustomLexer
-from uvl.UVLPythonListener import UVLPythonListener
-from uvl.UVLPythonParser import UVLPythonParser
+from antlr4 import CommonTokenStream, InputStream  # type: ignore
+from antlr4.error.ErrorListener import ErrorListener  # type: ignore
+from uvl.UVLCustomLexer import UVLCustomLexer  # type: ignore
+from uvl.UVLPythonListener import UVLPythonListener  # type: ignore
+from uvl.UVLPythonParser import UVLPythonParser  # type: ignore
 
 from cfmtoolbox import CFM, app
 from cfmtoolbox.models import Cardinality, Constraint, Feature, Interval
@@ -151,7 +150,7 @@ class CustomListener(UVLPythonListener):
                 if not self.warning_printed.get("groups", False):
                     self.warning_printed["groups"] = True
                     print(
-                        f"{Fore.YELLOW}Some information will be lost, due to the fact that CFM does not support multiple groups in a feature{Fore.RESET}"
+                        "Some information will be lost, due to the fact that CFM does not support multiple groups in a feature"
                     )
 
                 parent_feature = Feature(
@@ -163,7 +162,7 @@ class CustomListener(UVLPythonListener):
                     [],
                 )
                 min_cardinality = 0
-                max_cardinality = 0
+                max_cardinality: int | None = 0
                 for index, group in enumerate(self.groups[-new_groups:]):
                     cardinality = group[0]
                     features = group[1]
@@ -343,7 +342,7 @@ class CustomListener(UVLPythonListener):
                 )
             )
         else:
-            print(f"{Fore.YELLOW} ERROR, operation {op} not supported yet{Fore.RESET}")
+            print(f"ERROR, operation {op} not supported yet")
 
     def exitEquivalenceConstraint(
         self, ctx: UVLPythonParser.EquivalenceConstraintContext
@@ -366,7 +365,7 @@ class CustomListener(UVLPythonListener):
     def exitAttributes(self, ctx: UVLPythonParser.AttributesContext):
         if not self.warning_printed.get("attributes", False):
             self.warning_printed["attributes"] = True
-            print(f"{Fore.YELLOW}Text is not supported in CFM{Fore.RESET}")
+            print("Text is not supported in CFM")
 
 
 @app.importer(".uvl")
