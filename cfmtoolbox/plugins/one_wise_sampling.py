@@ -3,6 +3,8 @@ import random
 from collections import defaultdict
 from dataclasses import asdict
 
+import typer
+
 from cfmtoolbox import app
 from cfmtoolbox.models import CFM, Cardinality, Feature, FeatureNode
 
@@ -12,12 +14,10 @@ def one_wise_sampling(
     model: CFM | None,
 ) -> CFM | None:
     if model is None:
-        print("No model loaded.")
-        return None
+        raise typer.Abort("No model loaded.")
 
     if model.is_unbound():
-        print("Model is unbound. Please apply big-m global bound first.")
-        return model
+        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
 
     print(
         json.dumps(

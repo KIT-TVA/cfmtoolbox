@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+import typer
 
 import cfmtoolbox.plugins.one_wise_sampling as one_wise_sampling_plugin
 from cfmtoolbox import app
@@ -29,13 +30,15 @@ def test_plugin_can_be_loaded():
 
 
 def test_one_wise_sampling_without_loaded_model():
-    assert one_wise_sampling(None) is None
+    with pytest.raises(typer.Abort, match="No model loaded."):
+        one_wise_sampling(None)
 
 
 def test_one_wise_sampling_with_unbound_model(unbound_model: CFM, capsys):
-    one_wise_sampling(unbound_model) is unbound_model
-    captured = capsys.readouterr()
-    assert "Model is unbound. Please apply big-m global bound first." in captured.out
+    with pytest.raises(
+        typer.Abort, match="Model is unbound. Please apply big-m global bound first."
+    ):
+        one_wise_sampling(unbound_model)
 
 
 def test_plugin_passes_though_model(model: CFM):
