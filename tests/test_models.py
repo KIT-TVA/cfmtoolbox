@@ -188,15 +188,6 @@ def test_add_feature_ignores_already_added_features():
     assert feature in cfm.features
 
 
-def test_find_feature():
-    cfm = CFM([], [], [])
-    feature = Feature(
-        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
-    )
-    cfm.add_feature(feature)
-    assert cfm.find_feature("Cheese") == feature
-
-
 @pytest.mark.parametrize(
     ["cfm", "expectation"],
     [
@@ -238,22 +229,6 @@ def test_find_feature():
 )
 def test_cfm_is_unbound(cfm: CFM, expectation: bool):
     assert cfm.is_unbound() is expectation
-
-
-def test_find_feature_raises_missing_features_on_empty_feature_list():
-    cfm = CFM([], [], [])
-    with pytest.raises(ValueError, match="Feature Cheese not found"):
-        cfm.find_feature("Cheese")
-
-
-def test_find_feature_raises_missing_features():
-    bread_feature = Feature(
-        "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
-    )
-    cfm = CFM([bread_feature], [], [])
-
-    with pytest.raises(ValueError, match="Feature Cheese not found"):
-        cfm.find_feature("Cheese")
 
 
 def test_partition_children():

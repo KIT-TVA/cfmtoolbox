@@ -61,51 +61,60 @@ def parse_group_cardinality(feature: Element) -> Cardinality:
     return Cardinality([Interval(lower, upper)])
 
 
-def parse_feature(feature: Element) -> Feature:
-    name = feature.attrib["name"]
+def parse_feature(feature_element: Element, parent: Feature | None) -> Feature:
+    name = feature_element.attrib["name"]
     feature_cardinality = parse_instance_cardinality(
-        "mandatory" in feature.attrib and feature.attrib["mandatory"] == "true"
+        "mandatory" in feature_element.attrib
+        and feature_element.attrib["mandatory"] == "true"
     )
-    group_cardinality = parse_group_cardinality(feature)
+    group_cardinality = parse_group_cardinality(feature_element)
 
-    return Feature(
+    feature = Feature(
         name=name,
         instance_cardinality=feature_cardinality,
         group_instance_cardinality=group_cardinality,
         group_type_cardinality=group_cardinality,
-        parent=None,
+        parent=parent,
         children=[],
     )
 
+    feature.children = [
+        parse_feature(child_element, feature) for child_element in feature_element
+    ]
 
-def traverse_xml(element: Element | None, cfm: CFM, parent: Feature) -> list[Feature]:
-    if element is not None and len(element) > 0:
-        for child in element:
-            feature = parse_feature(child)
-            feature.parent = parent
-            parent.children.append(feature)
-            cfm.add_feature(feature)
-            traverse_xml(child, cfm, feature)
-
-    return cfm.features
+    return feature
 
 
-def parse_formula_value_and_feature(formula: Element, cfm: CFM) -> tuple[bool, Feature]:
+def parse_root(root_element: Element) -> list[Feature]:
+    root = parse_feature(root_element, parent=None)
+
+    features = [root]
+
+    for feature in features:
+        features.extend(feature.children)
+
+    return features
+
+
+def parse_formula_value_and_feature(
+    formula: Element, features: list[Feature]
+) -> tuple[bool, Feature]:
     if formula.tag == FormulaTypes.VAR.value and len(formula) == 0:
         if formula.text is None:
             raise TypeError("No valid feature name found in formula")
 
-        return (True, cfm.find_feature(formula.text))
+        feature = next(f for f in features if f.name == formula.text)
+        return (True, feature)
 
     if formula.tag == FormulaTypes.NOT.value and len(formula) == 1:
-        value, feature = parse_formula_value_and_feature(formula[0], cfm)
+        value, feature = parse_formula_value_and_feature(formula[0], features)
         return (not value, feature)
 
     raise TooComplexConstraintError()
 
 
 def parse_constraints(
-    constraints: Element | None, cfm: CFM
+    constraints: Element | None, features: list[Feature]
 ) -> tuple[list[Constraint], list[Constraint], set[Element]]:
     require_constraints: list[Constraint] = []
     exclude_constraints: list[Constraint] = []
@@ -127,10 +136,10 @@ def parse_constraints(
 
         try:
             first_feature_value, first_feature = parse_formula_value_and_feature(
-                rule[0][0], cfm
+                rule[0][0], features
             )
             second_feature_value, second_feature = parse_formula_value_and_feature(
-                rule[0][1], cfm
+                rule[0][1], features
             )
         except TooComplexConstraintError:
             eliminated_constraints.add(rule)
@@ -165,18 +174,16 @@ def parse_constraints(
 
 
 def parse_cfm(root: Element) -> CFM:
-    cfm = CFM([], [], [])
     struct = root.find("struct")
 
     if struct is None:
         raise TypeError("No valid Feature structure found in XML file")
 
     root_struct = struct[0]
-    root_feature = parse_feature(root_struct)
-    cfm.add_feature(root_feature)
-    features = traverse_xml(root_struct, cfm, root_feature)
+    features = parse_root(root_struct)
+
     require_constraints, exclude_constraints, eliminated_constraints = (
-        parse_constraints(root.find("constraints"), cfm)
+        parse_constraints(root.find("constraints"), features)
     )
 
     formatted_eliminated_constraints = [
