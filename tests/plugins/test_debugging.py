@@ -26,6 +26,14 @@ def test_debug(capsys):
     - parent: Sandwich
     - children: Sourdough, Wheat
 
+    CheeseMix: instance [0..1], group type [1..3], group instance [1..3]
+    - parent: Sandwich
+    - children: Cheddar, Swiss, Gouda
+
+    Veggies: instance [0..1], group type [1..2], group instance [1..2]
+    - parent: Sandwich
+    - children: Lettuce, Tomato
+
     Sourdough: instance [0..1], group type [], group instance []
     - parent: Bread
     - children: 
@@ -33,10 +41,6 @@ def test_debug(capsys):
     Wheat: instance [0..1], group type [], group instance []
     - parent: Bread
     - children: 
-
-    CheeseMix: instance [0..1], group type [1..3], group instance [1..3]
-    - parent: Sandwich
-    - children: Cheddar, Swiss, Gouda
 
     Cheddar: instance [0..1], group type [], group instance []
     - parent: CheeseMix
@@ -49,10 +53,6 @@ def test_debug(capsys):
     Gouda: instance [0..1], group type [], group instance []
     - parent: CheeseMix
     - children: 
-
-    Veggies: instance [0..1], group type [1..2], group instance [1..2]
-    - parent: Sandwich
-    - children: Lettuce, Tomato
 
     Lettuce: instance [0..1], group type [], group instance []
     - parent: Veggies

@@ -72,12 +72,6 @@ class CFM:
         if feature not in self.features:
             self.features.append(feature)
 
-    def find_feature(self, name: str) -> Feature:
-        for feature in self.features:
-            if feature.name == name:
-                return feature
-        raise ValueError(f"Feature {name} not found")
-
     def is_unbound(self) -> bool:
         return self.features[0].is_unbound()
 
