@@ -3,7 +3,7 @@ from cfmtoolbox import CFM, app
 
 def stringify_list(name: str, input: list) -> str:
     stringified_input = ", ".join(map(str, input))
-    return f"- {name}: {stringified_input} \n"
+    return f"- {name}: {stringified_input}\n"
 
 
 def stringify_cfm(cfm: CFM | None) -> str:
@@ -25,6 +25,6 @@ def stringify_cfm(cfm: CFM | None) -> str:
 
 @app.command()
 def debug(model: CFM | None) -> CFM | None:
-    print(stringify_cfm(model))
+    print(stringify_cfm(model), end="")
 
     return model

@@ -1,4 +1,5 @@
 from pathlib import Path
+from textwrap import dedent
 
 import pytest
 
@@ -15,53 +16,55 @@ def test_plugin_can_be_loaded():
 
 
 def test_debug(capsys):
-    expected_output = """CFM:
-Sandwich: instance [1..1], group type [1..3], group instance [1..3]
-- parents:  
-- children: Bread, CheeseMix, Veggies 
+    expected_output = dedent("""\
+    CFM:
+    Sandwich: instance [1..1], group type [1..3], group instance [1..3]
+    - parents: 
+    - children: Bread, CheeseMix, Veggies
 
-Bread: instance [1..1], group type [1..1], group instance [1..1]
-- parents: Sandwich 
-- children: Sourdough, Wheat 
+    Bread: instance [1..1], group type [1..1], group instance [1..1]
+    - parents: Sandwich
+    - children: Sourdough, Wheat
 
-Sourdough: instance [0..1], group type [], group instance []
-- parents: Bread 
-- children:  
+    Sourdough: instance [0..1], group type [], group instance []
+    - parents: Bread
+    - children: 
 
-Wheat: instance [0..1], group type [], group instance []
-- parents: Bread 
-- children:  
+    Wheat: instance [0..1], group type [], group instance []
+    - parents: Bread
+    - children: 
 
-CheeseMix: instance [0..1], group type [1..3], group instance [1..3]
-- parents: Sandwich 
-- children: Cheddar, Swiss, Gouda 
+    CheeseMix: instance [0..1], group type [1..3], group instance [1..3]
+    - parents: Sandwich
+    - children: Cheddar, Swiss, Gouda
 
-Cheddar: instance [0..1], group type [], group instance []
-- parents: CheeseMix 
-- children:  
+    Cheddar: instance [0..1], group type [], group instance []
+    - parents: CheeseMix
+    - children: 
 
-Swiss: instance [0..1], group type [], group instance []
-- parents: CheeseMix 
-- children:  
+    Swiss: instance [0..1], group type [], group instance []
+    - parents: CheeseMix
+    - children: 
 
-Gouda: instance [0..1], group type [], group instance []
-- parents: CheeseMix 
-- children:  
+    Gouda: instance [0..1], group type [], group instance []
+    - parents: CheeseMix
+    - children: 
 
-Veggies: instance [0..1], group type [1..2], group instance [1..2]
-- parents: Sandwich 
-- children: Lettuce, Tomato 
+    Veggies: instance [0..1], group type [1..2], group instance [1..2]
+    - parents: Sandwich
+    - children: Lettuce, Tomato
 
-Lettuce: instance [0..1], group type [], group instance []
-- parents: Veggies 
-- children:  
+    Lettuce: instance [0..1], group type [], group instance []
+    - parents: Veggies
+    - children: 
 
-Tomato: instance [0..1], group type [], group instance []
-- parents: Veggies 
-- children:  
+    Tomato: instance [0..1], group type [], group instance []
+    - parents: Veggies
+    - children: 
 
-- Require constraints: Sourdough => Cheddar, Tomato => Gouda, Swiss => Lettuce 
-- Exclude constraints: Wheat => Tomato"""
+    - Require constraints: Sourdough => Cheddar, Tomato => Gouda, Swiss => Lettuce
+    - Exclude constraints: Wheat => Tomato
+    """)
 
     path = Path("tests/data/sandwich.xml")
     cfm = import_featureide(path.read_bytes())
@@ -69,29 +72,31 @@ Tomato: instance [0..1], group type [], group instance []
     debug(cfm)
 
     output = capsys.readouterr()
-    assert expected_output in output.out
+    assert expected_output == output.out
 
 
 @pytest.mark.parametrize(
     ["name", "list", "expectation"],
     [
-        ("test", [1, 2, 3], "- test: 1, 2, 3"),
-        ("", [1, 2, 3], "- : 1, 2, 3"),
-        ("", [], "- : "),
+        ("test", [1, 2, 3], "- test: 1, 2, 3\n"),
+        ("", [1, 2, 3], "- : 1, 2, 3\n"),
+        ("", [], "- : \n"),
     ],
 )
 def test_stringify_list(name: str, list: list, expectation: str):
-    assert expectation in stringify_list(name, list)
+    assert expectation == stringify_list(name, list)
 
 
 def test_stringify_cfm():
-    cfm_str = """CFM:
-Sandwich: instance [1..0], group type [1..3], group instance [2..2]
-- parents:  
-- children:  
+    cfm_str = dedent("""\
+    CFM:
+    Sandwich: instance [1..0], group type [1..3], group instance [2..2]
+    - parents: 
+    - children: 
 
-- Require constraints: Sandwich => Sandwich 
-- Exclude constraints:"""
+    - Require constraints: Sandwich => Sandwich
+    - Exclude constraints: 
+    """)
 
     feature = Feature(
         "Sandwich",
@@ -108,7 +113,7 @@ Sandwich: instance [1..0], group type [1..3], group instance [2..2]
         [],
     )
 
-    assert cfm_str in stringify_cfm(cfm)
+    assert cfm_str == stringify_cfm(cfm)
 
 
 def test_stringify_cfm_can_stringify_none_cfm():
