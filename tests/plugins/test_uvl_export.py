@@ -204,13 +204,12 @@ def test_serialize_root_feature_raises_type_error_on_group_type_compounded_cardi
         serialize_root_feature(sandwich)
 
 
-@pytest.mark.xfail(reason="Case not fully handled yet")
 def test_serialize_features_raises_type_error_on_compounded_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(0, 2)]),
-        Cardinality([Interval(0, 2)]),
+        Cardinality([Interval(0, 2), Interval(2, 2)]),
         [],
         [],
     )
