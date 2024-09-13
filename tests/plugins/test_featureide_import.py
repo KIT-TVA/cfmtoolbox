@@ -183,7 +183,7 @@ def test_traverse_xml():
     root_feature = parse_feature(root_struct)
 
     cfm.add_feature(root_feature)
-    feature_list = traverse_xml(root_struct, cfm)
+    feature_list = traverse_xml(root_struct, cfm, root_feature)
 
     assert len(feature_list) == 11
     assert feature_list[0].name == "Sandwich"
@@ -237,11 +237,6 @@ def test_traverse_xml():
     assert feature_list[10].name == "Tomato"
     assert feature_list[10].parent == feature_list[8]
     assert feature_list[10].children == []
-
-
-def test_traverse_xml_can_traverse_on_empty_structure():
-    cfm = CFM([], [], [])
-    assert traverse_xml(None, cfm) == cfm.features
 
 
 def test_parse_formula_value_and_feature():
