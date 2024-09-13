@@ -138,25 +138,27 @@ def parse_constraints(
             eliminated_constraints.add(rule)
             continue
 
+        is_require = first_feature_value == second_feature_value
+
         constraint = (
             Constraint(
-                require=True,
+                require=is_require,
                 first_feature=first_feature,
-                first_cardinality=first_feature.instance_cardinality,
+                first_cardinality=Cardinality([Interval(1, 1)]),
                 second_feature=second_feature,
-                second_cardinality=second_feature.instance_cardinality,
+                second_cardinality=Cardinality([Interval(1, 1)]),
             )
             if (first_feature_value or second_feature_value)
             else Constraint(
-                require=True,
+                require=is_require,
                 first_feature=second_feature,
-                first_cardinality=second_feature.instance_cardinality,
+                first_cardinality=Cardinality([Interval(1, 1)]),
                 second_feature=first_feature,
-                second_cardinality=first_feature.instance_cardinality,
+                second_cardinality=Cardinality([Interval(1, 1)]),
             )
         )
 
-        if first_feature_value == second_feature_value:
+        if is_require:
             require_constraints.append(constraint)
         else:
             exclude_constraints.append(constraint)
