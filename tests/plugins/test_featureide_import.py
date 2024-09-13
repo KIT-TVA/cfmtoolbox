@@ -175,8 +175,13 @@ def test_parse_feature_can_parse_with_mandatory_is_none():
 def test_traverse_xml():
     cfm = CFM([], [], [])
     tree = ET.parse("tests/data/sandwich.xml")
-    root_struct = tree.getroot().find("struct")[0]
+
+    struct = tree.getroot().find("struct")
+    assert struct is not None
+
+    root_struct = struct[0]
     root_feature = parse_feature(root_struct)
+
     cfm.add_feature(root_feature)
     feature_list = traverse_xml(root_struct, cfm)
 
