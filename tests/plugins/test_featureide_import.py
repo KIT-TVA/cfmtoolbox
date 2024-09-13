@@ -344,9 +344,9 @@ def test_parse_constraint_can_parse_constraint_with_one_require_rule():
     constraint = Constraint(
         True,
         feature,
-        feature.instance_cardinality,
+        Cardinality([Interval(1, 1)]),
         feature,
-        feature.instance_cardinality,
+        Cardinality([Interval(1, 1)]),
     )
 
     require, exclude, eliminated = parse_constraints(constraints, cfm)
@@ -369,11 +369,11 @@ def test_parse_constraint_can_parse_constraint_with_one_exclude_rule():
     cfm = CFM([feature], [], [])
 
     constraint = Constraint(
-        True,
+        False,
         feature,
-        feature.instance_cardinality,
+        Cardinality([Interval(1, 1)]),
         feature,
-        feature.instance_cardinality,
+        Cardinality([Interval(1, 1)]),
     )
 
     require, exclude, eliminated = parse_constraints(constraints, cfm)
@@ -403,9 +403,9 @@ def test_parse_constraint_can_parse_constraint_with_both_formulas_negative():
     constraint = Constraint(
         True,
         cheese_feature,
-        cheese_feature.instance_cardinality,
+        Cardinality([Interval(1, 1)]),
         bread_feature,
-        bread_feature.instance_cardinality,
+        Cardinality([Interval(1, 1)]),
     )
 
     cfm = CFM([bread_feature, cheese_feature], [], [])

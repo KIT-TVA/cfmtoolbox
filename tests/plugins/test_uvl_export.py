@@ -544,9 +544,9 @@ features
 \t\t\t\t\tTomato cardinality [0..1]
 
 constraints
-\t((Sourdough >= 0) & (Sourdough <= 1)) => ((Cheddar >= 0) & (Cheddar <= 1))
-\t((Tomato >= 0) & (Tomato <= 1)) => ((Gouda >= 0) & (Gouda <= 1))
-\t((Swiss >= 0) & (Swiss <= 1)) => ((Lettuce >= 0) & (Lettuce <= 1))
-\t!(((Wheat >= 0) & (Wheat <= 1)) & ((Tomato >= 0) & (Tomato <= 1)))"""
+\t(Sourdough = 1) => (Cheddar = 1)
+\t(Tomato = 1) => (Gouda = 1)
+\t(Swiss = 1) => (Lettuce = 1)
+\t!((Wheat = 1) & (Tomato = 1))\n"""
 
     assert expectation in export.decode()
