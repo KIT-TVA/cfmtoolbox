@@ -35,3 +35,4 @@ jobs:
         run: |
           poetry run ruff check cfmtoolbox tests
           poetry run ruff format --check cfmtoolbox tests
+          poetry run mypy cfmtoolbox tests
