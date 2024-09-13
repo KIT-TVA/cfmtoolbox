@@ -39,6 +39,9 @@ extend-select = ["I"]
 [tool.pytest.ini_options]
 addopts = "--cov=cfmtoolbox --cov-report term-missing --cov-report html"
 
+[tool.mypy]
+check_untyped_defs = true
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
