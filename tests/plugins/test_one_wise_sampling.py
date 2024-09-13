@@ -70,14 +70,14 @@ def test_calculate_border_assignments(one_wise_sampler: OneWiseSampler):
         Cardinality([Interval(0, 2), Interval(5, 7), Interval(10, 10)]),
         Cardinality([Interval(1, 3)]),
         Cardinality([Interval(3, 3)]),
-        [],
+        None,
         [
             Feature(
                 "Cheddar",
                 Cardinality([Interval(0, 1)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -85,7 +85,7 @@ def test_calculate_border_assignments(one_wise_sampler: OneWiseSampler):
                 Cardinality([Interval(0, 2)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -93,7 +93,7 @@ def test_calculate_border_assignments(one_wise_sampler: OneWiseSampler):
                 Cardinality([Interval(0, 3)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
         ],
@@ -129,14 +129,14 @@ def test_generate_random_children_with_random_cardinality_with_assignment(
         Cardinality([]),
         Cardinality([Interval(1, 3)]),
         Cardinality([Interval(3, 3)]),
-        [],
+        None,
         [
             Feature(
                 "Cheddar",
                 Cardinality([Interval(0, 1)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -144,7 +144,7 @@ def test_generate_random_children_with_random_cardinality_with_assignment(
                 Cardinality([Interval(0, 2)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -152,7 +152,7 @@ def test_generate_random_children_with_random_cardinality_with_assignment(
                 Cardinality([Interval(0, 3)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
         ],
