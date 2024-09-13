@@ -78,16 +78,14 @@ def parse_feature(feature: Element) -> Feature:
     )
 
 
-def traverse_xml(element: Element | None, cfm: CFM) -> list[Feature]:
+def traverse_xml(element: Element | None, cfm: CFM, parent: Feature) -> list[Feature]:
     if element is not None and len(element) > 0:
-        parent = cfm.find_feature(element.attrib["name"])
-
         for child in element:
             feature = parse_feature(child)
             feature.parent = parent
             parent.children.append(feature)
             cfm.add_feature(feature)
-            traverse_xml(child, cfm)
+            traverse_xml(child, cfm, feature)
 
     return cfm.features
 
@@ -176,7 +174,7 @@ def parse_cfm(root: Element) -> CFM:
     root_struct = struct[0]
     root_feature = parse_feature(root_struct)
     cfm.add_feature(root_feature)
-    features = traverse_xml(root_struct, cfm)
+    features = traverse_xml(root_struct, cfm, root_feature)
     require_constraints, exclude_constraints, eliminated_constraints = (
         parse_constraints(root.find("constraints"), cfm)
     )
