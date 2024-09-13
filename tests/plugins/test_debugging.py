@@ -19,47 +19,47 @@ def test_debug(capsys):
     expected_output = dedent("""\
     CFM:
     Sandwich: instance [1..1], group type [1..3], group instance [1..3]
-    - parents: 
+    - parent: None
     - children: Bread, CheeseMix, Veggies
 
     Bread: instance [1..1], group type [1..1], group instance [1..1]
-    - parents: Sandwich
+    - parent: Sandwich
     - children: Sourdough, Wheat
 
     Sourdough: instance [0..1], group type [], group instance []
-    - parents: Bread
+    - parent: Bread
     - children: 
 
     Wheat: instance [0..1], group type [], group instance []
-    - parents: Bread
+    - parent: Bread
     - children: 
 
     CheeseMix: instance [0..1], group type [1..3], group instance [1..3]
-    - parents: Sandwich
+    - parent: Sandwich
     - children: Cheddar, Swiss, Gouda
 
     Cheddar: instance [0..1], group type [], group instance []
-    - parents: CheeseMix
+    - parent: CheeseMix
     - children: 
 
     Swiss: instance [0..1], group type [], group instance []
-    - parents: CheeseMix
+    - parent: CheeseMix
     - children: 
 
     Gouda: instance [0..1], group type [], group instance []
-    - parents: CheeseMix
+    - parent: CheeseMix
     - children: 
 
     Veggies: instance [0..1], group type [1..2], group instance [1..2]
-    - parents: Sandwich
+    - parent: Sandwich
     - children: Lettuce, Tomato
 
     Lettuce: instance [0..1], group type [], group instance []
-    - parents: Veggies
+    - parent: Veggies
     - children: 
 
     Tomato: instance [0..1], group type [], group instance []
-    - parents: Veggies
+    - parent: Veggies
     - children: 
 
     - Require constraints: Sourdough => Cheddar, Tomato => Gouda, Swiss => Lettuce
@@ -91,7 +91,7 @@ def test_stringify_cfm():
     cfm_str = dedent("""\
     CFM:
     Sandwich: instance [1..0], group type [1..3], group instance [2..2]
-    - parents: 
+    - parent: None
     - children: 
 
     - Require constraints: Sandwich => Sandwich
@@ -103,7 +103,7 @@ def test_stringify_cfm():
         Cardinality([Interval(1, 0)]),
         Cardinality([Interval(1, 3)]),
         Cardinality([Interval(2, 2)]),
-        [],
+        None,
         [],
     )
 

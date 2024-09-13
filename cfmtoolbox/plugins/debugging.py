@@ -14,7 +14,7 @@ def stringify_cfm(cfm: CFM | None) -> str:
 
     for feature in cfm.features:
         formatted_cfm += f"{feature}: instance [{feature.instance_cardinality}], group type [{feature.group_type_cardinality}], group instance [{feature.group_instance_cardinality}]\n"
-        formatted_cfm += stringify_list("parents", feature.parents)
+        formatted_cfm += f"- parent: {feature.parent}\n"
         formatted_cfm += stringify_list("children", feature.children) + "\n"
 
     formatted_cfm += stringify_list("Require constraints", cfm.require_constraints)

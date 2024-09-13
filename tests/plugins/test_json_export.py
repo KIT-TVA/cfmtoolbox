@@ -16,7 +16,7 @@ def test_export_json():
         instance_cardinality=Cardinality(intervals=[]),
         group_type_cardinality=Cardinality(intervals=[]),
         group_instance_cardinality=Cardinality(intervals=[]),
-        parents=[],
+        parent=None,
         children=[],
     )
 
@@ -48,7 +48,7 @@ def test_serialize_feature_can_serialize_standalone_features():
         instance_cardinality=Cardinality(intervals=[]),
         group_type_cardinality=Cardinality(intervals=[]),
         group_instance_cardinality=Cardinality(intervals=[]),
-        parents=[],
+        parent=None,
         children=[],
     )
 
@@ -68,7 +68,7 @@ def test_serialize_feature_can_serialize_children():
         instance_cardinality=Cardinality(intervals=[]),
         group_type_cardinality=Cardinality(intervals=[]),
         group_instance_cardinality=Cardinality(intervals=[]),
-        parents=[],
+        parent=None,
         children=[],
     )
 
@@ -77,7 +77,7 @@ def test_serialize_feature_can_serialize_children():
         instance_cardinality=Cardinality(intervals=[]),
         group_type_cardinality=Cardinality(intervals=[]),
         group_instance_cardinality=Cardinality(intervals=[]),
-        parents=[sandwich],
+        parent=sandwich,
         children=[],
     )
 
@@ -144,7 +144,7 @@ def test_serialize_constraint():
         instance_cardinality=Cardinality(intervals=[]),
         group_type_cardinality=Cardinality(intervals=[]),
         group_instance_cardinality=Cardinality(intervals=[]),
-        parents=[],
+        parent=None,
         children=[],
     )
 
@@ -153,7 +153,7 @@ def test_serialize_constraint():
         instance_cardinality=Cardinality(intervals=[]),
         group_type_cardinality=Cardinality(intervals=[]),
         group_instance_cardinality=Cardinality(intervals=[]),
-        parents=[],
+        parent=None,
         children=[],
     )
 

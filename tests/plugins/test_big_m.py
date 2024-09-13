@@ -40,14 +40,14 @@ def test_replace_infinite_upper_bound_with_global_upper_bound():
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(1, 3)]),
         Cardinality([Interval(1, None)]),
-        [],
+        None,
         [
             Feature(
                 "Tomato",
                 Cardinality([Interval(0, None)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -55,7 +55,7 @@ def test_replace_infinite_upper_bound_with_global_upper_bound():
                 Cardinality([Interval(0, None)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
             Feature(
@@ -63,7 +63,7 @@ def test_replace_infinite_upper_bound_with_global_upper_bound():
                 Cardinality([Interval(0, 3)]),
                 Cardinality([]),
                 Cardinality([]),
-                [],
+                None,
                 [],
             ),
         ],

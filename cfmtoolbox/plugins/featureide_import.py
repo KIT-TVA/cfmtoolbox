@@ -73,7 +73,7 @@ def parse_feature(feature: Element) -> Feature:
         instance_cardinality=feature_cardinality,
         group_instance_cardinality=group_cardinality,
         group_type_cardinality=group_cardinality,
-        parents=[],
+        parent=None,
         children=[],
     )
 
@@ -84,7 +84,7 @@ def traverse_xml(element: Element | None, cfm: CFM) -> list[Feature]:
 
         for child in element:
             feature = parse_feature(child)
-            feature.add_parent(parent)
+            feature.parent = parent
             parent.add_child(feature)
             cfm.add_feature(feature)
             traverse_xml(child, cfm)

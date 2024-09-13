@@ -38,7 +38,7 @@ def parse_cfm(serialized_cfm: JSON) -> CFM:
 
 
 def parse_root(serialized_root: JSON) -> list[Feature]:
-    root = parse_feature(serialized_root, parents=[])
+    root = parse_feature(serialized_root, parent=None)
 
     features = [root]
 
@@ -48,7 +48,7 @@ def parse_root(serialized_root: JSON) -> list[Feature]:
     return features
 
 
-def parse_feature(serialized_feature: JSON, /, parents: list[Feature]) -> Feature:
+def parse_feature(serialized_feature: JSON, /, parent: Feature | None) -> Feature:
     if not isinstance(serialized_feature, dict):
         raise TypeError(f"Feature must be an object: {serialized_feature}")
 
@@ -77,12 +77,12 @@ def parse_feature(serialized_feature: JSON, /, parents: list[Feature]) -> Featur
         instance_cardinality=instance_cardinality,
         group_type_cardinality=group_type_cardinality,
         group_instance_cardinality=group_instance_cardinality,
-        parents=parents,
+        parent=parent,
         children=[],
     )
 
     feature.children = [
-        parse_feature(serialized_child, parents=[feature])
+        parse_feature(serialized_child, parent=feature)
         for serialized_child in serialized_feature["children"]
     ]
 

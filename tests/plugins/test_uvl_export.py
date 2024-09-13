@@ -29,7 +29,7 @@ def test_serialize_group_cardinality_can_export_to_alternative():
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(1, 1)]),
-        [],
+        None,
         [],
     )
 
@@ -38,7 +38,7 @@ def test_serialize_group_cardinality_can_export_to_alternative():
         Cardinality([Interval(0, 1)]),
         Cardinality([]),
         Cardinality([]),
-        [sandwich],
+        sandwich,
         [],
     )
 
@@ -53,7 +53,7 @@ def test_serialize_group_cardinality_can_export_to_or():
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(1, 2)]),
         Cardinality([Interval(1, 3)]),
-        [],
+        None,
         [],
     )
 
@@ -62,7 +62,7 @@ def test_serialize_group_cardinality_can_export_to_or():
         Cardinality([Interval(0, 2)]),
         Cardinality([]),
         Cardinality([]),
-        [sandwich],
+        sandwich,
         [],
     )
 
@@ -71,7 +71,7 @@ def test_serialize_group_cardinality_can_export_to_or():
         Cardinality([Interval(0, 2)]),
         Cardinality([]),
         Cardinality([]),
-        [sandwich],
+        sandwich,
         [],
     )
 
@@ -87,7 +87,7 @@ def test_serialize_group_cardinality_can_export_to_one_numbered_cardinality():
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(2, 2)]),
         Cardinality([Interval(2, 2)]),
-        [],
+        None,
         [],
     )
 
@@ -96,7 +96,7 @@ def test_serialize_group_cardinality_can_export_to_one_numbered_cardinality():
         Cardinality([Interval(2, 2)]),
         Cardinality([]),
         Cardinality([]),
-        [sandwich],
+        sandwich,
         [],
     )
 
@@ -111,7 +111,7 @@ def test_serialize_group_cardinality_can_export_to_cardinality():
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(0, 3)]),
         Cardinality([Interval(1, 3)]),
-        [],
+        None,
         [],
     )
 
@@ -120,7 +120,7 @@ def test_serialize_group_cardinality_can_export_to_cardinality():
         Cardinality([Interval(0, 3)]),
         Cardinality([]),
         Cardinality([]),
-        [sandwich],
+        sandwich,
         [],
     )
 
@@ -135,7 +135,7 @@ def test_serialize_group_cardinality_can_export_to_nothing():
         Cardinality([Interval(1, 1)]),
         Cardinality([]),
         Cardinality([]),
-        [],
+        None,
         [],
     )
 
@@ -160,7 +160,7 @@ def test_serialize_root_feature():
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(0, 2)]),
         Cardinality([Interval(0, 2)]),
-        [],
+        None,
         [],
     )
 
@@ -169,7 +169,7 @@ def test_serialize_root_feature():
         Cardinality([Interval(0, 2)]),
         Cardinality([]),
         Cardinality([]),
-        [root],
+        root,
         [],
     )
 
@@ -184,7 +184,7 @@ def test_serialize_root_feature_raises_type_error_on_group_instance_compounded_c
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(0, 2)]),
         Cardinality([Interval(0, 2), Interval(2, 2)]),
-        [],
+        None,
         [],
     )
     with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
@@ -197,7 +197,7 @@ def test_serialize_root_feature_raises_type_error_on_group_type_compounded_cardi
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(0, 2), Interval(2, 2)]),
         Cardinality([Interval(0, 2)]),
-        [],
+        None,
         [],
     )
     with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
@@ -210,7 +210,7 @@ def test_serialize_features_raises_type_error_on_compounded_cardinality():
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(0, 2)]),
         Cardinality([Interval(0, 2), Interval(2, 2)]),
-        [],
+        None,
         [],
     )
     with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
@@ -223,7 +223,7 @@ def test_serialize_features_can_export_single_child_feature():
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(0, 2)]),
         Cardinality([Interval(0, 2)]),
-        [],
+        None,
         [],
     )
 
@@ -232,7 +232,7 @@ def test_serialize_features_can_export_single_child_feature():
         Cardinality([Interval(0, 2)]),
         Cardinality([]),
         Cardinality([]),
-        [sandwich],
+        sandwich,
         [],
     )
 
@@ -252,7 +252,7 @@ def test_serialize_features():
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(0, 2)]),
         Cardinality([Interval(4, 7)]),
-        [],
+        None,
         [],
     )
 
@@ -261,7 +261,7 @@ def test_serialize_features():
         Cardinality([Interval(2, 2)]),
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(0, 1)]),
-        [sandwich],
+        sandwich,
         [],
     )
 
@@ -270,7 +270,7 @@ def test_serialize_features():
         Cardinality([Interval(0, 1)]),
         Cardinality([]),
         Cardinality([]),
-        [bread],
+        bread,
         [],
     )
 
@@ -279,7 +279,7 @@ def test_serialize_features():
         Cardinality([Interval(0, 1)]),
         Cardinality([]),
         Cardinality([]),
-        [bread],
+        bread,
         [],
     )
 
@@ -288,7 +288,7 @@ def test_serialize_features():
         Cardinality([Interval(2, 4)]),
         Cardinality([Interval(0, 3)]),
         Cardinality([Interval(3, 3)]),
-        [sandwich],
+        sandwich,
         [],
     )
 
@@ -297,7 +297,7 @@ def test_serialize_features():
         Cardinality([Interval(0, 1)]),
         Cardinality([]),
         Cardinality([]),
-        [cheeseMix],
+        cheeseMix,
         [],
     )
 
@@ -306,7 +306,7 @@ def test_serialize_features():
         Cardinality([Interval(0, 2)]),
         Cardinality([]),
         Cardinality([]),
-        [cheeseMix],
+        cheeseMix,
         [],
     )
 
@@ -315,7 +315,7 @@ def test_serialize_features():
         Cardinality([Interval(0, 3)]),
         Cardinality([]),
         Cardinality([]),
-        [cheeseMix],
+        cheeseMix,
         [],
     )
 
@@ -324,7 +324,7 @@ def test_serialize_features():
         Cardinality([Interval(0, 1)]),
         Cardinality([Interval(1, 2)]),
         Cardinality([Interval(1, None)]),
-        [sandwich],
+        sandwich,
         [],
     )
 
@@ -333,7 +333,7 @@ def test_serialize_features():
         Cardinality([Interval(0, None)]),
         Cardinality([]),
         Cardinality([]),
-        [veggies],
+        veggies,
         [],
     )
 
@@ -342,7 +342,7 @@ def test_serialize_features():
         Cardinality([Interval(0, None)]),
         Cardinality([]),
         Cardinality([]),
-        [veggies],
+        veggies,
         [],
     )
 
@@ -384,7 +384,7 @@ def test_serialize_constraint(constraint: Cardinality, expectation: str):
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(0, 2)]),
         Cardinality([Interval(4, 7)]),
-        [],
+        None,
         [],
     )
 
@@ -405,7 +405,7 @@ def test_serialize_constraints(is_required: bool, expectation: str):
         Cardinality([Interval(1, 1)]),
         Cardinality([]),
         Cardinality([]),
-        [],
+        None,
         [],
     )
 
@@ -416,7 +416,7 @@ def test_serialize_constraints(is_required: bool, expectation: str):
         Cardinality([Interval(1, 2)]),
         Cardinality([]),
         Cardinality([]),
-        [],
+        None,
         [],
     )
 
@@ -435,7 +435,7 @@ def test_serialize_constraints_raises_type_error_on_compounded_cardinality_on_fi
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(0, 2)]),
         Cardinality([Interval(0, 2)]),
-        [],
+        None,
         [],
     )
 
@@ -460,7 +460,7 @@ def test_serialize_constraints_raises_type_error_on_compounded_cardinality_on_se
         Cardinality([Interval(1, 1)]),
         Cardinality([Interval(0, 2)]),
         Cardinality([Interval(0, 2)]),
-        [],
+        None,
         [],
     )
 
@@ -485,7 +485,7 @@ def test_serialize_all_constraints():
         Cardinality([Interval(1, 1)]),
         Cardinality([]),
         Cardinality([]),
-        [],
+        None,
         [],
     )
 
@@ -496,7 +496,7 @@ def test_serialize_all_constraints():
         Cardinality([Interval(1, 2)]),
         Cardinality([]),
         Cardinality([]),
-        [],
+        None,
         [],
     )
 
