@@ -128,11 +128,9 @@ class OneWiseSampler:
 
     def get_random_cardinality(self, cardinality_list: Cardinality):
         random_interval = random.choice(cardinality_list.intervals)
+        assert random_interval.upper is not None
         random_cardinality = random.randint(
-            random_interval.lower,
-            random_interval.upper
-            if random_interval.upper is not None
-            else random_interval.lower + 5,
+            random_interval.lower, random_interval.upper
         )
         return random_cardinality
 
