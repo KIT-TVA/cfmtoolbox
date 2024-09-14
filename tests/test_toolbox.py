@@ -96,4 +96,4 @@ def test_exporter_registration():
 def test_load_plugins():
     app = CFMToolbox()
     plugins = app.load_plugins()
-    assert len(plugins) == 9
+    assert len(plugins) == 10
