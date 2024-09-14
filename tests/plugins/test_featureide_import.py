@@ -464,7 +464,8 @@ def test_parse_cfm_can_parse_multiple_eliminated_constraints(capsys):
 \t\t\t\t\t<var>Spongecake</var>
 \t\t\t\t</disj>
 \t\t\t\t<var>Eclair</var>
-\t\t\t</imp>\n\t\t</rule>
+\t\t\t</imp>
+\t\t</rule>
 
 <rule>
 \t\t\t<imp>

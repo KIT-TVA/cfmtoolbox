@@ -204,7 +204,33 @@ def test_serialize_root_feature_raises_type_error_on_group_type_compounded_cardi
         serialize_root_feature(sandwich)
 
 
-def test_serialize_features_raises_type_error_on_compounded_cardinality():
+def test_serialize_features_raises_type_error_on_instance_compounded_cardinality():
+    sandwich = Feature(
+        "Sandwich",
+        Cardinality([Interval(1, 1), Interval(1, 1)]),
+        Cardinality([Interval(0, 2)]),
+        Cardinality([Interval(0, 2)]),
+        None,
+        [],
+    )
+    with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
+        serialize_features(sandwich)
+
+
+def test_serialize_features_raises_type_error_on_group_type_compounded_cardinality():
+    sandwich = Feature(
+        "Sandwich",
+        Cardinality([Interval(1, 1)]),
+        Cardinality([Interval(0, 2), Interval(1, 1)]),
+        Cardinality([Interval(0, 2)]),
+        None,
+        [],
+    )
+    with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
+        serialize_features(sandwich)
+
+
+def test_serialize_features_raises_type_error_on_group_instance_compounded_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
