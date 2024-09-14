@@ -30,6 +30,11 @@ def one_wise_sampling(
     return model
 
 
+ChildAndCardinalityPair = NamedTuple(
+    "ChildAndCardinalityPair", [("child", Feature), ("cardinality", int)]
+)
+
+
 # The OneWiseSampler class is responsible for generating one-wise samples under the definitions of Instance-Set, Boundary-Interior Coverage and global constraints
 class OneWiseSampler:
     def __init__(self, model: CFM):
@@ -134,9 +139,6 @@ class OneWiseSampler:
     def generate_random_children_with_random_cardinality_with_assignment(
         self, feature: Feature
     ):
-        ChildAndCardinalityPair = NamedTuple(
-            "ChildAndCardinalityPair", [("child", Feature), ("cardinality", int)]
-        )
         summed_random_instance_cardinality = 0
         summed_random_group_type_cardinality = 0
         child_with_random_instance_cardinality: list[ChildAndCardinalityPair] = []
