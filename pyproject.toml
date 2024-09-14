@@ -24,6 +24,7 @@ mkdocs-material = "^9.5.34"
 cfmtoolbox = "cfmtoolbox.__main__:__name__"
 
 [tool.poetry.plugins."cfmtoolbox.plugins"]
+conversion = "cfmtoolbox.plugins.conversion"
 random-sampling = "cfmtoolbox.plugins.random_sampling"
 uvl-export = "cfmtoolbox.plugins.uvl_export"
 uvl-import = "cfmtoolbox.plugins.uvl_import"
