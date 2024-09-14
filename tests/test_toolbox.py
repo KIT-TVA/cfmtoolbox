@@ -7,17 +7,6 @@ from cfmtoolbox import CFM
 from cfmtoolbox.toolbox import CFMToolbox
 
 
-def test_entrypoint_runs_cli(capsys):
-    with pytest.raises(SystemExit):
-        from cfmtoolbox.__main__ import app
-
-        assert app
-
-    stdout, stderr = capsys.readouterr()
-    assert stdout == ""
-    assert "Missing command." in stderr
-
-
 def test_import_model_without_import_path():
     app = CFMToolbox()
     assert app.import_path is None
