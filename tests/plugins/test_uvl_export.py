@@ -365,10 +365,10 @@ def test_serialize_features():
 \t\tVeggie cardinality [0..1]
 \t\t\tor
 \t\t\t\tLettuce cardinality [0..*]
-\t\t\t\tTomato cardinality [0..*]"""
+\t\t\t\tTomato cardinality [0..*]\n"""
 
     export = serialize_features(sandwich)
-    assert expectation in export
+    assert expectation == export
 
 
 @pytest.mark.parametrize(
@@ -549,4 +549,4 @@ constraints
 \t(Swiss = 1) => (Lettuce = 1)
 \t!((Wheat = 1) & (Tomato = 1))\n"""
 
-    assert expectation in export.decode()
+    assert expectation == export.decode()

@@ -412,16 +412,16 @@ def test_parse_cfm(capsys):
     exclude_constraints = cfm.exclude_constraints
 
     output = capsys.readouterr()
-    expected_rule = """<rule>
-			<imp>
-				<conj>
-					<var>Bread</var>
-					<var>Swiss</var>
-				</conj>
-				<var>Tomato</var>
-			</imp>
-		</rule>
-    """
+    expectation = """The following constraints were exterminated:
+<rule>
+\t\t\t<imp>
+\t\t\t\t<conj>
+\t\t\t\t\t<var>Bread</var>
+\t\t\t\t\t<var>Swiss</var>
+\t\t\t\t</conj>
+\t\t\t\t<var>Tomato</var>
+\t\t\t</imp>
+\t\t</rule>\n\n"""
 
     assert len(cfm.features) == 11
     assert cfm.features[0].name == "Sandwich"
@@ -446,7 +446,7 @@ def test_parse_cfm(capsys):
     assert exclude_constraints[0].first_feature.name == "Wheat"
     assert exclude_constraints[0].second_feature.name == "Tomato"
 
-    assert dedent(expected_rule) in output.err
+    assert dedent(expectation) == dedent(output.err)
 
 
 def test_parse_cfm_can_parse_multiple_eliminated_constraints(capsys):
@@ -456,34 +456,31 @@ def test_parse_cfm_can_parse_multiple_eliminated_constraints(capsys):
     require_constraints = cfm.require_constraints
     exclude_constraints = cfm.exclude_constraints
 
-    expected_rule_one = """<rule>
-			<imp>
-				<conj>
-					<var>Tart</var>
-					<var>Shortcake</var>
-				</conj>
-				<var>Choux</var>
-			</imp>
-		</rule>
-    """
+    expectation = """The following constraints were exterminated:
+<rule>
+\t\t\t<imp>
+\t\t\t\t<disj>
+\t\t\t\t\t<var>Croissant</var>
+\t\t\t\t\t<var>Spongecake</var>
+\t\t\t\t</disj>
+\t\t\t\t<var>Eclair</var>
+\t\t\t</imp>\n\t\t</rule>
 
-    expected_rule_two = """<rule>
-			<imp>
-				<disj>
-					<var>Croissant</var>
-					<var>Spongecake</var>
-				</disj>
-				<var>Eclair</var>
-			</imp>
-		</rule>
-    """
+<rule>
+\t\t\t<imp>
+\t\t\t\t<conj>
+\t\t\t\t\t<var>Tart</var>
+\t\t\t\t\t<var>Shortcake</var>
+\t\t\t\t</conj>
+\t\t\t\t<var>Choux</var>
+\t\t\t</imp>
+\t\t</rule>\n\n"""
 
     output = capsys.readouterr()
 
     assert len(exclude_constraints) == 0
     assert len(require_constraints) == 0
-    assert dedent(expected_rule_one) in output.err
-    assert dedent(expected_rule_two) in output.err
+    assert dedent(expectation) == dedent(output.err)
 
 
 def test_parse_cfm_does_not_print_extermination_without_eliminated_constraints(capsys):
