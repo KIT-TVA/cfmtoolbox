@@ -16,8 +16,8 @@ python3 -m cfmtoolbox --import example.uvl random-sampling --amount 5
 In case of an unbound model, transform the model first with e.g. the Big M plugin.
 
 ```bash
-python3 -m cfmtoolbox --import example_unbound.uvl --export example_bound.uvl apply-big-m
-python3 -m cfmtoolbox --import example_bound.uvl random-sampling 
+python3 -m cfmtoolbox --import unbound.uvl --export bound.uvl apply-big-m
+python3 -m cfmtoolbox --import bound.uvl random-sampling 
 ```
 
 Because the sampling algorithm uses non-determinism, it is recommended to limit the runtime of the command with a timeout of e.g. `5` seconds.

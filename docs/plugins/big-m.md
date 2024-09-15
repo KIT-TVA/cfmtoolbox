@@ -6,5 +6,5 @@ The safe global upper bound is calculated by multiplying the upper bounds of all
 Import a cfm, apply the big-m method and export it:
 
 ```bash
-python3 -m cfmtoolbox --import example_unbound.uvl --export example_bound.uvl apply-big-m
+python3 -m cfmtoolbox --import unbound.uvl --export bound.uvl apply-big-m
 ```
