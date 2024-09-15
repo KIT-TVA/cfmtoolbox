@@ -4,7 +4,7 @@ It generates a non-minimal set of random valid configurations that cover the mod
 The One Wise Sampling plugin requires the model to be bound which means no infinite upper bounds as instance cardinalities are allowed.
 In case of an unbound model, you can use other plugins like the Big M plugin to replace infinte upper bounds with finite ones.
 
-## Usage example
+## Usage
 
 Import a cfm and generate a one wise sample set for it:
 

@@ -4,7 +4,7 @@ It generates a custom amount of random valid configurations and outputs them int
 The Random Sampling plugin requires the model to be bound which means no infinite upper bounds as instance cardinalities are allowed.
 In case of an unbound model, you can use other plugins like the Big M plugin to replace infinte upper bounds with finite ones.
 
-## Usage example
+## Usage
 
 Import a cfm and generate 5 random samples for it:
 The `--amount` parameter defaults to `1` if not specified.
