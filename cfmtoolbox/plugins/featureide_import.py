@@ -115,10 +115,10 @@ def parse_formula_value_and_feature(
 
 def parse_constraints(
     constraints: Element | None, features: list[Feature]
-) -> tuple[list[Constraint], list[Constraint], set[Element]]:
+) -> tuple[list[Constraint], list[Constraint], list[Element]]:
     require_constraints: list[Constraint] = []
     exclude_constraints: list[Constraint] = []
-    eliminated_constraints: set[Element] = set()
+    eliminated_constraints: list[Element] = list()
 
     if constraints is None or len(constraints) == 0:
         return (require_constraints, exclude_constraints, eliminated_constraints)
@@ -131,7 +131,7 @@ def parse_constraints(
             raise TypeError("No valid constraint rule found in constraints")
 
         if rule[0].tag != FormulaTypes.IMP.value:
-            eliminated_constraints.add(rule)
+            eliminated_constraints.append(rule)
             return (require_constraints, exclude_constraints, eliminated_constraints)
 
         try:
@@ -142,7 +142,7 @@ def parse_constraints(
                 rule[0][1], features
             )
         except TooComplexConstraintError:
-            eliminated_constraints.add(rule)
+            eliminated_constraints.append(rule)
             continue
 
         is_require = first_feature_value == second_feature_value

@@ -34,7 +34,7 @@
 				<var>Choux</var>
 			</imp>
 		</rule>
-        <rule>
+		<rule>
 			<imp>
 				<disj>
 					<var>Croissant</var>
