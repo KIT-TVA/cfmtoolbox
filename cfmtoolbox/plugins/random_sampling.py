@@ -37,9 +37,7 @@ class RandomSampler:
     def random_sampling(self) -> FeatureNode:
         while True:
             self.global_feature_count = defaultdict(int)
-            random_feature_node = self.generate_random_feature_node(
-                self.model.features[0]
-            )
+            random_feature_node = self.generate_random_feature_node(self.model.root)
             if random_feature_node.validate(self.model):
                 break
 

@@ -108,7 +108,7 @@ def test_stringify_cfm():
     )
 
     cfm = CFM(
-        [feature],
+        feature,
         [Constraint(True, feature, Cardinality([]), feature, Cardinality([]))],
         [],
     )

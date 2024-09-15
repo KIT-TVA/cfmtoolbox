@@ -21,7 +21,7 @@ def test_export_json():
     )
 
     cfm = CFM(
-        features=[root],
+        root=root,
         require_constraints=[],
         exclude_constraints=[],
     )

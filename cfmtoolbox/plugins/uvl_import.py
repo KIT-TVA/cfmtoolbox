@@ -31,8 +31,13 @@ class ConstraintType(Enum):
 
 
 class CustomListener(UVLPythonListener):
-    def __init__(self, cfm: CFM):
-        self.cfm = cfm
+    def __init__(
+        self,
+        imported_features: list[Feature],
+        imported_require_constraints: list[Constraint],
+    ):
+        self.imported_features = imported_features
+        self.imported_require_constraints = imported_require_constraints
         self.references: list[str] = []
         self.feature_cardinalities: list[Cardinality] = []
         self.features: list[Feature] = []
@@ -141,7 +146,7 @@ class CustomListener(UVLPythonListener):
             )
             self.feature_map[name] = feature
             self.features.append(feature)
-            self.cfm.features.append(feature)
+            self.imported_features.append(feature)
             if len(self.group_features_count) > 0:
                 self.group_features_count[-1] += 1
         else:
@@ -204,7 +209,7 @@ class CustomListener(UVLPythonListener):
                         features,
                     )
                     parent_feature.children.append(feature)
-                    self.cfm.require_constraints.append(
+                    self.imported_require_constraints.append(
                         Constraint(
                             True,
                             parent_feature,
@@ -230,15 +235,17 @@ class CustomListener(UVLPythonListener):
                     [
                         Interval(
                             min_cardinality,
-                            max_cardinality
-                            if max_cardinality is not None and max_cardinality > 0
-                            else None,
+                            (
+                                max_cardinality
+                                if max_cardinality is not None and max_cardinality > 0
+                                else None
+                            ),
                         )
                     ]
                 )
                 self.feature_map[name] = parent_feature
                 self.features.append(parent_feature)
-                self.cfm.features.append(parent_feature)
+                self.imported_features.append(parent_feature)
                 self.groups = self.groups[:-new_groups]
                 if len(self.group_features_count) > 0:
                     self.group_features_count[-1] += 1
@@ -282,7 +289,7 @@ class CustomListener(UVLPythonListener):
                     child.parent = feature
                 self.feature_map[name] = feature
                 self.features.append(feature)
-                self.cfm.features.append(feature)
+                self.imported_features.append(feature)
                 if len(self.group_features_count) > 0:
                     self.group_features_count[-1] += 1
 
@@ -313,7 +320,7 @@ class CustomListener(UVLPythonListener):
         op = self.constraint_types.pop()
 
         if op == ConstraintType.IMPLICATION:
-            self.cfm.require_constraints.append(
+            self.imported_require_constraints.append(
                 Constraint(
                     True,
                     self.feature_map[ref_1],
@@ -323,7 +330,7 @@ class CustomListener(UVLPythonListener):
                 )
             )
         elif op == ConstraintType.EQUIVALENCE:
-            self.cfm.require_constraints.append(
+            self.imported_require_constraints.append(
                 Constraint(
                     True,
                     self.feature_map[ref_1],
@@ -332,7 +339,7 @@ class CustomListener(UVLPythonListener):
                     Cardinality([Interval(1, None)]),
                 )
             )
-            self.cfm.require_constraints.append(
+            self.imported_require_constraints.append(
                 Constraint(
                     True,
                     self.feature_map[ref_2],
@@ -380,12 +387,17 @@ def import_uvl(data: bytes):
     token_stream = CommonTokenStream(lexer)
     parser = UVLPythonParser(token_stream)
 
-    cfm = CFM([], [], [])
+    imported_features: list[Feature] = []
+    imported_require_constraints: list[Constraint] = []
 
-    listener = CustomListener(cfm)
+    listener = CustomListener(imported_features, imported_require_constraints)
     parser.removeErrorListeners()
     parser.addErrorListener(CustomErrorListener())
     parser.addParseListener(listener)
     parser.featureModel()  # start parsing
 
-    return cfm
+    return CFM(
+        root=imported_features[0],
+        require_constraints=imported_require_constraints,
+        exclude_constraints=[],
+    )

@@ -26,7 +26,7 @@ def test_apply_big_m_with_loaded_model(model: CFM):
 
 
 def test_get_global_upper_bound(model: CFM):
-    feature = model.features[0]
+    feature = model.root
     assert big_m.get_global_upper_bound(feature) == 12
 
 

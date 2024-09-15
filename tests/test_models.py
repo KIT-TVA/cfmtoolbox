@@ -173,16 +173,14 @@ def test_feature_is_unbound(feature: Feature, expectation: bool):
     [
         (
             CFM(
-                [
-                    Feature(
-                        "Cheese",
-                        Cardinality([Interval(0, None)]),
-                        Cardinality([]),
-                        Cardinality([]),
-                        None,
-                        [],
-                    )
-                ],
+                Feature(
+                    "Cheese",
+                    Cardinality([Interval(0, None)]),
+                    Cardinality([]),
+                    Cardinality([]),
+                    None,
+                    [],
+                ),
                 [],
                 [],
             ),
@@ -190,16 +188,14 @@ def test_feature_is_unbound(feature: Feature, expectation: bool):
         ),
         (
             CFM(
-                [
-                    Feature(
-                        "Cheese",
-                        Cardinality([Interval(0, 4)]),
-                        Cardinality([]),
-                        Cardinality([]),
-                        None,
-                        [],
-                    )
-                ],
+                Feature(
+                    "Cheese",
+                    Cardinality([Interval(0, 4)]),
+                    Cardinality([]),
+                    Cardinality([]),
+                    None,
+                    [],
+                ),
                 [],
                 [],
             ),
@@ -450,7 +446,7 @@ def test_validate_feature_instance(feature_instance: FeatureNode, expectation: b
             ),
         ],
     )
-    cfm = CFM([feature], [], [])
+    cfm = CFM(feature, [], [])
     assert feature_instance.validate(cfm) == expectation
 
 
@@ -739,5 +735,8 @@ def test_validate_constraints(
         ],
     )
 
-    cfm = CFM([], require_constraints, exclude_constraints)
+    dummy_root = Feature(
+        "Dummy", Cardinality([]), Cardinality([]), Cardinality([]), None, []
+    )
+    cfm = CFM(dummy_root, require_constraints, exclude_constraints)
     assert feature_instance.validate_constraints(cfm) == expectation

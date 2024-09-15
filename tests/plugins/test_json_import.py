@@ -16,7 +16,7 @@ def test_import_json():
     path = Path("tests/data/sandwich.json")
     cfm = json_import.import_json(path.read_bytes())
     assert len(cfm.features) == 12
-    assert cfm.features[0].name == "sandwich"
+    assert cfm.root.name == "sandwich"
 
 
 @pytest.mark.parametrize(
@@ -119,7 +119,7 @@ def test_parse_cfm_parses_root_and_constraints():
 
 
 def test_parse_root_returns_all_features_in_the_tree():
-    features = json_import.parse_root(
+    root, features = json_import.parse_root(
         {
             "name": "sandwich",
             "instance_cardinality": {"intervals": []},
@@ -159,6 +159,7 @@ def test_parse_root_returns_all_features_in_the_tree():
         }
     )
 
+    assert root.name == "sandwich"
     assert len(features) == 5
     assert features[0].name == "sandwich"
     assert features[1].name == "meat"
