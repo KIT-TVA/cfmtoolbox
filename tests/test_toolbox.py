@@ -1,3 +1,4 @@
+import inspect
 from pathlib import Path
 
 import pytest
@@ -7,71 +8,77 @@ from cfmtoolbox import CFM
 from cfmtoolbox.toolbox import CFMToolbox
 
 
-def test_import_model_without_import_path():
+def test_import_model_does_nothing_without_import_path():
     app = CFMToolbox()
     assert app.import_path is None
-
-    app.import_model()
-    assert app.model is None
+    assert app.import_model() is None
 
 
-def test_import_model_without_matching_importer(tmp_path: Path):
+def test_import_model_reports_unsupported_formats(tmp_path):
+    import_path = tmp_path / "test.txt"
+    import_path.touch()
+
     app = CFMToolbox()
-    app.import_path = tmp_path / "test.txt"
-    app.import_path.touch()
+    app.import_path = import_path
 
     with pytest.raises(typer.Abort, match="Unsupported import format"):
         app.import_model()
 
-    assert app.model is None
 
-
-def test_import_model_with_matching_importer(tmp_path: Path):
-    app = CFMToolbox()
-    app.import_path = tmp_path / "test.uvl"
-    app.import_path.touch()
+def test_import_model_returns_cfm_of_supported_format(tmp_path: Path):
+    import_path = tmp_path / "test.uvl"
+    import_path.touch()
 
     cfm = CFM([], [], [])
-    assert app.model is not cfm
+
+    app = CFMToolbox()
+    app.import_path = import_path
 
     @app.importer(".uvl")
     def import_uvl(data: bytes):
         return cfm
 
-    app.import_model()
-    assert app.model is cfm
+    assert app.import_model() is cfm
 
 
-def test_export_model_without_export_path():
+def test_export_model_does_nothing_without_export_path():
+    cfm = CFM([], [], [])
+
     app = CFMToolbox()
     assert app.export_path is None
 
-    app.export_model()
+    app.export_model(cfm)
 
 
-def test_export_model_without_matching_exporter(tmp_path: Path):
+def test_export_model_reports_unsupported_formats(tmp_path):
+    cfm = CFM([], [], [])
+    export_path = tmp_path / "test.txt"
+
     app = CFMToolbox()
-    app.model = CFM([], [], [])
-    app.export_path = tmp_path / "test.txt"
+    app.export_path = export_path
 
     with pytest.raises(typer.Abort, match="Unsupported export format"):
-        app.export_model()
+        app.export_model(cfm)
+
+    assert not export_path.exists()
 
 
-def test_export_model_with_matching_exporter(tmp_path: Path):
+def test_export_model_stores_exported_model_in_supported_format(tmp_path):
+    cfm = CFM([], [], [])
+    export_path = tmp_path / "test.uvl"
+
     app = CFMToolbox()
-    app.model = CFM([], [], [])
-    app.export_path = tmp_path / "test.uvl"
+    app.export_path = export_path
 
     @app.exporter(".uvl")
     def export_uvl(cfm: CFM):
         return "hello".encode()
 
-    app.export_model()
-    assert app.export_path.read_text() == "hello"
+    app.export_model(cfm)
+    assert export_path.read_text() == "hello"
 
 
-def test_importer_registration():
+def test_importer_registers_the_decorated_importer():
     app = CFMToolbox()
 
     @app.importer(".uvl")
@@ -82,7 +89,7 @@ def test_importer_registration():
     assert app.registered_importers[".uvl"] == import_uvl
 
 
-def test_exporter_registration():
+def test_exporter_registers_the_decorated_exporter():
     app = CFMToolbox()
 
     @app.exporter(".uvl")
@@ -93,7 +100,34 @@ def test_exporter_registration():
     assert app.registered_exporters[".uvl"] == export_uvl
 
 
-def test_load_plugins():
+def test_command_registers_the_decorated_command():
+    app = CFMToolbox()
+    assert len(app.typer.registered_commands) == 0
+
+    @app.command()
+    def make_sandwich(cfm: CFM) -> CFM:
+        return cfm
+
+    assert len(app.typer.registered_commands) == 1
+
+    command = app.typer.registered_commands[0]
+    assert getattr(command.callback, "__name__") == "make_sandwich"
+
+
+def test_command_prevent_typer_from_including_the_cfm_argument_in_the_cli():
+    app = CFMToolbox()
+
+    @app.command()
+    def make_sandwich(cfm: CFM) -> CFM:
+        return cfm
+
+    command = app.typer.registered_commands[0]
+    callback = command.callback
+    assert callback is not None
+    assert "cfm" not in inspect.signature(callback).parameters
+
+
+def test_load_plugins_loads_all_core_plugins():
     app = CFMToolbox()
     plugins = app.load_plugins()
     assert len(plugins) == 10

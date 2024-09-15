@@ -8,11 +8,7 @@ from cfmtoolbox.models import CFM, Cardinality, Feature, FeatureNode
 
 
 @app.command()
-def random_sampling(model: CFM | None, amount: int = 1) -> CFM | None:
-    if model is None:
-        print("No model loaded.")
-        return None
-
+def random_sampling(model: CFM, amount: int = 1) -> CFM:
     if model.is_unbound():
         print("Model is unbound. Please apply big-m global bound first.")
         return model

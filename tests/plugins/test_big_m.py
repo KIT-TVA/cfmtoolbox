@@ -18,10 +18,6 @@ def test_plugin_can_be_loaded():
     assert big_m in app.load_plugins()
 
 
-def test_apply_big_m_without_loaded_model():
-    assert apply_big_m(None) is None
-
-
 def test_apply_big_m_with_loaded_model(model: CFM):
     assert model.is_unbound()
     new_model = apply_big_m(model)

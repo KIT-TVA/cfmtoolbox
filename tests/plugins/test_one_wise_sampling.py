@@ -29,11 +29,6 @@ def test_plugin_can_be_loaded():
     assert one_wise_sampling_plugin in app.load_plugins()
 
 
-def test_one_wise_sampling_without_loaded_model():
-    with pytest.raises(typer.Abort, match="No model loaded."):
-        one_wise_sampling(None)
-
-
 def test_one_wise_sampling_with_unbound_model(unbound_model: CFM, capsys):
     with pytest.raises(
         typer.Abort, match="Model is unbound. Please apply big-m global bound first."
