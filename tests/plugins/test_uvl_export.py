@@ -7,7 +7,6 @@ from cfmtoolbox.models import Cardinality, Constraint, Feature, Interval
 from cfmtoolbox.plugins.featureide_import import import_featureide
 from cfmtoolbox.plugins.uvl_export import (
     export_uvl,
-    serialize_all_constraints,
     serialize_constraint,
     serialize_constraints,
     serialize_features,
@@ -423,8 +422,8 @@ def test_serialize_constraint(constraint: Cardinality, expectation: str):
 @pytest.mark.parametrize(
     ["is_required", "expectation"],
     [
-        (True, "\t(Sandwich = 3) => ((Bread >= 0) & (Bread <= 2))\n"),
-        (False, "\t!((Sandwich = 3) & ((Bread >= 0) & (Bread <= 2)))\n"),
+        (True, "constraints\n\t(Sandwich = 3) => ((Bread >= 0) & (Bread <= 2))\n"),
+        (False, "constraints\n\t!((Sandwich = 3) & ((Bread >= 0) & (Bread <= 2)))\n"),
     ],
 )
 def test_serialize_constraints(is_required: bool, expectation: str):
@@ -451,10 +450,12 @@ def test_serialize_constraints(is_required: bool, expectation: str):
     bread_cardinality = Cardinality([Interval(0, 2)])
 
     constraints = [
-        Constraint(True, sandwich, sandwich_cardinality, bread, bread_cardinality)
+        Constraint(
+            is_required, sandwich, sandwich_cardinality, bread, bread_cardinality
+        )
     ]
 
-    assert serialize_constraints(constraints, is_required) == expectation
+    assert serialize_constraints(constraints) == expectation
 
 
 def test_serialize_constraints_raises_type_error_for_compounded_cardinality_on_first_feature_cardinality():
@@ -479,7 +480,7 @@ def test_serialize_constraints_raises_type_error_for_compounded_cardinality_on_f
     )
 
     with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
-        serialize_constraints([constraint], is_required=True)
+        serialize_constraints([constraint])
 
 
 def test_serialize_constraints_raises_type_error_for_compounded_cardinality_on_second_feature_cardinality():
@@ -504,10 +505,10 @@ def test_serialize_constraints_raises_type_error_for_compounded_cardinality_on_s
     )
 
     with pytest.raises(TypeError, match="UVL cannot handle compounded cardinalities"):
-        serialize_constraints([constraint], is_required=True)
+        serialize_constraints([constraint])
 
 
-def test_serialize_all_constraints():
+def test_serialize_constraints_with_multiple_constraints():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -531,13 +532,11 @@ def test_serialize_all_constraints():
     bread_cardinality = Cardinality([Interval(0, 2)])
 
     constraints = [
-        Constraint(True, sandwich, sandwich_cardinality, bread, bread_cardinality)
+        Constraint(True, sandwich, sandwich_cardinality, bread, bread_cardinality),
+        Constraint(False, sandwich, sandwich_cardinality, bread, bread_cardinality),
     ]
 
-    require_constraints = constraints
-    exclude_constraints = constraints
-
-    export = serialize_all_constraints(require_constraints, exclude_constraints)
+    export = serialize_constraints(constraints)
 
     expectation = """constraints
 \t(Sandwich = 3) => ((Bread >= 0) & (Bread <= 2))
@@ -574,9 +573,8 @@ features
 
 constraints
 \t(Sourdough = 1) => (Cheddar = 1)
-\t(Tomato = 1) => (Gouda = 1)
-\t(Swiss = 1) => (Lettuce = 1)
 \t!((Wheat = 1) & (Tomato = 1))
-"""
+\t(Tomato = 1) => (Gouda = 1)
+\t(Swiss = 1) => (Lettuce = 1)\n"""
 
     assert expectation == export.decode()

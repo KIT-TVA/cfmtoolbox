@@ -102,8 +102,9 @@ def serialize_constraint(feature: Feature, cardinality: Cardinality) -> str:
     )
 
 
-def serialize_constraints(constraints: list[Constraint], is_required: bool) -> str:
-    constraints_str = ""
+def serialize_constraints(constraints: list[Constraint]) -> str:
+    constraints_str = "constraints\n"
+
     for constraint in constraints:
         if (
             len(constraint.first_cardinality.intervals) != 1
@@ -113,28 +114,11 @@ def serialize_constraints(constraints: list[Constraint], is_required: bool) -> s
 
         constraints_str += (
             f"\t{serialize_constraint(constraint.first_feature, constraint.first_cardinality)} => {serialize_constraint(constraint.second_feature, constraint.second_cardinality)}\n"
-            if is_required
+            if constraint.require
             else f"\t!({serialize_constraint(constraint.first_feature, constraint.first_cardinality)} & {serialize_constraint(constraint.second_feature, constraint.second_cardinality)})\n"
         )
 
     return constraints_str
-
-
-def serialize_all_constraints(
-    require_constraints: list[Constraint], exclude_constraints: list[Constraint]
-) -> str:
-    require_constraints_str = serialize_constraints(
-        require_constraints, is_required=True
-    )
-    exclude_constraints_str = serialize_constraints(
-        exclude_constraints, is_required=False
-    )
-
-    stringified_constraints = (
-        "constraints\n" + require_constraints_str + exclude_constraints_str
-    )
-
-    return stringified_constraints
 
 
 @app.exporter(".uvl")
@@ -147,9 +131,7 @@ def export_uvl(cfm: CFM) -> bytes:
     ]
 
     features = "".join(feature_strings) + "\n"
-    constraints = serialize_all_constraints(
-        cfm.require_constraints, cfm.exclude_constraints
-    )
+    constraints = serialize_constraints(cfm.constraints)
 
     export = includes + root + features + constraints
 

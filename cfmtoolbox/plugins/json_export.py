@@ -6,9 +6,7 @@ from cfmtoolbox import CFM, Cardinality, Constraint, Feature, Interval, app
 @app.exporter(".json")
 def export_json(cfm: CFM) -> bytes:
     serialized_root = serialize_feature(cfm.root)
-    serialized_constraints = list(
-        map(serialize_constraint, [*cfm.require_constraints, *cfm.exclude_constraints])
-    )
+    serialized_constraints = list(map(serialize_constraint, cfm.constraints))
 
     serialized_cfm = {
         "root": serialized_root,

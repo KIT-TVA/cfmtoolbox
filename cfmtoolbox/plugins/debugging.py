@@ -14,8 +14,11 @@ def stringify_cfm(cfm: CFM) -> str:
         formatted_cfm += f"- parent: {feature.parent}\n"
         formatted_cfm += stringify_list("children", feature.children) + "\n"
 
-    formatted_cfm += stringify_list("Require constraints", cfm.require_constraints)
-    formatted_cfm += stringify_list("Exclude constraints", cfm.exclude_constraints)
+    require_constraints = [c for c in cfm.constraints if c.require]
+    exclude_constraints = [c for c in cfm.constraints if not c.require]
+
+    formatted_cfm += stringify_list("Require constraints", require_constraints)
+    formatted_cfm += stringify_list("Exclude constraints", exclude_constraints)
 
     return formatted_cfm
 

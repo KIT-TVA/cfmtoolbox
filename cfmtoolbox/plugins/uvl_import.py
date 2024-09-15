@@ -34,10 +34,10 @@ class CustomListener(UVLPythonListener):
     def __init__(
         self,
         imported_features: list[Feature],
-        imported_require_constraints: list[Constraint],
+        imported_constraints: list[Constraint],
     ):
         self.imported_features = imported_features
-        self.imported_require_constraints = imported_require_constraints
+        self.imported_constraints = imported_constraints
         self.references: list[str] = []
         self.feature_cardinalities: list[Cardinality] = []
         self.features: list[Feature] = []
@@ -209,7 +209,7 @@ class CustomListener(UVLPythonListener):
                         features,
                     )
                     parent_feature.children.append(feature)
-                    self.imported_require_constraints.append(
+                    self.imported_constraints.append(
                         Constraint(
                             True,
                             parent_feature,
@@ -320,7 +320,7 @@ class CustomListener(UVLPythonListener):
         op = self.constraint_types.pop()
 
         if op == ConstraintType.IMPLICATION:
-            self.imported_require_constraints.append(
+            self.imported_constraints.append(
                 Constraint(
                     True,
                     self.feature_map[ref_1],
@@ -330,7 +330,7 @@ class CustomListener(UVLPythonListener):
                 )
             )
         elif op == ConstraintType.EQUIVALENCE:
-            self.imported_require_constraints.append(
+            self.imported_constraints.append(
                 Constraint(
                     True,
                     self.feature_map[ref_1],
@@ -339,7 +339,7 @@ class CustomListener(UVLPythonListener):
                     Cardinality([Interval(1, None)]),
                 )
             )
-            self.imported_require_constraints.append(
+            self.imported_constraints.append(
                 Constraint(
                     True,
                     self.feature_map[ref_2],
@@ -388,9 +388,9 @@ def import_uvl(data: bytes):
     parser = UVLPythonParser(token_stream)
 
     imported_features: list[Feature] = []
-    imported_require_constraints: list[Constraint] = []
+    imported_constraints: list[Constraint] = []
 
-    listener = CustomListener(imported_features, imported_require_constraints)
+    listener = CustomListener(imported_features, imported_constraints)
     parser.removeErrorListeners()
     parser.addErrorListener(CustomErrorListener())
     parser.addParseListener(listener)
@@ -398,6 +398,5 @@ def import_uvl(data: bytes):
 
     return CFM(
         root=imported_features[0],
-        require_constraints=imported_require_constraints,
-        exclude_constraints=[],
+        constraints=imported_constraints,
     )

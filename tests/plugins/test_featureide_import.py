@@ -282,7 +282,7 @@ def test_parse_formula_value_and_feature_raises_too_complex_contraint_error_with
 
 @pytest.mark.parametrize(
     ["constraints", "expectation"],
-    [(None, ([], [], [])), (Element("constraints"), ([], [], []))],
+    [(None, ([], [])), (Element("constraints"), ([], []))],
 )
 def test_parse_constraints_can_parse_without_constraints(
     constraints: Element,
@@ -308,8 +308,8 @@ def test_parse_constraints_raises_type_error_on_no_valid_constraint_structure():
 
 
 def test_parse_constraint_can_parse_constraint_with_one_require_rule():
-    constraints = Element("constraints")
-    rule = SubElement(constraints, "rule")
+    constraints_element = Element("constraints")
+    rule = SubElement(constraints_element, "rule")
     imp = SubElement(rule, "imp")
     SubElement(imp, "var").text = "Bread"
     SubElement(imp, "var").text = "Bread"
@@ -317,7 +317,10 @@ def test_parse_constraint_can_parse_constraint_with_one_require_rule():
         "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
 
-    constraint = Constraint(
+    constraints, eliminated = parse_constraints(constraints_element, [feature])
+    assert len(eliminated) == 0
+    assert len(constraints) == 1
+    assert constraints[0] == Constraint(
         True,
         feature,
         Cardinality([Interval(1, 1)]),
@@ -325,16 +328,10 @@ def test_parse_constraint_can_parse_constraint_with_one_require_rule():
         Cardinality([Interval(1, 1)]),
     )
 
-    require, exclude, eliminated = parse_constraints(constraints, [feature])
-    assert len(require) == 1
-    assert len(exclude) == 0
-    assert len(eliminated) == 0
-    assert require[0] == constraint
-
 
 def test_parse_constraint_can_parse_constraint_with_one_exclude_rule():
-    constraints = Element("constraints")
-    rule = SubElement(constraints, "rule")
+    constraints_element = Element("constraints")
+    rule = SubElement(constraints_element, "rule")
     imp = SubElement(rule, "imp")
     negation = SubElement(imp, "not")
     SubElement(negation, "var").text = "Bread"
@@ -343,7 +340,10 @@ def test_parse_constraint_can_parse_constraint_with_one_exclude_rule():
         "Bread", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
 
-    constraint = Constraint(
+    constraints, eliminated = parse_constraints(constraints_element, [feature])
+    assert len(eliminated) == 0
+    assert len(constraints) == 1
+    assert constraints[0] == Constraint(
         False,
         feature,
         Cardinality([Interval(1, 1)]),
@@ -351,16 +351,10 @@ def test_parse_constraint_can_parse_constraint_with_one_exclude_rule():
         Cardinality([Interval(1, 1)]),
     )
 
-    require, exclude, eliminated = parse_constraints(constraints, [feature])
-    assert len(require) == 0
-    assert len(exclude) == 1
-    assert len(eliminated) == 0
-    assert exclude[0] == constraint
-
 
 def test_parse_constraint_can_parse_constraint_with_both_formulas_negative():
-    constraints = Element("constraints")
-    rule = SubElement(constraints, "rule")
+    constraints_element = Element("constraints")
+    rule = SubElement(constraints_element, "rule")
     imp = SubElement(rule, "imp")
     first_negation = SubElement(imp, "not")
     SubElement(first_negation, "var").text = "Bread"
@@ -375,7 +369,12 @@ def test_parse_constraint_can_parse_constraint_with_both_formulas_negative():
         "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
 
-    constraint = Constraint(
+    constraints, eliminated = parse_constraints(
+        constraints_element, [bread_feature, cheese_feature]
+    )
+    assert len(eliminated) == 0
+    assert len(constraints) == 1
+    assert constraints[0] == Constraint(
         True,
         cheese_feature,
         Cardinality([Interval(1, 1)]),
@@ -383,24 +382,15 @@ def test_parse_constraint_can_parse_constraint_with_both_formulas_negative():
         Cardinality([Interval(1, 1)]),
     )
 
-    require, exclude, eliminated = parse_constraints(
-        constraints, [bread_feature, cheese_feature]
-    )
-    assert len(require) == 1
-    assert len(exclude) == 0
-    assert len(eliminated) == 0
-    assert require[0] == constraint
-
 
 def test_parse_constraint_can_parse_constraint_with_elimination():
-    constraint = Element("constraints")
-    rule = SubElement(constraint, "rule")
+    constraints_element = Element("constraints")
+    rule = SubElement(constraints_element, "rule")
     SubElement(rule, "conj")
-    require, exclude, eliminated = parse_constraints(constraint, [])
 
-    assert len(require) == 0
-    assert len(exclude) == 0
+    constraints, eliminated = parse_constraints(constraints_element, [])
     assert len(eliminated) == 1
+    assert len(constraints) == 0
     assert eliminated == [rule]
 
 
@@ -408,8 +398,6 @@ def test_parse_cfm(capsys):
     tree = ET.parse("tests/data/sandwich.xml")
     root = tree.getroot()
     cfm = parse_cfm(root)
-    require_constraints = cfm.require_constraints
-    exclude_constraints = cfm.exclude_constraints
 
     output = capsys.readouterr()
     expectation = """The following constraints were exterminated:
@@ -437,16 +425,15 @@ def test_parse_cfm(capsys):
     assert cfm.features[8].name == "Gouda"
     assert cfm.features[9].name == "Lettuce"
     assert cfm.features[10].name == "Tomato"
-    assert len(require_constraints) == 3
-    assert len(exclude_constraints) == 1
-    assert require_constraints[0].first_feature.name == "Sourdough"
-    assert require_constraints[0].second_feature.name == "Cheddar"
-    assert require_constraints[1].first_feature.name == "Tomato"
-    assert require_constraints[1].second_feature.name == "Gouda"
-    assert require_constraints[2].first_feature.name == "Swiss"
-    assert require_constraints[2].second_feature.name == "Lettuce"
-    assert exclude_constraints[0].first_feature.name == "Wheat"
-    assert exclude_constraints[0].second_feature.name == "Tomato"
+    assert len(cfm.constraints) == 4
+    assert cfm.constraints[0].first_feature.name == "Sourdough"
+    assert cfm.constraints[0].second_feature.name == "Cheddar"
+    assert cfm.constraints[1].first_feature.name == "Wheat"
+    assert cfm.constraints[1].second_feature.name == "Tomato"
+    assert cfm.constraints[2].first_feature.name == "Tomato"
+    assert cfm.constraints[2].second_feature.name == "Gouda"
+    assert cfm.constraints[3].first_feature.name == "Swiss"
+    assert cfm.constraints[3].second_feature.name == "Lettuce"
 
     assert expectation == output.err
 
@@ -455,8 +442,6 @@ def test_parse_cfm_can_parse_multiple_eliminated_constraints(capsys):
     tree = ET.parse("tests/data/dessert.xml")
     root = tree.getroot()
     cfm = parse_cfm(root)
-    require_constraints = cfm.require_constraints
-    exclude_constraints = cfm.exclude_constraints
 
     expectation = """The following constraints were exterminated:
 <rule>
@@ -483,8 +468,7 @@ def test_parse_cfm_can_parse_multiple_eliminated_constraints(capsys):
 
     output = capsys.readouterr()
 
-    assert len(exclude_constraints) == 0
-    assert len(require_constraints) == 0
+    assert len(cfm.constraints) == 0
     assert expectation == output.err
 
 

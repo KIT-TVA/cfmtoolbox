@@ -20,11 +20,7 @@ def test_export_json():
         children=[],
     )
 
-    cfm = CFM(
-        root=root,
-        require_constraints=[],
-        exclude_constraints=[],
-    )
+    cfm = CFM(root=root, constraints=[])
 
     output = json_export.export_json(cfm)
     assert output.decode() == json.dumps(

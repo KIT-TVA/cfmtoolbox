@@ -27,14 +27,7 @@ def parse_cfm(serialized_cfm: JSON) -> CFM:
         for serialized_constraint in serialized_cfm["constraints"]
     ]
 
-    require_constraints = list(filter(lambda c: c.require, constraints))
-    exclude_constraints = list(filter(lambda c: not c.require, constraints))
-
-    return CFM(
-        root=root,
-        require_constraints=require_constraints,
-        exclude_constraints=exclude_constraints,
-    )
+    return CFM(root=root, constraints=constraints)
 
 
 def parse_root(serialized_root: JSON) -> tuple[Feature, list[Feature]]:
