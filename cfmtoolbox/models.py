@@ -68,10 +68,6 @@ class CFM:
     require_constraints: list[Constraint]
     exclude_constraints: list[Constraint]
 
-    def add_feature(self, feature: Feature):
-        if feature not in self.features:
-            self.features.append(feature)
-
     def is_unbound(self) -> bool:
         return self.features[0].is_unbound()
 
