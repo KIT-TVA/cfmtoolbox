@@ -420,7 +420,9 @@ def test_parse_cfm(capsys):
 \t\t\t\t</conj>
 \t\t\t\t<var>Tomato</var>
 \t\t\t</imp>
-\t\t</rule>\n\t\n"""
+\t\t</rule>
+\t
+"""
 
     assert len(cfm.features) == 11
     assert cfm.features[0].name == "Sandwich"
@@ -474,7 +476,9 @@ def test_parse_cfm_can_parse_multiple_eliminated_constraints(capsys):
 \t\t\t\t</disj>
 \t\t\t\t<var>Eclair</var>
 \t\t\t</imp>
-\t\t</rule>\n\t\n"""
+\t\t</rule>
+\t
+"""
 
     output = capsys.readouterr()
 

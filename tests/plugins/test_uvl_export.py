@@ -155,6 +155,7 @@ def test_serialize_root_feature():
     expectation = """features
 \tSandwich
 \t\t[0..2]"""
+
     root = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -178,7 +179,7 @@ def test_serialize_root_feature():
     assert expectation in root_export
 
 
-def test_serialize_root_feature_raises_type_error_on_group_instance_compounded_cardinality():
+def test_serialize_root_feature_raises_type_error_for_group_instance_compounded_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -191,7 +192,7 @@ def test_serialize_root_feature_raises_type_error_on_group_instance_compounded_c
         serialize_root_feature(sandwich)
 
 
-def test_serialize_root_feature_raises_type_error_on_group_type_compounded_cardinality():
+def test_serialize_root_feature_raises_type_error_for_group_type_compounded_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -204,7 +205,7 @@ def test_serialize_root_feature_raises_type_error_on_group_type_compounded_cardi
         serialize_root_feature(sandwich)
 
 
-def test_serialize_features_raises_type_error_on_instance_compounded_cardinality():
+def test_serialize_features_raises_type_error_for_instance_compounded_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1), Interval(1, 1)]),
@@ -217,7 +218,7 @@ def test_serialize_features_raises_type_error_on_instance_compounded_cardinality
         serialize_features(sandwich)
 
 
-def test_serialize_features_raises_type_error_on_group_type_compounded_cardinality():
+def test_serialize_features_raises_type_error_for_group_type_compounded_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -230,7 +231,7 @@ def test_serialize_features_raises_type_error_on_group_type_compounded_cardinali
         serialize_features(sandwich)
 
 
-def test_serialize_features_raises_type_error_on_group_instance_compounded_cardinality():
+def test_serialize_features_raises_type_error_for_group_instance_compounded_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -391,7 +392,8 @@ def test_serialize_features():
 \t\tVeggie cardinality [0..1]
 \t\t\tor
 \t\t\t\tLettuce cardinality [0..*]
-\t\t\t\tTomato cardinality [0..*]\n"""
+\t\t\t\tTomato cardinality [0..*]
+"""
 
     export = serialize_features(sandwich)
     assert expectation == export
@@ -455,7 +457,7 @@ def test_serialize_constraints(is_required: bool, expectation: str):
     assert serialize_constraints(constraints, is_required) == expectation
 
 
-def test_serialize_constraints_raises_type_error_on_compounded_cardinality_on_first_feature_cardinality():
+def test_serialize_constraints_raises_type_error_for_compounded_cardinality_on_first_feature_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -480,7 +482,7 @@ def test_serialize_constraints_raises_type_error_on_compounded_cardinality_on_fi
         serialize_constraints([constraint], is_required=True)
 
 
-def test_serialize_constraints_raises_type_error_on_compounded_cardinality_on_second_feature_cardinality():
+def test_serialize_constraints_raises_type_error_for_compounded_cardinality_on_second_feature_cardinality():
     sandwich = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -539,7 +541,8 @@ def test_serialize_all_constraints():
 
     expectation = """constraints
 \t(Sandwich = 3) => ((Bread >= 0) & (Bread <= 2))
-\t!((Sandwich = 3) & ((Bread >= 0) & (Bread <= 2)))\n"""
+\t!((Sandwich = 3) & ((Bread >= 0) & (Bread <= 2)))
+"""
 
     assert expectation == export
 
@@ -573,6 +576,7 @@ constraints
 \t(Sourdough = 1) => (Cheddar = 1)
 \t(Tomato = 1) => (Gouda = 1)
 \t(Swiss = 1) => (Lettuce = 1)
-\t!((Wheat = 1) & (Tomato = 1))\n"""
+\t!((Wheat = 1) & (Tomato = 1))
+"""
 
     assert expectation == export.decode()
