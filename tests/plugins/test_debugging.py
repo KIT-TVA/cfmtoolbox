@@ -114,7 +114,3 @@ def test_stringify_cfm():
     )
 
     assert cfm_str == stringify_cfm(cfm)
-
-
-def test_stringify_cfm_can_stringify_none_cfm():
-    assert stringify_cfm(None) == "CFM:\nNone"

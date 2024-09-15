@@ -3,11 +3,7 @@ from cfmtoolbox.models import CFM, Feature
 
 
 @app.command()
-def apply_big_m(model: CFM | None) -> CFM | None:
-    if model is None:
-        print("No model loaded.")
-        return None
-
+def apply_big_m(model: CFM) -> CFM:
     global_upper_bound = get_global_upper_bound(model.features[0])
 
     replace_infinite_upper_bound_with_global_upper_bound(

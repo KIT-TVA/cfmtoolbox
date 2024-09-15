@@ -6,11 +6,8 @@ def stringify_list(name: str, input: list) -> str:
     return f"- {name}: {stringified_input}\n"
 
 
-def stringify_cfm(cfm: CFM | None) -> str:
+def stringify_cfm(cfm: CFM) -> str:
     formatted_cfm = "CFM:\n"
-
-    if cfm is None:
-        return formatted_cfm + "None"
 
     for feature in cfm.features:
         formatted_cfm += f"{feature}: instance [{feature.instance_cardinality}], group type [{feature.group_type_cardinality}], group instance [{feature.group_instance_cardinality}]\n"
@@ -24,7 +21,7 @@ def stringify_cfm(cfm: CFM | None) -> str:
 
 
 @app.command()
-def debug(model: CFM | None) -> CFM | None:
+def debug(model: CFM) -> CFM:
     print(stringify_cfm(model), end="")
 
     return model

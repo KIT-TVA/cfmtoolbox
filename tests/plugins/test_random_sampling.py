@@ -31,11 +31,6 @@ def test_plugin_can_be_loaded():
     assert random_sampling_plugin in app.load_plugins()
 
 
-def test_random_sampling_without_loaded_model():
-    assert random_sampling(None) is None
-    assert random_sampling(None, 3) is None
-
-
 def test_random_sampling_with_unbound_model(unbound_model: CFM, capsys):
     random_sampling(unbound_model) is unbound_model
     captured = capsys.readouterr()
