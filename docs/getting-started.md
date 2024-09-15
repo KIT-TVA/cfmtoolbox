@@ -42,6 +42,15 @@ Using your shell's built-in `timeout` command, you can apply a timeout to the sa
 timeout 5 python3 -m cfmtoolbox --import example.uvl random-sampling
 ```
 
+### Converting between formats
+
+The CFM Toolbox can also be used to convert between different model formats, such as UVL and JSON:
+
+```bash
+echo "features\n\tminimalism" > example.uvl
+python3 -m cfmtoolbox --import example.uvl --export example.json convert
+```
+
 ## Installing additional plugins
 
 The CFM toolbox will automatically detect and load plugins that are installed in the same Python environment.
