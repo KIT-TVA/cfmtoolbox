@@ -20,7 +20,7 @@ def parse_cfm(serialized_cfm: JSON) -> CFM:
             f"CFM constraints must be a list: {serialized_cfm['constraints']}"
         )
 
-    features = parse_root(serialized_cfm["root"])
+    root, features = parse_root(serialized_cfm["root"])
 
     constraints = [
         parse_constraint(serialized_constraint, features)
@@ -31,13 +31,13 @@ def parse_cfm(serialized_cfm: JSON) -> CFM:
     exclude_constraints = list(filter(lambda c: not c.require, constraints))
 
     return CFM(
-        features=features,
+        root=root,
         require_constraints=require_constraints,
         exclude_constraints=exclude_constraints,
     )
 
 
-def parse_root(serialized_root: JSON) -> list[Feature]:
+def parse_root(serialized_root: JSON) -> tuple[Feature, list[Feature]]:
     root = parse_feature(serialized_root, parent=None)
 
     features = [root]
@@ -45,7 +45,7 @@ def parse_root(serialized_root: JSON) -> list[Feature]:
     for feature in features:
         features.extend(feature.children)
 
-    return features
+    return root, features
 
 
 def parse_feature(serialized_feature: JSON, /, parent: Feature | None) -> Feature:

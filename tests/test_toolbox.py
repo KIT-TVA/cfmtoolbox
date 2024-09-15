@@ -1,11 +1,21 @@
 import inspect
-from pathlib import Path
 
 import pytest
 import typer
 
-from cfmtoolbox import CFM
-from cfmtoolbox.toolbox import CFMToolbox
+from cfmtoolbox import CFM, Cardinality, CFMToolbox, Feature
+
+
+@pytest.fixture
+def root_feature():
+    return Feature(
+        name="root",
+        instance_cardinality=Cardinality([]),
+        group_type_cardinality=Cardinality([]),
+        group_instance_cardinality=Cardinality([]),
+        parent=None,
+        children=[],
+    )
 
 
 def test_import_model_does_nothing_without_import_path():
@@ -25,11 +35,10 @@ def test_import_model_reports_unsupported_formats(tmp_path):
         app.import_model()
 
 
-def test_import_model_returns_cfm_of_supported_format(tmp_path: Path):
+def test_import_model_returns_cfm_of_supported_format(root_feature, tmp_path):
+    cfm = CFM(root_feature, [], [])
     import_path = tmp_path / "test.uvl"
     import_path.touch()
-
-    cfm = CFM([], [], [])
 
     app = CFMToolbox()
     app.import_path = import_path
@@ -41,8 +50,8 @@ def test_import_model_returns_cfm_of_supported_format(tmp_path: Path):
     assert app.import_model() is cfm
 
 
-def test_export_model_does_nothing_without_export_path():
-    cfm = CFM([], [], [])
+def test_export_model_does_nothing_without_export_path(root_feature):
+    cfm = CFM(root_feature, [], [])
 
     app = CFMToolbox()
     assert app.export_path is None
@@ -50,8 +59,8 @@ def test_export_model_does_nothing_without_export_path():
     app.export_model(cfm)
 
 
-def test_export_model_reports_unsupported_formats(tmp_path):
-    cfm = CFM([], [], [])
+def test_export_model_reports_unsupported_formats(root_feature, tmp_path):
+    cfm = CFM(root_feature, [], [])
     export_path = tmp_path / "test.txt"
 
     app = CFMToolbox()
@@ -63,8 +72,8 @@ def test_export_model_reports_unsupported_formats(tmp_path):
     assert not export_path.exists()
 
 
-def test_export_model_stores_exported_model_in_supported_format(tmp_path):
-    cfm = CFM([], [], [])
+def test_export_model_stores_exported_model_in_supported_format(root_feature, tmp_path):
+    cfm = CFM(root_feature, [], [])
     export_path = tmp_path / "test.uvl"
 
     app = CFMToolbox()
@@ -78,12 +87,12 @@ def test_export_model_stores_exported_model_in_supported_format(tmp_path):
     assert export_path.read_text() == "hello"
 
 
-def test_importer_registers_the_decorated_importer():
+def test_importer_registers_the_decorated_importer(root_feature):
     app = CFMToolbox()
 
     @app.importer(".uvl")
     def import_uvl(data: bytes):
-        return CFM([], [], [])
+        return CFM(root_feature, [], [])
 
     assert len(app.registered_importers) == 1
     assert app.registered_importers[".uvl"] == import_uvl

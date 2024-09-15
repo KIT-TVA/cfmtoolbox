@@ -4,24 +4,23 @@ from cfmtoolbox.models import CFM, Feature
 
 @app.command()
 def apply_big_m(model: CFM) -> CFM:
-    global_upper_bound = get_global_upper_bound(model.features[0])
+    global_upper_bound = get_global_upper_bound(model.root)
 
-    replace_infinite_upper_bound_with_global_upper_bound(
-        model.features[0], global_upper_bound
-    )
+    replace_infinite_upper_bound_with_global_upper_bound(model.root, global_upper_bound)
 
     print("Successfully applied Big-M global bound.")
 
     return model
 
 
-def get_global_upper_bound(feature: Feature):
+def get_global_upper_bound(feature: Feature) -> int:
     global_upper_bound = feature.instance_cardinality.intervals[-1].upper
-    local_upper_bound = global_upper_bound
 
     # Terminate calculation if the upper bound is infinite
-    if local_upper_bound is None:
+    if global_upper_bound is None:
         return 0
+
+    local_upper_bound = global_upper_bound
 
     # Recursively calculate the global upper bound by multiplying the upper bounds of all paths
     # from the root feature excluding paths that contain a feature with an infinite upper bound

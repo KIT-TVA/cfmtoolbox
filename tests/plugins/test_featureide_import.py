@@ -30,7 +30,7 @@ def test_featureide_import():
     path = Path("tests/data/sandwich.xml")
     cfm = import_featureide(path.read_bytes())
     assert len(cfm.features) == 11
-    assert cfm.features[0].name == "Sandwich"
+    assert cfm.root.name == "Sandwich"
 
 
 @pytest.mark.parametrize(
@@ -205,8 +205,9 @@ def test_parse_root():
     assert struct is not None
 
     root_struct = struct[0]
-    feature_list = parse_root(root_struct)
+    root_feature, feature_list = parse_root(root_struct)
 
+    assert root_feature.name == "Sandwich"
     assert len(feature_list) == 11
     assert feature_list[0].name == "Sandwich"
     assert feature_list[1].name == "Bread"

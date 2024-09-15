@@ -43,7 +43,7 @@ class OneWiseSampler:
         self.model = model
 
     def one_wise_sampling(self) -> list[FeatureNode]:
-        self.calculate_border_assignments(self.model.features[0])
+        self.calculate_border_assignments(self.model.root)
 
         samples = []
 
@@ -70,9 +70,9 @@ class OneWiseSampler:
         while True:
             self.global_feature_count = defaultdict(int)
             self.covered_assignments = set()
-            self.covered_assignments.add((self.model.features[0].name, 1))
+            self.covered_assignments.add((self.model.root.name, 1))
             random_feature_node = self.generate_random_feature_node_with_assignment(
-                self.model.features[0]
+                self.model.root
             )
             if (
                 random_feature_node.validate(self.model)

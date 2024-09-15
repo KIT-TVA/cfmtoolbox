@@ -85,7 +85,7 @@ def parse_feature(feature_element: Element, parent: Feature | None) -> Feature:
     return feature
 
 
-def parse_root(root_element: Element) -> list[Feature]:
+def parse_root(root_element: Element) -> tuple[Feature, list[Feature]]:
     root = parse_feature(root_element, parent=None)
 
     features = [root]
@@ -93,7 +93,7 @@ def parse_root(root_element: Element) -> list[Feature]:
     for feature in features:
         features.extend(feature.children)
 
-    return features
+    return root, features
 
 
 def parse_formula_value_and_feature(
@@ -173,17 +173,17 @@ def parse_constraints(
     return (require_constraints, exclude_constraints, eliminated_constraints)
 
 
-def parse_cfm(root: Element) -> CFM:
-    struct = root.find("struct")
+def parse_cfm(root_element: Element) -> CFM:
+    struct = root_element.find("struct")
 
     if struct is None:
         raise TypeError("No valid Feature structure found in XML file")
 
     root_struct = struct[0]
-    features = parse_root(root_struct)
+    root_feature, all_features = parse_root(root_struct)
 
     require_constraints, exclude_constraints, eliminated_constraints = (
-        parse_constraints(root.find("constraints"), features)
+        parse_constraints(root_element.find("constraints"), all_features)
     )
 
     formatted_eliminated_constraints = [
@@ -198,7 +198,7 @@ def parse_cfm(root: Element) -> CFM:
             file=sys.stderr,
         )
 
-    return CFM(features, require_constraints, exclude_constraints)
+    return CFM(root_feature, require_constraints, exclude_constraints)
 
 
 @app.importer(".xml")

@@ -139,13 +139,11 @@ def serialize_all_constraints(
 
 @app.exporter(".uvl")
 def export_uvl(cfm: CFM) -> bytes:
-    root_feature = cfm.features[0]
-
     includes = serialize_includes()
-    root = serialize_root_feature(root_feature)
+    root = serialize_root_feature(cfm.root)
 
     feature_strings = [
-        indent(serialize_features(child), "\t\t\t") for child in root_feature.children
+        indent(serialize_features(child), "\t\t\t") for child in cfm.root.children
     ]
 
     features = "".join(feature_strings) + "\n"

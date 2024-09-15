@@ -64,12 +64,21 @@ class Constraint:
 
 @dataclass
 class CFM:
-    features: list[Feature]
+    root: Feature
     require_constraints: list[Constraint]
     exclude_constraints: list[Constraint]
 
+    @property
+    def features(self) -> list[Feature]:
+        features = [self.root]
+
+        for feature in features:
+            features.extend(feature.children)
+
+        return features
+
     def is_unbound(self) -> bool:
-        return self.features[0].is_unbound()
+        return self.root.is_unbound()
 
 
 @dataclass
@@ -79,11 +88,10 @@ class FeatureNode:
 
     def validate(self, cfm: CFM) -> bool:
         # Check if root feature is valid
-        root_feature = cfm.features[0]
-        if root_feature.name != self.value.split("#")[0]:
+        if cfm.root.name != self.value.split("#")[0]:
             return False
 
-        if not self.validate_children(root_feature):
+        if not self.validate_children(cfm.root):
             return False
 
         return self.validate_constraints(cfm)
