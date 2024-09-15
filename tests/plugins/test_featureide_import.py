@@ -1,6 +1,5 @@
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from textwrap import dedent
 from xml.etree.ElementTree import Element, SubElement
 
 import pytest
@@ -421,7 +420,7 @@ def test_parse_cfm(capsys):
 \t\t\t\t</conj>
 \t\t\t\t<var>Tomato</var>
 \t\t\t</imp>
-\t\t</rule>\n\n"""
+\t\t</rule>\n\t\n"""
 
     assert len(cfm.features) == 11
     assert cfm.features[0].name == "Sandwich"
@@ -446,7 +445,7 @@ def test_parse_cfm(capsys):
     assert exclude_constraints[0].first_feature.name == "Wheat"
     assert exclude_constraints[0].second_feature.name == "Tomato"
 
-    assert dedent(expectation) == dedent(output.err)
+    assert expectation == output.err
 
 
 def test_parse_cfm_can_parse_multiple_eliminated_constraints(capsys):
@@ -466,7 +465,7 @@ def test_parse_cfm_can_parse_multiple_eliminated_constraints(capsys):
 \t\t\t\t<var>Choux</var>
 \t\t\t</imp>
 \t\t</rule>
-
+\t\t
 <rule>
 \t\t\t<imp>
 \t\t\t\t<disj>
@@ -475,13 +474,13 @@ def test_parse_cfm_can_parse_multiple_eliminated_constraints(capsys):
 \t\t\t\t</disj>
 \t\t\t\t<var>Eclair</var>
 \t\t\t</imp>
-\t\t</rule>\n\n"""
+\t\t</rule>\n\t\n"""
 
     output = capsys.readouterr()
 
     assert len(exclude_constraints) == 0
     assert len(require_constraints) == 0
-    assert dedent(expectation) == dedent(output.err)
+    assert expectation == output.err
 
 
 def test_parse_cfm_does_not_print_extermination_without_eliminated_constraints(capsys):
