@@ -21,7 +21,7 @@ Making use of the toolbox's core plugins and your shell's capabilities, you can 
 The following command demonstrates sampling a minimal UVL-based CFM using a random sampling strategy:
 
 ```bash
-cat "features\n\tminimalism" > example.uvl
+echo "features\n\tminimalism" > example.uvl
 python3 -m cfmtoolbox --import example.uvl random-sampling
 ```
 
@@ -30,6 +30,7 @@ python3 -m cfmtoolbox --import example.uvl random-sampling
 By making use your of shell's redirection capabilities, you can easily store the output in a file:
 
 ```bash
+echo "features\n\tminimalism" > example.uvl
 python3 -m cfmtoolbox --import example.uvl random-sampling > sampling.json
 ```
 
@@ -39,6 +40,7 @@ Some commands may take a long time to execute.
 Using your shell's built-in `timeout` command, you can apply a timeout to the sampling process like so:
 
 ```bash
+echo "features\n\tminimalism" > example.uvl
 timeout 5 python3 -m cfmtoolbox --import example.uvl random-sampling
 ```
 
