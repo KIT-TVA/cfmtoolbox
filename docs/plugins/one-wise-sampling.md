@@ -15,8 +15,8 @@ python3 -m cfmtoolbox --import example.uvl one-wise-sampling
 In case of an unbound model, transform the model first with e.g. the Big M plugin.
 
 ```bash
-python3 -m cfmtoolbox --import example_unbound.uvl --export example_bound.uvl apply-big-m
-python3 -m cfmtoolbox --import example_bound.uvl one-wise-sampling 
+python3 -m cfmtoolbox --import unbound.uvl --export bound.uvl apply-big-m
+python3 -m cfmtoolbox --import bound.uvl one-wise-sampling 
 ```
 
 Because the sampling algorithm uses non-determinism, it is recommended to limit the runtime of the command with a timeout of e.g. `5` seconds.
