@@ -37,7 +37,9 @@ nav:
       - UVL Import: plugins/uvl-import.md
       - UVL Export: plugins/uvl-export.md
       - JSON Impex: plugins/json-impex.md
+      - Big M: plugins/big-m.md
       - Random Sampling: plugins/random-sampling.md
+      - One Wise Sampling: plugins/one-wise-sampling.md
       - Debugging: plugins/debugging.md
   - Framework:
     - Architecture: framework/index.md
