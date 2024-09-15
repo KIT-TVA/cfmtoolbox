@@ -2,6 +2,9 @@ import json
 import random
 from collections import defaultdict
 from dataclasses import asdict
+from typing import NamedTuple
+
+import typer
 
 from cfmtoolbox import app
 from cfmtoolbox.models import CFM, Cardinality, Feature, FeatureNode
@@ -10,8 +13,7 @@ from cfmtoolbox.models import CFM, Cardinality, Feature, FeatureNode
 @app.command()
 def random_sampling(model: CFM, amount: int = 1) -> CFM:
     if model.is_unbound():
-        print("Model is unbound. Please apply big-m global bound first.")
-        return model
+        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
 
     all_samples = [
         asdict(RandomSampler(model).random_sampling()) for _ in range(amount)
@@ -20,6 +22,11 @@ def random_sampling(model: CFM, amount: int = 1) -> CFM:
     print(json.dumps(all_samples, indent=2))
 
     return model
+
+
+ChildAndCardinalityPair = NamedTuple(
+    "ChildAndCardinalityPair", [("child", Feature), ("cardinality", int)]
+)
 
 
 class RandomSampler:
@@ -40,11 +47,9 @@ class RandomSampler:
 
     def get_random_cardinality(self, cardinality_list: Cardinality):
         random_interval = random.choice(cardinality_list.intervals)
+        assert random_interval.upper is not None
         random_cardinality = random.randint(
-            random_interval.lower,
-            random_interval.upper
-            if random_interval.upper is not None
-            else random_interval.lower + 5,
+            random_interval.lower, random_interval.upper
         )
         return random_cardinality
 
@@ -55,11 +60,10 @@ class RandomSampler:
             modified_cardinality_list_intervals = cardinality_list.intervals[1:]
 
         random_interval = random.choice(modified_cardinality_list_intervals)
+        assert random_interval.upper is not None
         random_cardinality = random.randint(
             random_interval.lower if random_interval.lower != 0 else 1,
-            random_interval.upper
-            if random_interval.upper is not None
-            else random_interval.lower + 5,
+            random_interval.upper,
         )
         return random_cardinality
 
@@ -107,9 +111,7 @@ class RandomSampler:
         )
 
         summed_random_instance_cardinality = 0
-        child_with_random_instance_cardinality: list[
-            tuple[Feature, int]
-        ] = []  # List of tuples (child, random_instance_cardinality)
+        child_with_random_instance_cardinality: list[ChildAndCardinalityPair] = []
 
         for child in feature.children:
             if child.is_required() or child in optional_children_sample:
@@ -120,7 +122,7 @@ class RandomSampler:
                 random_instance_cardinality = 0
             summed_random_instance_cardinality += random_instance_cardinality
             child_with_random_instance_cardinality.append(
-                (child, random_instance_cardinality)
+                ChildAndCardinalityPair(child, random_instance_cardinality)
             )
 
         return (
