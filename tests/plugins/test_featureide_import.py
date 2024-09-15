@@ -282,11 +282,11 @@ def test_parse_formula_value_and_feature_raises_too_complex_contraint_error_with
 
 @pytest.mark.parametrize(
     ["constraints", "expectation"],
-    [(None, ([], [], set([]))), (Element("constraints"), ([], [], set([])))],
+    [(None, ([], [], [])), (Element("constraints"), ([], [], []))],
 )
 def test_parse_constraints_can_parse_without_constraints(
     constraints: Element,
-    expectation: tuple[list[Constraint], list[Constraint], set[int]],
+    expectation: tuple[list[Constraint], list[Constraint], list[int]],
 ):
     assert parse_constraints(constraints, []) == expectation
 
@@ -401,7 +401,7 @@ def test_parse_constraint_can_parse_constraint_with_elimination():
     assert len(require) == 0
     assert len(exclude) == 0
     assert len(eliminated) == 1
-    assert eliminated == set([rule])
+    assert eliminated == [rule]
 
 
 def test_parse_cfm(capsys):
@@ -459,21 +459,21 @@ def test_parse_cfm_can_parse_multiple_eliminated_constraints(capsys):
     expectation = """The following constraints were exterminated:
 <rule>
 \t\t\t<imp>
-\t\t\t\t<disj>
-\t\t\t\t\t<var>Croissant</var>
-\t\t\t\t\t<var>Spongecake</var>
-\t\t\t\t</disj>
-\t\t\t\t<var>Eclair</var>
-\t\t\t</imp>
-\t\t</rule>
-
-<rule>
-\t\t\t<imp>
 \t\t\t\t<conj>
 \t\t\t\t\t<var>Tart</var>
 \t\t\t\t\t<var>Shortcake</var>
 \t\t\t\t</conj>
 \t\t\t\t<var>Choux</var>
+\t\t\t</imp>
+\t\t</rule>
+
+<rule>
+\t\t\t<imp>
+\t\t\t\t<disj>
+\t\t\t\t\t<var>Croissant</var>
+\t\t\t\t\t<var>Spongecake</var>
+\t\t\t\t</disj>
+\t\t\t\t<var>Eclair</var>
 \t\t\t</imp>
 \t\t</rule>\n\n"""
 
