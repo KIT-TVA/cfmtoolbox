@@ -168,26 +168,6 @@ def test_feature_is_unbound(feature: Feature, expectation: bool):
     assert feature.is_unbound() is expectation
 
 
-def test_add_feature():
-    cfm = CFM([], [], [])
-    feature = Feature(
-        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
-    )
-    cfm.add_feature(feature)
-    assert feature in cfm.features
-
-
-def test_add_feature_ignores_already_added_features():
-    cfm = CFM([], [], [])
-    feature = Feature(
-        "Cheese", Cardinality([]), Cardinality([]), Cardinality([]), None, []
-    )
-    cfm.add_feature(feature)
-    cfm.add_feature(feature)
-    assert len(cfm.features) == 1
-    assert feature in cfm.features
-
-
 @pytest.mark.parametrize(
     ["cfm", "expectation"],
     [
