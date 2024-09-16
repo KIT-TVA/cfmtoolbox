@@ -114,8 +114,7 @@ def test_parse_cfm_parses_root_and_constraints():
     )
 
     assert len(cfm.features) == 4
-    assert len(cfm.require_constraints) == 2
-    assert len(cfm.exclude_constraints) == 1
+    assert len(cfm.constraints) == 3
 
 
 def test_parse_root_returns_all_features_in_the_tree():

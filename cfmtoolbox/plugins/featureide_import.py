@@ -114,16 +114,15 @@ def parse_formula_value_and_feature(
 
 
 def parse_constraints(
-    constraints: Element | None, features: list[Feature]
-) -> tuple[list[Constraint], list[Constraint], list[Element]]:
-    require_constraints: list[Constraint] = []
-    exclude_constraints: list[Constraint] = []
-    eliminated_constraints: list[Element] = list()
+    constraints_element: Element | None, features: list[Feature]
+) -> tuple[list[Constraint], list[Element]]:
+    constraints: list[Constraint] = []
+    eliminated_constraints: list[Element] = []
 
-    if constraints is None or len(constraints) == 0:
-        return (require_constraints, exclude_constraints, eliminated_constraints)
+    if constraints_element is None or len(constraints_element) == 0:
+        return (constraints, eliminated_constraints)
 
-    for rule in constraints:
+    for rule in constraints_element:
         if rule.tag != "rule":
             raise TypeError(f"Unknown constraint tag: {rule.tag}")
 
@@ -132,7 +131,7 @@ def parse_constraints(
 
         if rule[0].tag != FormulaTypes.IMP.value:
             eliminated_constraints.append(rule)
-            return (require_constraints, exclude_constraints, eliminated_constraints)
+            return (constraints, eliminated_constraints)
 
         try:
             first_feature_value, first_feature = parse_formula_value_and_feature(
@@ -165,12 +164,9 @@ def parse_constraints(
             )
         )
 
-        if is_require:
-            require_constraints.append(constraint)
-        else:
-            exclude_constraints.append(constraint)
+        constraints.append(constraint)
 
-    return (require_constraints, exclude_constraints, eliminated_constraints)
+    return (constraints, eliminated_constraints)
 
 
 def parse_cfm(root_element: Element) -> CFM:
@@ -182,8 +178,8 @@ def parse_cfm(root_element: Element) -> CFM:
     root_struct = struct[0]
     root_feature, all_features = parse_root(root_struct)
 
-    require_constraints, exclude_constraints, eliminated_constraints = (
-        parse_constraints(root_element.find("constraints"), all_features)
+    constraints, eliminated_constraints = parse_constraints(
+        root_element.find("constraints"), all_features
     )
 
     formatted_eliminated_constraints = [
@@ -198,7 +194,7 @@ def parse_cfm(root_element: Element) -> CFM:
             file=sys.stderr,
         )
 
-    return CFM(root_feature, require_constraints, exclude_constraints)
+    return CFM(root_feature, constraints)
 
 
 @app.importer(".xml")

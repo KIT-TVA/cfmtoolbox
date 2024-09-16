@@ -377,7 +377,7 @@ def test_exit_feature_with_two_groups(listener):
     assert len(listener.features) == 1
     assert listener.features[0].name == "test"
 
-    mock_parent = copy.deepcopy(listener.imported_require_constraints[0].first_feature)
+    mock_parent = copy.deepcopy(listener.imported_constraints[0].first_feature)
 
     feature1 = Feature(
         name="test_0",
@@ -398,7 +398,7 @@ def test_exit_feature_with_two_groups(listener):
     )
 
     mock_parent.children = [feature1, feature2]
-    for child in listener.imported_require_constraints[0].first_feature.children:
+    for child in listener.imported_constraints[0].first_feature.children:
         child.parent = mock_parent
 
     assert listener.features[0].parent is None
@@ -409,15 +409,15 @@ def test_exit_feature_with_two_groups(listener):
     )
     assert listener.feature_map["test"] == listener.features[0]
     assert len(listener.groups) == 0
-    assert len(listener.imported_require_constraints) == 2
-    assert listener.imported_require_constraints[0] == Constraint(
+    assert len(listener.imported_constraints) == 2
+    assert listener.imported_constraints[0] == Constraint(
         require=True,
         first_feature=mock_parent,
         first_cardinality=Cardinality([Interval(1, None)]),
         second_feature=feature1,
         second_cardinality=Cardinality([Interval(1, None)]),
     )
-    assert listener.imported_require_constraints[1] == Constraint(
+    assert listener.imported_constraints[1] == Constraint(
         require=True,
         first_feature=mock_parent,
         first_cardinality=Cardinality([Interval(1, None)]),
@@ -485,7 +485,7 @@ def test_exit_feature_with_two_groups_and_instance_cardinality(listener):
     assert len(listener.features) == 1
     assert listener.features[0].name == "test"
 
-    mock_parent = copy.deepcopy(listener.imported_require_constraints[0].first_feature)
+    mock_parent = copy.deepcopy(listener.imported_constraints[0].first_feature)
 
     feature1 = Feature(
         name="test_0",
@@ -506,7 +506,7 @@ def test_exit_feature_with_two_groups_and_instance_cardinality(listener):
     )
 
     mock_parent.children = [feature1, feature2]
-    for child in listener.imported_require_constraints[0].first_feature.children:
+    for child in listener.imported_constraints[0].first_feature.children:
         child.parent = mock_parent
 
     assert listener.features[0].parent is None
@@ -517,15 +517,15 @@ def test_exit_feature_with_two_groups_and_instance_cardinality(listener):
     )
     assert listener.feature_map["test"] == listener.features[0]
     assert listener.group_features_count == [1]
-    assert len(listener.imported_require_constraints) == 2
-    assert listener.imported_require_constraints[0] == Constraint(
+    assert len(listener.imported_constraints) == 2
+    assert listener.imported_constraints[0] == Constraint(
         require=True,
         first_feature=mock_parent,
         first_cardinality=Cardinality([Interval(1, None)]),
         second_feature=feature1,
         second_cardinality=Cardinality([Interval(1, None)]),
     )
-    assert listener.imported_require_constraints[1] == Constraint(
+    assert listener.imported_constraints[1] == Constraint(
         require=True,
         first_feature=mock_parent,
         first_cardinality=Cardinality([Interval(1, None)]),
@@ -592,7 +592,7 @@ def test_exit_feature_with_two_groups_including_group_cardinality(listener):
     assert len(listener.features) == 1
     assert listener.features[0].name == "test"
 
-    mock_parent = copy.deepcopy(listener.imported_require_constraints[0].first_feature)
+    mock_parent = copy.deepcopy(listener.imported_constraints[0].first_feature)
 
     feature1 = Feature(
         name="test_0",
@@ -613,7 +613,7 @@ def test_exit_feature_with_two_groups_including_group_cardinality(listener):
     )
 
     mock_parent.children = [feature1, feature2]
-    for child in listener.imported_require_constraints[0].first_feature.children:
+    for child in listener.imported_constraints[0].first_feature.children:
         child.parent = mock_parent
 
     assert listener.features[0].parent is None
@@ -624,15 +624,15 @@ def test_exit_feature_with_two_groups_including_group_cardinality(listener):
     )
     assert listener.feature_map["test"] == listener.features[0]
     assert listener.group_features_count == [1]
-    assert len(listener.imported_require_constraints) == 2
-    assert listener.imported_require_constraints[0] == Constraint(
+    assert len(listener.imported_constraints) == 2
+    assert listener.imported_constraints[0] == Constraint(
         require=True,
         first_feature=mock_parent,
         first_cardinality=Cardinality([Interval(1, None)]),
         second_feature=feature1,
         second_cardinality=Cardinality([Interval(1, None)]),
     )
-    assert listener.imported_require_constraints[1] == Constraint(
+    assert listener.imported_constraints[1] == Constraint(
         require=True,
         first_feature=mock_parent,
         first_cardinality=Cardinality([Interval(1, None)]),
@@ -701,7 +701,7 @@ def test_exit_feature_with_two_groups_including_group_cardinality_with_instances
     assert len(listener.features) == 1
     assert listener.features[0].name == "test"
 
-    mock_parent = copy.deepcopy(listener.imported_require_constraints[0].first_feature)
+    mock_parent = copy.deepcopy(listener.imported_constraints[0].first_feature)
 
     feature1 = Feature(
         name="test_0",
@@ -722,7 +722,7 @@ def test_exit_feature_with_two_groups_including_group_cardinality_with_instances
     )
 
     mock_parent.children = [feature1, feature2]
-    for child in listener.imported_require_constraints[0].first_feature.children:
+    for child in listener.imported_constraints[0].first_feature.children:
         child.parent = mock_parent
 
     assert listener.features[0].parent is None
@@ -733,15 +733,15 @@ def test_exit_feature_with_two_groups_including_group_cardinality_with_instances
     )
     assert listener.feature_map["test"] == listener.features[0]
     assert listener.group_features_count == [1]
-    assert len(listener.imported_require_constraints) == 2
-    assert listener.imported_require_constraints[0] == Constraint(
+    assert len(listener.imported_constraints) == 2
+    assert listener.imported_constraints[0] == Constraint(
         require=True,
         first_feature=mock_parent,
         first_cardinality=Cardinality([Interval(1, None)]),
         second_feature=feature1,
         second_cardinality=Cardinality([Interval(1, None)]),
     )
-    assert listener.imported_require_constraints[1] == Constraint(
+    assert listener.imported_constraints[1] == Constraint(
         require=True,
         first_feature=mock_parent,
         first_cardinality=Cardinality([Interval(1, None)]),
@@ -793,7 +793,7 @@ def test_exit_features_with_one_group_with_group_cardinality(listener):
     )
     assert listener.feature_map["test"] == listener.features[0]
     assert listener.group_features_count == [1]
-    assert len(listener.imported_require_constraints) == 0
+    assert len(listener.imported_constraints) == 0
 
 
 def test_exit_group_spec_one_subfeature(listener):
@@ -1236,7 +1236,7 @@ def test_exit_constraint_line_equivalence(listener):
 
     listener.exitConstraintLine(mock_ctx)
 
-    assert len(listener.imported_require_constraints) == 2
+    assert len(listener.imported_constraints) == 2
 
 
 def test_exit_constraint_line_implication(listener):
@@ -1264,7 +1264,7 @@ def test_exit_constraint_line_implication(listener):
 
     listener.exitConstraintLine(mock_ctx)
 
-    assert len(listener.imported_require_constraints) == 1
+    assert len(listener.imported_constraints) == 1
 
 
 def test_exit_features(listener):

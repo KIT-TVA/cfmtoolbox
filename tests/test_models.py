@@ -182,7 +182,6 @@ def test_feature_is_unbound(feature: Feature, expectation: bool):
                     [],
                 ),
                 [],
-                [],
             ),
             True,
         ),
@@ -196,7 +195,6 @@ def test_feature_is_unbound(feature: Feature, expectation: bool):
                     None,
                     [],
                 ),
-                [],
                 [],
             ),
             False,
@@ -446,7 +444,7 @@ def test_validate_feature_instance(feature_instance: FeatureNode, expectation: b
             ),
         ],
     )
-    cfm = CFM(feature, [], [])
+    cfm = CFM(feature, [])
     assert feature_instance.validate(cfm) == expectation
 
 
@@ -513,10 +511,9 @@ def test_initialize_global_feature_count(
 
 
 @pytest.mark.parametrize(
-    ["require_constraints", "exclude_constraints", "expectation"],
+    ["constraints", "expectation"],
     [
         (
-            [],
             [],
             True,
         ),
@@ -544,7 +541,6 @@ def test_initialize_global_feature_count(
                     Cardinality([Interval(1, 1)]),
                 )
             ],
-            [],
             True,
         ),
         (
@@ -571,7 +567,6 @@ def test_initialize_global_feature_count(
                     Cardinality([Interval(2, 2)]),
                 )
             ],
-            [],
             False,
         ),
         (
@@ -598,14 +593,12 @@ def test_initialize_global_feature_count(
                     Cardinality([Interval(1, None)]),
                 )
             ],
-            [],
             True,
         ),
         (
-            [],
             [
                 Constraint(
-                    True,
+                    False,
                     Feature(
                         "Swiss",
                         Cardinality([]),
@@ -629,10 +622,9 @@ def test_initialize_global_feature_count(
             True,
         ),
         (
-            [],
             [
                 Constraint(
-                    True,
+                    False,
                     Feature(
                         "Gouda",
                         Cardinality([]),
@@ -677,11 +669,9 @@ def test_initialize_global_feature_count(
                         [],
                     ),
                     Cardinality([Interval(1, None)]),
-                )
-            ],
-            [
+                ),
                 Constraint(
-                    True,
+                    False,
                     Feature(
                         "Swiss",
                         Cardinality([]),
@@ -700,15 +690,14 @@ def test_initialize_global_feature_count(
                         [],
                     ),
                     Cardinality([Interval(1, None)]),
-                )
+                ),
             ],
             True,
         ),
     ],
 )
 def test_validate_constraints(
-    require_constraints: list[Constraint],
-    exclude_constraints: list[Constraint],
+    constraints: list[Constraint],
     expectation: bool,
 ):
     feature_instance = FeatureNode(
@@ -738,5 +727,5 @@ def test_validate_constraints(
     dummy_root = Feature(
         "Dummy", Cardinality([]), Cardinality([]), Cardinality([]), None, []
     )
-    cfm = CFM(dummy_root, require_constraints, exclude_constraints)
+    cfm = CFM(dummy_root, constraints)
     assert feature_instance.validate_constraints(cfm) == expectation

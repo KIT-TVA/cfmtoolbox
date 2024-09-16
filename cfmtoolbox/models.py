@@ -65,8 +65,7 @@ class Constraint:
 @dataclass
 class CFM:
     root: Feature
-    require_constraints: list[Constraint]
-    exclude_constraints: list[Constraint]
+    constraints: list[Constraint]
 
     @property
     def features(self) -> list[Feature]:
@@ -100,21 +99,25 @@ class FeatureNode:
         global_feature_count: defaultdict[str, int] = defaultdict(int)
         self.initialize_global_feature_count(global_feature_count)
 
-        # Check require constraints
-        for constraint in cfm.require_constraints:
-            if constraint.first_cardinality.is_valid_cardinality(
+        for constraint in cfm.constraints:
+            if not constraint.first_cardinality.is_valid_cardinality(
                 global_feature_count[constraint.first_feature.name]
-            ) and not constraint.second_cardinality.is_valid_cardinality(
-                global_feature_count[constraint.second_feature.name]
+            ):
+                continue
+
+            if (
+                constraint.require
+                and not constraint.second_cardinality.is_valid_cardinality(
+                    global_feature_count[constraint.second_feature.name]
+                )
             ):
                 return False
 
-        # Check exclude constraints
-        for constraint in cfm.exclude_constraints:
-            if constraint.first_cardinality.is_valid_cardinality(
-                global_feature_count[constraint.first_feature.name]
-            ) and constraint.second_cardinality.is_valid_cardinality(
-                global_feature_count[constraint.second_feature.name]
+            if (
+                not constraint.require
+                and constraint.second_cardinality.is_valid_cardinality(
+                    global_feature_count[constraint.second_feature.name]
+                )
             ):
                 return False
 
