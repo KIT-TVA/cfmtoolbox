@@ -402,6 +402,7 @@ def test_serialize_features():
     ["constraint", "expectation"],
     [
         (Cardinality([Interval(1, 1)]), "(Sandwich = 1)"),
+        (Cardinality([Interval(1, None)]), "(Sandwich >= 1)"),
         (Cardinality([Interval(1, 2)]), "((Sandwich >= 1) & (Sandwich <= 2))"),
     ],
 )
