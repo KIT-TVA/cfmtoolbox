@@ -8,7 +8,7 @@ As long as a CFM model is returned in the used plugin in question, the debugging
 python3 -m cfmtoolbox --import model.uvl debug
 ```
 
-## Example
+## Usage example
 
 Create a basic CFM model in any supported format, for example `sandwich.uvl`:
 
