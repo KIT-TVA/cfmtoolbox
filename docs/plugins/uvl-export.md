@@ -27,12 +27,10 @@ By having a `CheeseMix` with a group type cardinality of `[1..3]` and a group in
 
 The following list summarized the cardinalities and how it is exported:
 
-<ul>
-    <li>Group type cardinality <code>[1..1]</code>: alt </li>
-    <li>Group type cardinality <code>[1..n]</code>: or </li>
-    <li>Group type cardinality <code>[0..n]</code> and group instance cardinality <code>[1..n]</code>: [1..n]</li>
-    <li>Group type cardinality <code>[n..n]</code>: [n]</li>
-</ul>
+- Group type cardinality `[1..1]`: `alt`
+- Group type cardinality `[1..n]`: `or`
+- Group type cardinality `[0..n]` and group instance cardinality `[1..n]`: `[1..n]`
+- Group type cardinality `[n..n]`: `[n]`
 
 Further, compounded cardinalities like `[0..2], [4..5]` are not supported by UVL and thus also not in the UVL export plugin. 
 
