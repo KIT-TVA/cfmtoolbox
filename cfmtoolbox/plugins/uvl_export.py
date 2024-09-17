@@ -97,6 +97,9 @@ def serialize_constraint(feature: Feature, cardinality: Cardinality) -> str:
     if interval.lower == interval.upper:
         return f"({feature.name} = {interval.lower})"
 
+    if interval.upper is None:
+        return f"({feature.name} >= {interval.lower})"
+
     return (
         f"(({feature.name} >= {interval.lower}) & ({feature.name} <= {interval.upper}))"
     )
