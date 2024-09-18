@@ -4,8 +4,13 @@ from dataclasses import dataclass
 
 @dataclass
 class Interval:
+    """Dataclass representing a cardinality interval."""
+
     lower: int
+    """Lower bound of the interval."""
+
     upper: int | None
+    """Upper bound of the interval. None if unbounded."""
 
     def __str__(self) -> str:
         lower_formatted = self.lower
@@ -15,12 +20,17 @@ class Interval:
 
 @dataclass
 class Cardinality:
+    """Dataclass representing a cardinality."""
+
     intervals: list[Interval]
+    """Ordered list of cardinality intervals."""
 
     def __str__(self) -> str:
         return ", ".join(map(str, self.intervals))
 
     def is_valid_cardinality(self, value: int) -> bool:
+        """Check if a value is a valid cardinality for the given intervals."""
+
         for interval in self.intervals:
             if (interval.lower <= value) and (
                 interval.upper is None or interval.upper >= value
@@ -31,20 +41,37 @@ class Cardinality:
 
 @dataclass
 class Feature:
+    """Dataclass representing a feature in a feature model."""
+
     name: str
+    """Globally unique name of the feature."""
+
     instance_cardinality: Cardinality
+    """Instance cardinality of the feature"""
+
     group_type_cardinality: Cardinality
+    """Group type cardinality of the feature."""
+
     group_instance_cardinality: Cardinality
+    """Group instance cardinality of the feature."""
+
     parent: "Feature | None"
+    """Parent feature. None if root feature."""
+
     children: list["Feature"]
+    """List of child features."""
 
     def __str__(self) -> str:
         return self.name
 
     def is_required(self) -> bool:
+        """Check if the feature is required."""
+
         return self.instance_cardinality.intervals[0].lower != 0
 
     def is_unbound(self) -> bool:
+        """Check if the feature is unbound."""
+
         return self.instance_cardinality.intervals[-1].upper is None or any(
             child.is_unbound() for child in self.children
         )
@@ -52,11 +79,22 @@ class Feature:
 
 @dataclass
 class Constraint:
+    """Dataclass representing a constraint in a feature model."""
+
     require: bool
+    """Indicates whether the constraint is a require or exclude constraint."""
+
     first_feature: Feature
+    """First feature in the constraint."""
+
     first_cardinality: Cardinality
+    """Cardinality of the first feature."""
+
     second_feature: Feature
+    """Second feature in the constraint."""
+
     second_cardinality: Cardinality
+    """Cardinality of the second feature."""
 
     def __str__(self) -> str:
         return f"{self.first_feature.name} => {self.second_feature.name}"
@@ -64,11 +102,18 @@ class Constraint:
 
 @dataclass
 class CFM:
+    """Dataclass representing a feature model."""
+
     root: Feature
+    """Root feature of the feature model."""
+
     constraints: list[Constraint]
+    """List of constraints in the feature model."""
 
     @property
     def features(self) -> list[Feature]:
+        """Dynamically computed list of all features in the feature model."""
+
         features = [self.root]
 
         for feature in features:
@@ -77,15 +122,24 @@ class CFM:
         return features
 
     def is_unbound(self) -> bool:
+        """Check if the feature model is unbound."""
+
         return self.root.is_unbound()
 
 
 @dataclass
 class FeatureNode:
+    """Dataclass representing an instantiated feature from a feature model."""
+
     value: str
+    """Value of the feature node."""
+
     children: list["FeatureNode"]
+    """List of child feature nodes."""
 
     def validate(self, cfm: CFM) -> bool:
+        """Validate the feature node against the feature model."""
+
         # Check if root feature is valid
         if cfm.root.name != self.value.split("#")[0]:
             return False
