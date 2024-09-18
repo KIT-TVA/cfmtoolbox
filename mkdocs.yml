@@ -5,6 +5,8 @@ repo_url: https://github.com/KIT-TVA/cfmtoolbox/
 
 theme:
   name: material
+  color_mode: auto
+  user_color_mode_toggle: true
   features:
     - navigation.sections
     - navigation.instant
@@ -12,6 +14,20 @@ theme:
     - navigation.top
     - navigation.footer
     - content.code.copy
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
 
 plugins:
   - search
@@ -19,16 +35,16 @@ plugins:
       handlers:
         python:
           import:
-          - https://docs.python.org/3/objects.inv
-          - https://mkdocstrings.github.io/autorefs/objects.inv
-          - https://www.mkdocs.org/objects.inv
-          - https://python-markdown.github.io/objects.inv
-          paths: [cfmtoolbox]
+            - https://docs.python.org/3/objects.inv
+            - https://mkdocstrings.github.io/autorefs/objects.inv
+            - https://www.mkdocs.org/objects.inv
+            - https://python-markdown.github.io/objects.inv
+          paths: [ cfmtoolbox ]
           options:
             docstring_options:
               ignore_init_summary: true
             docstring_section_style: list
-            filters: ["!^_"]
+            filters: [ "!^_" ]
             heading_level: 1
             inherited_members: true
             merge_init_into_class: true
@@ -56,19 +72,19 @@ nav:
   - Introduction: index.md
   - Getting Started: getting-started.md
   - Plugins:
-    - Plugin Overview: plugins/index.md
-    - Core Plugins:
-      - Conversion: plugins/conversion.md
-      - FeatureIDE Import: plugins/featureide-import.md
-      - UVL Import: plugins/uvl-import.md
-      - UVL Export: plugins/uvl-export.md
-      - JSON Import: plugins/json-import.md
-      - JSON Export: plugins/json-export.md
-      - Big M: plugins/big-m.md
-      - Random Sampling: plugins/random-sampling.md
-      - One Wise Sampling: plugins/one-wise-sampling.md
-      - Debugging: plugins/debugging.md
+      - Plugin Overview: plugins/index.md
+      - Core Plugins:
+          - Conversion: plugins/conversion.md
+          - FeatureIDE Import: plugins/featureide-import.md
+          - UVL Import: plugins/uvl-import.md
+          - UVL Export: plugins/uvl-export.md
+          - JSON Import: plugins/json-import.md
+          - JSON Export: plugins/json-export.md
+          - Big M: plugins/big-m.md
+          - Random Sampling: plugins/random-sampling.md
+          - One Wise Sampling: plugins/one-wise-sampling.md
+          - Debugging: plugins/debugging.md
   - Framework:
-    - Architecture: framework/index.md
-    - Models: framework/models.md
-    - Writing Plugins: framework/writing-plugins.md
+      - Architecture: framework/index.md
+      - Models: framework/models.md
+      - Writing Plugins: framework/writing-plugins.md
