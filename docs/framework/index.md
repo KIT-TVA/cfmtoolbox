@@ -40,7 +40,7 @@ For example, the signature of on `.uvl` file importer would look like this:
 def import_uvl(file_contents: bytes) -> CFM: ...
 ```
 
-To learn more please refer to the [writing plugins](writing-plugins.md) guide.
+To learn more please refer to the [writing plugins](writing-plugins.md#importers) guide.
 
 ### Commands
 
@@ -66,7 +66,7 @@ Here is an example signature of a command that takes an optional integer argumen
 def my_command(cfm: CFM, my_argument: int = 10) -> CFM: ...
 ```
 
-To learn more please refer to the [writing plugins](writing-plugins.md) guide.
+To learn more please refer to the [writing plugins](writing-plugins.md#commands) guide.
 
 ### Exporters
 
@@ -82,7 +82,7 @@ For example, the signature of on `.uvl` file exporter would look like this:
 def export_uvl(cfm: CFM) -> bytes: ...
 ```
 
-To learn more please refer to the [writing plugins](writing-plugins.md) guide.
+To learn more please refer to the [writing plugins](writing-plugins.md#exporters) guide.
 
 ## Command Line Interface
 
