@@ -88,3 +88,4 @@ nav:
       - Architecture: framework/index.md
       - Models: framework/models.md
       - Writing Plugins: framework/writing-plugins.md
+      - Contributing: framework/contributing.md
