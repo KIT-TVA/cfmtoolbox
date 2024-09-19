@@ -14,6 +14,8 @@
 A plugin-based toolbox for working with cardinality-based feature models.
 This repository contains the `cfmtoolbox` itself and a few first party plugins demonstrating how to extend the toolbox.
 
+[Read the documentation](https://kit-tva.github.io/cfmtoolbox/) to learn more.
+
 ## Development
 
 1. Install [poetry](https://python-poetry.org/)
