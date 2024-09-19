@@ -1,4 +1,4 @@
-The CFM Toolbox is a plugin-based framwork for working with cardinality-based feature models.
+The CFM Toolbox is a plugin-based framework for working with cardinality-based feature models.
 The framework ships with a set of core plugins, but can also easily be extended with third-party and custom plugins.
 
 ## Features
