@@ -25,3 +25,9 @@ Because the sampling algorithm uses non-determinism, it is recommended to limit 
 ```bash
 timeout 5 python3 -m cfmtoolbox --import example.uvl random-sampling
 ```
+
+To store the sampling in a `.json` file, shell redirect can be used, as shown in the following example:
+
+```bash
+python3 -m cfmtoolbox --import example.uvl random-sampling > sampling.json
+```
