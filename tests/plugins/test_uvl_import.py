@@ -5,7 +5,11 @@ import pytest
 
 import cfmtoolbox.plugins.uvl_import as uvl_import_plugin
 from cfmtoolbox import Cardinality, CFMToolbox, Constraint, Feature, Interval
-from cfmtoolbox.plugins.uvl_import import ConstraintType, CustomListener
+from cfmtoolbox.plugins.uvl_import import (
+    ConstraintType,
+    CustomErrorListener,
+    CustomListener,
+)
 
 
 @pytest.fixture()
@@ -16,6 +20,26 @@ def listener():
 def test_plugin_can_be_loaded():
     app = CFMToolbox()
     assert uvl_import_plugin in app.load_plugins()
+
+
+def test_custom_error_listener_print(capsys):
+    listener = CustomErrorListener()
+    listener.syntaxError("", "", 1, 1, "\\ttest", "")
+    out, err = capsys.readouterr()
+    assert (
+        out
+        == "The UVL has the following warning that prevents reading it :Line 1:1 - \\ttest\n"
+    )
+
+
+def test_custom_error_listener_error():
+    listener = CustomErrorListener()
+    with pytest.raises(Exception) as err:
+        listener.syntaxError("", "", 1, 1, "test", "")
+    assert (
+        str(err.value)
+        == "The UVL has the following error that prevents reading it :Line 1:1 - test"
+    )
 
 
 def test_exit_reference(listener):
@@ -1267,6 +1291,26 @@ def test_exit_constraint_line_implication(listener):
     assert len(listener.imported_constraints) == 1
 
 
+def test_exit_constraint_line_not_enough_references(listener):
+    mock_ctx = Mock()
+    listener.exitConstraintLine(mock_ctx)
+
+
+def test_exit_constraint_line_ignore_text_constraint(listener):
+    mock_ctx = Mock()
+    listener.references = ["hello.test", "world.test"]
+    listener.exitConstraintLine(mock_ctx)
+
+
+def test_exit_constraint_line_op_not_supported(listener, capsys):
+    mock_ctx = Mock()
+    listener.references = ["hello", "world"]
+    listener.constraint_types = ["dummy"]
+    listener.exitConstraintLine(mock_ctx)
+    out, err = capsys.readouterr()
+    assert out == "ERROR, operation dummy not supported yet\n"
+
+
 def test_exit_features(listener):
     mock_ctx = Mock()
     listener.references_set = {"test1", "test2"}
@@ -1284,3 +1328,10 @@ def test_exit_features(listener):
 
     assert feature1.instance_cardinality == Cardinality([Interval(1, 1)])
     assert listener.references_set == set()
+
+
+def test_exit_attributes(listener, capsys):
+    mock_ctx = Mock()
+    listener.exitAttributes(mock_ctx)
+    out, err = capsys.readouterr()
+    assert out == "Text is not supported in CFM\n"
