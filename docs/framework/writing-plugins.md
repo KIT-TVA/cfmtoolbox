@@ -8,8 +8,9 @@ Below you'll find guides on how to write each type of plugin using `python-poetr
 ## Importers
 
 1. Start by running `poetry new cfmtoolbox-example-importer` to create a new Python project
-2. Your importer's code will live in the `cfmtoolbox_example_importer` package
-3. To create a minimal valid importer, add the following code to your `cfmtoolbox_example_importer/__init__.py` file:
+2. Now switch to the project directory by running `cd cfmtoolbox-example-importer`
+3. Next, run `poetry add cfmtoolbox` to add the framework as a dependency
+4. To create a minimal valid importer, add the following code to your `cfmtoolbox_example_importer/__init__.py` file:
 
     ```python
     from cfmtoolbox import app, CFM, Feature, Cardinality
@@ -31,7 +32,7 @@ Below you'll find guides on how to write each type of plugin using `python-poetr
         )
     ```
 
-4. To enable the CFM Toolbox to discover and automatically load your plugin, add the following to your `pyproject.toml` file:
+5. To enable the CFM Toolbox to discover and automatically load your plugin, add the following to your `pyproject.toml` file:
 
     ```toml
     [tool.poetry.plugins."cfmtoolbox.plugins"]
@@ -46,8 +47,9 @@ This plugin would allow the CFM Toolbox to import feature models from a `.exampl
 ## Commands
 
 1. Start by running `poetry new cfmtoolbox-example-command` to create a new Python project
-2. Your command's code will live in the `cfmtoolbox_example_command` package
-3. To create a minimal valid command, add the following code to your `cfmtoolbox_example_command/__init__.py` file:
+2. Now switch to the project directory by running `cd cfmtoolbox-example-command`
+3. Next, run `poetry add cfmtoolbox` to add the framework as a dependency
+4. To create a minimal valid command, add the following code to your `cfmtoolbox_example_command/__init__.py` file:
 
     ```python
     from cfmtoolbox import app, CFM
@@ -58,7 +60,7 @@ This plugin would allow the CFM Toolbox to import feature models from a `.exampl
         return cfm
     ```
 
-4. To enable the CFM Toolbox to discover and automatically load your plugin, add the following to your `pyproject.toml` file:
+5. To enable the CFM Toolbox to discover and automatically load your plugin, add the following to your `pyproject.toml` file:
 
     ```toml
     [tool.poetry.plugins."cfmtoolbox.plugins"]
@@ -73,8 +75,9 @@ This plugin would add a new `example-command` command to the CFM Toolbox, which 
 ## Exporters
 
 1. Start by running `poetry new cfmtoolbox-summary-exporter` to create a new Python project
-2. Your exporter's code will live in the `cfmtoolbox_summary_exporter` package
-3. To create a minimal valid exporter, add the following code to your `cfmtoolbox_summary_exporter/__init__.py` file:
+2. Now switch to the project directory by running `cd cfmtoolbox-summary-exporter`
+3. Next, run `poetry add cfmtoolbox` to add the framework as a dependency
+4. To create a minimal valid exporter, add the following code to your `cfmtoolbox_summary_exporter/__init__.py` file:
 
     ```python
     from cfmtoolbox import app, CFM
@@ -85,7 +88,7 @@ This plugin would add a new `example-command` command to the CFM Toolbox, which 
         return contents.encode("utf-8")
     ```
 
-4. To enable the CFM Toolbox to discover and automatically load your plugin, add the following to your `pyproject.toml` file:
+5. To enable the CFM Toolbox to discover and automatically load your plugin, add the following to your `pyproject.toml` file:
 
     ```toml
     [tool.poetry.plugins."cfmtoolbox.plugins"]
