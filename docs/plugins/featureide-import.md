@@ -22,3 +22,8 @@ Import the feature model into the CFM Toolbox and show some basic information ab
 ```bash
 python3 -m cfmtoolbox --import sandwich.xml debug
 ```
+
+## Limitation
+
+The current version of the FeatureIDE import does not support the import of more complex constraints (conjunction, disjunction and equation). It supports `implications` between two features and direct negations such as `A => B` and `not A => not not B`.  
+If more complex constraints are added, those will be eliminated and printed into the `stderr`.
