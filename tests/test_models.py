@@ -61,43 +61,43 @@ def test_cardinality_is_valid():
 def test_feature_is_required():
     cardinality = Cardinality([Interval(1, 10)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
-    assert feature.is_required()
+    assert feature.is_required
 
     cardinality = Cardinality([Interval(0, 10)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
-    assert not feature.is_required()
+    assert not feature.is_required
 
     cardinality = Cardinality([Interval(0, 0)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
-    assert not feature.is_required()
+    assert not feature.is_required
 
     cardinality = Cardinality([Interval(1, 1)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
-    assert feature.is_required()
+    assert feature.is_required
 
     cardinality = Cardinality([Interval(0, 1)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
-    assert not feature.is_required()
+    assert not feature.is_required
 
     cardinality = Cardinality([Interval(1, 10), Interval(20, 30), Interval(40, 50)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
-    assert feature.is_required()
+    assert feature.is_required
 
     cardinality = Cardinality([Interval(0, 10), Interval(20, 30), Interval(40, 50)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
-    assert not feature.is_required()
+    assert not feature.is_required
 
     cardinality = Cardinality([Interval(0, 0), Interval(20, 30), Interval(40, 50)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
-    assert not feature.is_required()
+    assert not feature.is_required
 
     cardinality = Cardinality([Interval(1, 1), Interval(20, 30), Interval(40, 50)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
-    assert feature.is_required()
+    assert feature.is_required
 
     cardinality = Cardinality([Interval(0, 1), Interval(20, 30), Interval(40, 50)])
     feature = Feature("Cheese", cardinality, cardinality, cardinality, None, [])
-    assert not feature.is_required()
+    assert not feature.is_required
 
 
 @pytest.mark.parametrize(
@@ -165,7 +165,7 @@ def test_feature_is_required():
     ],
 )
 def test_feature_is_unbound(feature: Feature, expectation: bool):
-    assert feature.is_unbound() is expectation
+    assert feature.is_unbound is expectation
 
 
 @pytest.mark.parametrize(
@@ -202,7 +202,7 @@ def test_feature_is_unbound(feature: Feature, expectation: bool):
     ],
 )
 def test_cfm_is_unbound(cfm: CFM, expectation: bool):
-    assert cfm.is_unbound() is expectation
+    assert cfm.is_unbound is expectation
 
 
 def test_partition_children():

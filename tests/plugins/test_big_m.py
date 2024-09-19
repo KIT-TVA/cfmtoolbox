@@ -19,10 +19,10 @@ def test_plugin_can_be_loaded():
 
 
 def test_apply_big_m_with_loaded_model(model: CFM):
-    assert model.is_unbound()
+    assert model.is_unbound
     new_model = apply_big_m(model)
     assert new_model is not None
-    assert not new_model.is_unbound()
+    assert not new_model.is_unbound
 
 
 def test_get_global_upper_bound(model: CFM):
