@@ -42,9 +42,6 @@ extend-select = ["I"]
 [tool.pytest.ini_options]
 addopts = "--cov=cfmtoolbox --cov-report term-missing --cov-report html"
 
-[tool.coverage.run]
-omit = ["cfmtoolbox/__main__.py"]
-
 [tool.mypy]
 check_untyped_defs = true
 
