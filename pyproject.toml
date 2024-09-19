@@ -8,6 +8,15 @@ readme = "README.md"
 homepage = "https://github.com/KIT-TVA/cfmtoolbox/"
 repository = "https://github.com/KIT-TVA/cfmtoolbox/"
 documentation = "https://kit-tva.github.io/cfmtoolbox/"
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
