@@ -5,6 +5,9 @@ description = "A plugin-based toolbox for working with cardinality-based feature
 authors = ["Jonathan Ehwald <github@ehwald.info>", "Daniel-Delong Zhang <danielzhang728@gmail.com>", "Anna Chen <chenxanna@gmail.com>", "Valentin Kaczmarek <valentinkaczmarek@yahoo.de>"]
 license = "MIT"
 readme = "README.md"
+homepage = "https://github.com/KIT-TVA/cfmtoolbox/"
+repository = "https://github.com/KIT-TVA/cfmtoolbox/"
+documentation = "https://kit-tva.github.io/cfmtoolbox/"
 
 [tool.poetry.dependencies]
 python = "^3.11"
