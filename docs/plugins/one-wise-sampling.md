@@ -25,7 +25,7 @@ Because the sampling algorithm uses non-determinism, it is recommended to limit 
 timeout 5 python3 -m cfmtoolbox --import example.uvl one-wise-sampling
 ```
 
-To store the sampling in a `.json` file, shell redirect can be used, as shown in the following example:
+To store the sampling in a `.json` file, shell redirection can be used, as shown in the following example:
 
 ```bash
 python3 -m cfmtoolbox --import example.uvl one-wise-sampling > sampling.json
