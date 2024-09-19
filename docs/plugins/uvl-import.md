@@ -11,7 +11,7 @@ features
     Sandwich cardinality [1]
 ```
 
-The, import the model into the CFM toolbox and show some basic information about it:
+Import the model into the CFM toolbox and show some basic information about it:
 
 ```bash
 python3 -m cfmtoolbox --import sandwich.uvl debug
@@ -24,12 +24,12 @@ python3 -m cfmtoolbox --import sandwich.uvl debug
   The given group_cardinality is equal to the group_type_cardinality, even though some of the groups have a textual
   representation instead of a numeric one (e.g. **or**) they can be converted.
   The group_instance_cardinality has to be implied by the given type and internal structure of the model.
-- Additional attributes supplied in UVL are not supported by CFM, so will be ignored.
+- Additional attributes supplied in UVL are not supported by CFM, so they will be ignored.
 - UVL has the capability to have more than one group as children for a feature, but CFM only allows children from the
   same type.
   This problem is solved by creating indexed subfeatures, which have the specific children and will be part of a parent,
   that has very general cardinalities.
-  With that the model can be imported without any problems, altough you will have some information loss.
+  With that the model can be imported without any problems, although you will have some information loss.
 
 ```text
 features
