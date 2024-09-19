@@ -40,3 +40,13 @@ The constraints are exported in a specific way, for example the constraint `A =>
 constraints
     ((A >= 0) & (A <= 2)) => (B = 1)
 ```
+
+Currently, only the bare minimum needed for exporting our internal model is implemented.
+If additional UVL "include" statements are required, they must be added manually.
+The following shows the currently generated UVL "include" statements:
+
+```uvl
+include
+    Arithmetic.feature-cardinality
+    Boolean.group-cardinality
+```
