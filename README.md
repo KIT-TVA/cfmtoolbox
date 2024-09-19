@@ -1,4 +1,4 @@
-# CFM Toolsuite
+# CFM Toolbox
 
 A plugin-based toolbox for working with cardinality-based feature models.
 This repository contains the `cfmtoolbox` itself and a few first party plugins demonstrating how to extend the toolbox.
