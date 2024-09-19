@@ -1,6 +1,6 @@
 The JSON import plugin enables the import of JSON files created with the JSON export plugin.
-Both plugins serve as reference import and export plugins for the CFM toolbox but are also used internally for testing.
-The JSON files handled by these plugins represent a serialized version of the internal data structures used by the CFM toolbox.
+Both plugins serve as reference import and export plugins for the CFM Toolbox but are also used internally for testing.
+The JSON files handled by these plugins represent a serialized version of the internal data structures used by the CFM Toolbox.
 
 ## Usage example
 
@@ -30,7 +30,7 @@ Create a JSON file named `sandwich.json` containing a basic CFM:
 }
 ```
 
-Then, import the model into the CFM toolbox and show some basic information about it:
+Then, import the model into the CFM Toolbox and show some basic information about it:
 
 ```bash
 python3 -m cfmtoolbox --import sandwich.json debug

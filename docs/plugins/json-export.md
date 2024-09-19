@@ -1,5 +1,5 @@
-The JSON export plugin enables the export of CFM models to JSON files. The JSON files created by this plugin represent a serialized version of the internal data structures used by the CFM toolbox.
-JSON model files created this way can be imported back into the CFM toolbox using the JSON import plugin.
+The JSON export plugin enables the export of CFM models to JSON files. The JSON files created by this plugin represent a serialized version of the internal data structures used by the CFM Toolbox.
+JSON model files created this way can be imported back into the CFM Toolbox using the JSON import plugin.
 
 ## Usage example
 
