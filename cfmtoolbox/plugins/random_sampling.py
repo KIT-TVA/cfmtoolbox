@@ -12,7 +12,7 @@ from cfmtoolbox.models import CFM, Cardinality, Feature, FeatureNode
 
 @app.command()
 def random_sampling(model: CFM, amount: int = 1) -> CFM:
-    if model.is_unbound():
+    if model.is_unbound:
         raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
 
     all_samples = [
@@ -112,7 +112,7 @@ class RandomSampler:
         child_with_random_instance_cardinality: list[ChildAndCardinalityPair] = []
 
         for child in feature.children:
-            if child.is_required() or child in optional_children_sample:
+            if child.is_required or child in optional_children_sample:
                 random_instance_cardinality = self.get_random_cardinality_without_zero(
                     child.instance_cardinality
                 )
@@ -135,7 +135,7 @@ class RandomSampler:
         ]
 
     def get_required_children(self, feature: Feature):
-        return [child for child in feature.children if child.is_required()]
+        return [child for child in feature.children if child.is_required]
 
     def get_optional_children(self, feature: Feature):
-        return [child for child in feature.children if not child.is_required()]
+        return [child for child in feature.children if not child.is_required]

@@ -12,7 +12,7 @@ from cfmtoolbox.models import CFM, Cardinality, Feature, FeatureNode
 
 @app.command()
 def one_wise_sampling(model: CFM) -> CFM:
-    if model.is_unbound():
+    if model.is_unbound:
         raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
 
     print(

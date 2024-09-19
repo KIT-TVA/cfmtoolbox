@@ -64,16 +64,18 @@ class Feature:
     def __str__(self) -> str:
         return self.name
 
+    @property
     def is_required(self) -> bool:
         """Check if the feature is required."""
 
         return self.instance_cardinality.intervals[0].lower != 0
 
+    @property
     def is_unbound(self) -> bool:
         """Check if the feature is unbound."""
 
         return self.instance_cardinality.intervals[-1].upper is None or any(
-            child.is_unbound() for child in self.children
+            child.is_unbound for child in self.children
         )
 
 
@@ -121,10 +123,11 @@ class CFM:
 
         return features
 
+    @property
     def is_unbound(self) -> bool:
         """Check if the feature model is unbound."""
 
-        return self.root.is_unbound()
+        return self.root.is_unbound
 
 
 @dataclass
