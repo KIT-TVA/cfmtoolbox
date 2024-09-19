@@ -36,4 +36,4 @@ jobs:
       - name: Install library
         run: poetry install --no-interaction
       - name: Run tests and collect coverage
-        run: poetry run pytest
+        run: poetry run pytest -vv
