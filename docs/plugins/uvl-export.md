@@ -41,7 +41,9 @@ constraints
     ((A >= 0) & (A <= 2)) => (B = 1)
 ```
 
-Currently, only the bare minimum needed for exporting the internal model is included, if further imports are required, those must be added manually. The following shows the current include:
+Currently, only the bare minimum needed for exporting our internal model is implemented.
+If additional UVL "include" statements are required, they must be added manually.
+The following shows the currently generated UVL "include" statements:
 
 ```uvl
 include
