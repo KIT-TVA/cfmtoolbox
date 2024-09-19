@@ -9,25 +9,23 @@ To convert an XML-based FeatureIDE feature model to the UVL format, use the foll
 python3 -m cfmtoolbox --import model.xml --export model.uvl convert
 ```
 
-## Example
+## Usage example
 
-Create a simple feature model in FeatureIDE's XML format:
+Create a basic FeatureIDE feature model file named `sandwich.xml` with the following content:
 
 ```xml
-cat <<EOT >> basic-sandwich.xml
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <featureModel>
     <struct>
         <feature abstract="true" mandatory="true" name="Sandwich"/>
     </struct>
 </featureModel>
-EOT
 ```
 
 Convert the feature model to the UVL format:
 
 ```bash
-python3 -m cfmtoolbox --import basic-sandwich.xml --export basic-sandwich.uvl convert
+python3 -m cfmtoolbox --import sandwich.xml --export sandwich.uvl convert
 ```
 
 ## Limitations
