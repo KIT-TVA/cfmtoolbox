@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cfmtoolbox"
-version = "0.2.0"
+version = "0.2.1"
 description = "A plugin-based toolbox for working with cardinality-based feature models"
 authors = ["Jonathan Ehwald <github@ehwald.info>", "Daniel-Delong Zhang <danielzhang728@gmail.com>", "Anna Chen <chenxanna@gmail.com>", "Valentin Kaczmarek <valentinkaczmarek@yahoo.de>"]
 license = "MIT"
