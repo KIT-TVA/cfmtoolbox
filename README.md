@@ -11,7 +11,7 @@
 [license-image]: https://img.shields.io/pypi/l/cfmtoolbox
 [license-url]: https://github.com/KIT-TVA/cfmtoolbox/blob/main/LICENSE
 
-The CFM Toolbox is a plugin-based framwork for working with cardinality-based feature models.
+The CFM Toolbox is a plugin-based framework for working with cardinality-based feature models.
 The framework ships with a set of core plugins, but can also easily be extended with third-party and custom plugins.
 
 [Read the documentation](https://kit-tva.github.io/cfmtoolbox/) to learn more.
