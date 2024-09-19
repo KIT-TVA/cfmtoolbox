@@ -11,7 +11,7 @@ features
     Sandwich cardinality [1]
 ```
 
-Import the model into the CFM toolbox and show some basic information about it:
+Import the model into the CFM Toolbox and show some basic information about it:
 
 ```bash
 python3 -m cfmtoolbox --import sandwich.uvl debug

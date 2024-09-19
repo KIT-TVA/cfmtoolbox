@@ -55,7 +55,7 @@ python3 -m cfmtoolbox --import example.uvl --export example.json convert
 
 ## Installing additional plugins
 
-The CFM toolbox will automatically detect and load plugins that are installed in the same Python environment.
+The CFM Toolbox will automatically detect and load plugins that are installed in the same Python environment.
 This makes installing plugins as easy as running `pip3 install` with the desired plugin's name.
 
 For example, to install the `cfmtoolbox-hello-world-plugin` plugin, you can run:
