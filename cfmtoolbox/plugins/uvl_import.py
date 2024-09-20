@@ -397,6 +397,6 @@ def import_uvl(data: bytes):
     parser.featureModel()  # start parsing
 
     return CFM(
-        root=imported_features[0],
+        root=imported_features[-1],
         constraints=imported_constraints,
     )
