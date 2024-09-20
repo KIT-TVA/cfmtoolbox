@@ -11,12 +11,12 @@ from cfmtoolbox.models import CFM, Cardinality, Feature, FeatureNode
 
 
 @app.command()
-def random_sampling(model: CFM, amount: int = 1) -> CFM:
+def random_sampling(model: CFM, num_samples: int = 1) -> CFM:
     if model.is_unbound:
         raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
 
     all_samples = [
-        asdict(RandomSampler(model).random_sampling()) for _ in range(amount)
+        asdict(RandomSampler(model).random_sampling()) for _ in range(num_samples)
     ]
 
     print(json.dumps(all_samples, indent=2))
@@ -101,11 +101,11 @@ class RandomSampler:
 
         # Seperate required and optional children to only randomize the optional children
         required_children = self.get_required_children(feature)
-        amount_of_optional_children = random_group_type_cardinality - len(
+        number_of_optional_children = random_group_type_cardinality - len(
             required_children
         )
         optional_children_sample = self.get_sorted_sample(
-            self.get_optional_children(feature), amount_of_optional_children
+            self.get_optional_children(feature), number_of_optional_children
         )
 
         summed_random_instance_cardinality = 0

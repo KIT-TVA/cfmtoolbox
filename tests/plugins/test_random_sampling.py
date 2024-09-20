@@ -43,7 +43,7 @@ def test_plugin_passes_though_model(model: CFM):
     assert random_sampling(model) is model
 
 
-def test_plugin_outputs_expected_amount_of_random_samples(model: CFM, capsys):
+def test_plugin_outputs_expected_number_of_random_samples(model: CFM, capsys):
     random_sampling(model, 3)
     captured = capsys.readouterr()
     assert captured.out.count("sandwich#0") == 3
