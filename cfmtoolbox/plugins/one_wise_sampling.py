@@ -34,7 +34,7 @@ ChildAndCardinalityPair = NamedTuple(
 class OneWiseSampler:
     def __init__(self, model: CFM):
         self.global_feature_count: defaultdict[str, int] = defaultdict(int)
-        # An assignment describes a feature and the amount of instances it should have
+        # An assignment describes a feature and the number of instances it should have
         self.assignments: set[tuple[str, int]] = set()
         # Covered assignments are all assignments of that appear in a sample and gets filled while generating the sample
         self.covered_assignments: set[tuple[str, int]] = set()
@@ -137,7 +137,7 @@ class OneWiseSampler:
         child_with_random_instance_cardinality: list[ChildAndCardinalityPair] = []
 
         for child in feature.children:
-            # Enforces the feature of the chosen assignment to have the chosen amount of instances
+            # Enforces the feature of the chosen assignment to have the chosen number of instances
             if child.name == self.chosen_assignment[0]:
                 random_instance_cardinality = self.chosen_assignment[1]
             else:
