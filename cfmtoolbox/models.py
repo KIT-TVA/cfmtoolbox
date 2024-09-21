@@ -131,13 +131,13 @@ class CFM:
 
 
 @dataclass
-class FeatureNode:
-    """Dataclass representing an instantiated feature from a feature model."""
+class ConfigurationNode:
+    """Dataclass representing configuration of a CFM feature."""
 
     value: str
     """Value of the feature node."""
 
-    children: list["FeatureNode"]
+    children: list["ConfigurationNode"]
     """List of child feature nodes."""
 
     def validate(self, cfm: CFM) -> bool:
@@ -216,7 +216,7 @@ class FeatureNode:
 
         return True
 
-    def partition_children(self, feature: Feature) -> list[list["FeatureNode"]]:
+    def partition_children(self, feature: Feature) -> list[list["ConfigurationNode"]]:
         sublists = []
         i = 0
         for model_child in feature.children:
