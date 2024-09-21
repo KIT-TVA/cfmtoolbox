@@ -7,7 +7,7 @@ from typing import NamedTuple
 import typer
 
 from cfmtoolbox import app
-from cfmtoolbox.models import CFM, Cardinality, Feature, FeatureNode
+from cfmtoolbox.models import CFM, Cardinality, ConfigurationNode, Feature
 
 
 @app.command()
@@ -34,7 +34,7 @@ class RandomSampler:
         self.global_feature_count: defaultdict[str, int] = defaultdict(int)
         self.model = model
 
-    def random_sampling(self) -> FeatureNode:
+    def random_sampling(self) -> ConfigurationNode:
         while True:
             self.global_feature_count = defaultdict(int)
             random_feature_node = self.generate_random_feature_node(self.model.root)
@@ -69,7 +69,7 @@ class RandomSampler:
         self,
         feature: Feature,
     ):
-        feature_node = FeatureNode(
+        feature_node = ConfigurationNode(
             value=f"{feature.name}#{self.global_feature_count[feature.name]}",
             children=[],
         )

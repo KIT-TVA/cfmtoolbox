@@ -6,4 +6,4 @@
 
 ## ::: cfmtoolbox.models.Interval
 
-## ::: cfmtoolbox.models.FeatureNode
+## ::: cfmtoolbox.models.ConfigurationNode

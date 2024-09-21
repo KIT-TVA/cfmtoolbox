@@ -7,7 +7,7 @@ from typing import NamedTuple
 import typer
 
 from cfmtoolbox import app
-from cfmtoolbox.models import CFM, Cardinality, Feature, FeatureNode
+from cfmtoolbox.models import CFM, Cardinality, ConfigurationNode, Feature
 
 
 @app.command()
@@ -42,7 +42,7 @@ class OneWiseSampler:
         self.chosen_assignment: tuple[str, int]
         self.model = model
 
-    def one_wise_sampling(self) -> list[FeatureNode]:
+    def one_wise_sampling(self) -> list[ConfigurationNode]:
         self.calculate_border_assignments(self.model.root)
 
         samples = []
@@ -85,7 +85,7 @@ class OneWiseSampler:
         self,
         feature: Feature,
     ):
-        feature_node = FeatureNode(
+        feature_node = ConfigurationNode(
             value=f"{feature.name}#{self.global_feature_count[feature.name]}",
             children=[],
         )

@@ -1,4 +1,4 @@
-from .models import CFM, Cardinality, Constraint, Feature, FeatureNode, Interval
+from .models import CFM, Cardinality, ConfigurationNode, Constraint, Feature, Interval
 from .toolbox import CFMToolbox
 
 app = CFMToolbox()
@@ -10,5 +10,5 @@ __all__ = [
     "Cardinality",
     "Feature",
     "Constraint",
-    "FeatureNode",
+    "ConfigurationNode",
 ]

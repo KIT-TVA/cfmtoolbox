@@ -5,9 +5,9 @@ import pytest
 from cfmtoolbox.models import (
     CFM,
     Cardinality,
+    ConfigurationNode,
     Constraint,
     Feature,
-    FeatureNode,
     Interval,
 )
 
@@ -224,22 +224,22 @@ def test_partition_children():
             ),
         ],
     )
-    feature_node = FeatureNode(
+    feature_node = ConfigurationNode(
         "Sandwich",
         [
-            FeatureNode("Bread#0", []),
-            FeatureNode("Bread#1", []),
-            FeatureNode("Meat#0", []),
+            ConfigurationNode("Bread#0", []),
+            ConfigurationNode("Bread#1", []),
+            ConfigurationNode("Meat#0", []),
         ],
     )
     assert feature_node.partition_children(feature) == [
         [
-            FeatureNode("Bread#0", []),
-            FeatureNode("Bread#1", []),
+            ConfigurationNode("Bread#0", []),
+            ConfigurationNode("Bread#1", []),
         ],
         [],
         [
-            FeatureNode("Meat#0", []),
+            ConfigurationNode("Meat#0", []),
         ],
     ]
 
@@ -256,7 +256,7 @@ def test_partition_children():
                 None,
                 [],
             ),
-            FeatureNode("Sandwich#0", []),
+            ConfigurationNode("Sandwich#0", []),
             True,
         ),
         (
@@ -268,13 +268,13 @@ def test_partition_children():
                 None,
                 [],
             ),
-            FeatureNode("Sandwich#0", [FeatureNode("Bread#0", [])]),
+            ConfigurationNode("Sandwich#0", [ConfigurationNode("Bread#0", [])]),
             False,
         ),
     ],
 )
 def test_validate_children_no_children(
-    feature: Feature, feature_instance: FeatureNode, expectation: bool
+    feature: Feature, feature_instance: ConfigurationNode, expectation: bool
 ):
     assert feature_instance.validate_children(feature) == expectation
 
@@ -283,46 +283,46 @@ def test_validate_children_no_children(
     ["feature_instance", "expectation"],
     [
         (
-            FeatureNode("Sandwich#0", [FeatureNode("Bread#0", [])]),
+            ConfigurationNode("Sandwich#0", [ConfigurationNode("Bread#0", [])]),
             False,
         ),
         (
-            FeatureNode(
+            ConfigurationNode(
                 "Sandwich#0",
                 [
-                    FeatureNode("Bread#0", []),
-                    FeatureNode("Bread#1", []),
-                    FeatureNode("Bread#2", []),
+                    ConfigurationNode("Bread#0", []),
+                    ConfigurationNode("Bread#1", []),
+                    ConfigurationNode("Bread#2", []),
                 ],
             ),
             False,
         ),
         (
-            FeatureNode(
+            ConfigurationNode(
                 "Sandwich#0",
                 [
-                    FeatureNode("Bread#0", []),
-                    FeatureNode("Bread#1", []),
-                    FeatureNode("Bread#2", []),
-                    FeatureNode("Cheese#0", []),
+                    ConfigurationNode("Bread#0", []),
+                    ConfigurationNode("Bread#1", []),
+                    ConfigurationNode("Bread#2", []),
+                    ConfigurationNode("Cheese#0", []),
                 ],
             ),
             False,
         ),
         (
-            FeatureNode(
+            ConfigurationNode(
                 "Sandwich#0",
                 [
-                    FeatureNode("Bread#0", []),
-                    FeatureNode("Bread#1", []),
-                    FeatureNode("Cheese#0", []),
+                    ConfigurationNode("Bread#0", []),
+                    ConfigurationNode("Bread#1", []),
+                    ConfigurationNode("Cheese#0", []),
                 ],
             ),
             True,
         ),
     ],
 )
-def test_validate_children(feature_instance: FeatureNode, expectation: bool):
+def test_validate_children(feature_instance: ConfigurationNode, expectation: bool):
     feature = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -363,37 +363,42 @@ def test_validate_children(feature_instance: FeatureNode, expectation: bool):
     ["feature_instance", "expectation"],
     [
         (
-            FeatureNode("Milkshake#0", []),
+            ConfigurationNode("Milkshake#0", []),
             False,
         ),
         (
-            FeatureNode(
+            ConfigurationNode(
                 "Sandwich#0",
                 [
-                    FeatureNode(
+                    ConfigurationNode(
                         "Bread#0",
-                        [FeatureNode("Wheat#0", []), FeatureNode("Wheat#0", [])],
+                        [
+                            ConfigurationNode("Wheat#0", []),
+                            ConfigurationNode("Wheat#0", []),
+                        ],
                     ),
-                    FeatureNode("Bread#1", []),
-                    FeatureNode("Cheese#0", []),
+                    ConfigurationNode("Bread#1", []),
+                    ConfigurationNode("Cheese#0", []),
                 ],
             ),
             False,
         ),
         (
-            FeatureNode(
+            ConfigurationNode(
                 "Sandwich#0",
                 [
-                    FeatureNode("Bread#0", [FeatureNode("Wheat#0", [])]),
-                    FeatureNode("Bread#1", [FeatureNode("Wheat#0", [])]),
-                    FeatureNode("Cheese#0", []),
+                    ConfigurationNode("Bread#0", [ConfigurationNode("Wheat#0", [])]),
+                    ConfigurationNode("Bread#1", [ConfigurationNode("Wheat#0", [])]),
+                    ConfigurationNode("Cheese#0", []),
                 ],
             ),
             True,
         ),
     ],
 )
-def test_validate_feature_instance(feature_instance: FeatureNode, expectation: bool):
+def test_validate_feature_instance(
+    feature_instance: ConfigurationNode, expectation: bool
+):
     feature = Feature(
         "Sandwich",
         Cardinality([Interval(1, 1)]),
@@ -452,40 +457,40 @@ def test_validate_feature_instance(feature_instance: FeatureNode, expectation: b
     ["feature_instance", "expectation"],
     [
         (
-            FeatureNode("Milkshake#0", []),
+            ConfigurationNode("Milkshake#0", []),
             {"Milkshake": 1},
         ),
         (
-            FeatureNode(
+            ConfigurationNode(
                 "Sandwich#0",
                 [
-                    FeatureNode("Bread#0", [FeatureNode("Wheat#0", [])]),
-                    FeatureNode("Bread#1", [FeatureNode("Wheat#1", [])]),
-                    FeatureNode("Cheese#0", []),
+                    ConfigurationNode("Bread#0", [ConfigurationNode("Wheat#0", [])]),
+                    ConfigurationNode("Bread#1", [ConfigurationNode("Wheat#1", [])]),
+                    ConfigurationNode("Cheese#0", []),
                 ],
             ),
             {"Sandwich": 1, "Bread": 2, "Wheat": 2, "Cheese": 1},
         ),
         (
-            FeatureNode(
+            ConfigurationNode(
                 "Sandwich#0",
                 [
-                    FeatureNode("Bread#0", [FeatureNode("Wheat#0", [])]),
-                    FeatureNode("Bread#1", [FeatureNode("Wheat#1", [])]),
-                    FeatureNode(
+                    ConfigurationNode("Bread#0", [ConfigurationNode("Wheat#0", [])]),
+                    ConfigurationNode("Bread#1", [ConfigurationNode("Wheat#1", [])]),
+                    ConfigurationNode(
                         "Cheese-mix#0",
                         [
-                            FeatureNode("Swiss#0", []),
-                            FeatureNode("Gouda#0", []),
-                            FeatureNode("Gouda#1", []),
+                            ConfigurationNode("Swiss#0", []),
+                            ConfigurationNode("Gouda#0", []),
+                            ConfigurationNode("Gouda#1", []),
                         ],
                     ),
-                    FeatureNode(
+                    ConfigurationNode(
                         "Cheese-mix#1",
                         [
-                            FeatureNode("Swiss#1", []),
-                            FeatureNode("Gouda#2", []),
-                            FeatureNode("Cheddar#0", []),
+                            ConfigurationNode("Swiss#1", []),
+                            ConfigurationNode("Gouda#2", []),
+                            ConfigurationNode("Cheddar#0", []),
                         ],
                     ),
                 ],
@@ -503,7 +508,7 @@ def test_validate_feature_instance(feature_instance: FeatureNode, expectation: b
     ],
 )
 def test_initialize_global_feature_count(
-    feature_instance: FeatureNode, expectation: defaultdict[str, int]
+    feature_instance: ConfigurationNode, expectation: defaultdict[str, int]
 ):
     global_feature_count: defaultdict[str, int] = defaultdict(int)
     feature_instance.initialize_global_feature_count(global_feature_count)
@@ -700,25 +705,25 @@ def test_validate_constraints(
     constraints: list[Constraint],
     expectation: bool,
 ):
-    feature_instance = FeatureNode(
+    feature_instance = ConfigurationNode(
         "Sandwich#0",
         [
-            FeatureNode("Bread#0", [FeatureNode("Wheat#0", [])]),
-            FeatureNode("Bread#1", [FeatureNode("Wheat#1", [])]),
-            FeatureNode(
+            ConfigurationNode("Bread#0", [ConfigurationNode("Wheat#0", [])]),
+            ConfigurationNode("Bread#1", [ConfigurationNode("Wheat#1", [])]),
+            ConfigurationNode(
                 "Cheese-mix#0",
                 [
-                    FeatureNode("Swiss#0", []),
-                    FeatureNode("Gouda#0", []),
-                    FeatureNode("Gouda#1", []),
+                    ConfigurationNode("Swiss#0", []),
+                    ConfigurationNode("Gouda#0", []),
+                    ConfigurationNode("Gouda#1", []),
                 ],
             ),
-            FeatureNode(
+            ConfigurationNode(
                 "Cheese-mix#1",
                 [
-                    FeatureNode("Swiss#1", []),
-                    FeatureNode("Gouda#2", []),
-                    FeatureNode("Cheddar#0", []),
+                    ConfigurationNode("Swiss#1", []),
+                    ConfigurationNode("Gouda#2", []),
+                    ConfigurationNode("Cheddar#0", []),
                 ],
             ),
         ],
