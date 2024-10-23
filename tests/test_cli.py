@@ -21,6 +21,6 @@ def test_cli_invokation_from_shell():
     proc = subprocess.run(
         ["poetry", "run", "cfmtoolbox", "--help"], capture_output=True
     )
-    assert proc.returncode == 0
+    assert proc.returncode == 0, proc.stdout
     assert not proc.stderr
     assert "cfmtoolbox [OPTIONS] COMMAND [ARGS]" in proc.stdout.decode()
