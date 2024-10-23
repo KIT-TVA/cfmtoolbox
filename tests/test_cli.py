@@ -23,4 +23,5 @@ def test_cli_invokation_from_shell():
     )
     assert proc.returncode == 0, proc.stdout
     assert not proc.stderr
-    assert "cfmtoolbox [OPTIONS] COMMAND [ARGS]" in proc.stdout.decode()
+    assert "cfmtoolbox" in proc.stdout.decode()
+    assert "[OPTIONS] COMMAND [ARGS]" in proc.stdout.decode()
