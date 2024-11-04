@@ -1,5 +1,5 @@
 import json
-import random
+import secrets
 from collections import defaultdict
 from dataclasses import asdict
 from typing import NamedTuple
@@ -41,6 +41,7 @@ class OneWiseSampler:
         # The chosen assignment is the assignment that is currently being used to generate a sample
         self.chosen_assignment: tuple[str, int]
         self.model = model
+        self.random_generator = secrets.SystemRandom()
 
     def one_wise_sampling(self) -> list[ConfigurationNode]:
         self.calculate_border_assignments(self.model.root)
@@ -122,9 +123,9 @@ class OneWiseSampler:
         return feature_node
 
     def get_random_cardinality(self, cardinality_list: Cardinality):
-        random_interval = random.choice(cardinality_list.intervals)
+        random_interval = self.random_generator.choice(cardinality_list.intervals)
         assert random_interval.upper is not None
-        random_cardinality = random.randint(
+        random_cardinality = self.random_generator.randint(
             random_interval.lower, random_interval.upper
         )
         return random_cardinality
