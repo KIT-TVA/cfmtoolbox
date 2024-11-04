@@ -1,5 +1,5 @@
 import json
-import random
+import secrets
 from collections import defaultdict
 from dataclasses import asdict
 from typing import NamedTuple
@@ -33,6 +33,7 @@ class RandomSampler:
     def __init__(self, model: CFM):
         self.global_feature_count: defaultdict[str, int] = defaultdict(int)
         self.model = model
+        self.random_generator = secrets.SystemRandom()
 
     def random_sampling(self) -> ConfigurationNode:
         while True:
@@ -44,9 +45,9 @@ class RandomSampler:
         return random_feature_node
 
     def get_random_cardinality(self, cardinality_list: Cardinality):
-        random_interval = random.choice(cardinality_list.intervals)
+        random_interval = self.random_generator.choice(cardinality_list.intervals)
         assert random_interval.upper is not None
-        random_cardinality = random.randint(
+        random_cardinality = self.random_generator.randint(
             random_interval.lower, random_interval.upper
         )
         return random_cardinality
@@ -57,9 +58,11 @@ class RandomSampler:
         if first_interval.lower == 0 and first_interval.upper == 0:
             modified_cardinality_list_intervals = cardinality_list.intervals[1:]
 
-        random_interval = random.choice(modified_cardinality_list_intervals)
+        random_interval = self.random_generator.choice(
+            modified_cardinality_list_intervals
+        )
         assert random_interval.upper is not None
-        random_cardinality = random.randint(
+        random_cardinality = self.random_generator.randint(
             random_interval.lower if random_interval.lower != 0 else 1,
             random_interval.upper,
         )
@@ -131,7 +134,9 @@ class RandomSampler:
     def get_sorted_sample(self, features: list[Feature], sample_size: int):
         return [
             features[i]
-            for i in sorted(random.sample(range(len(features)), sample_size))
+            for i in sorted(
+                self.random_generator.sample(range(len(features)), sample_size)
+            )
         ]
 
     def get_required_children(self, feature: Feature):
