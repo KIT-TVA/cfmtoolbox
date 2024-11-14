@@ -5,7 +5,7 @@ import typer
 
 import cfmtoolbox.plugins.one_wise_sampling as one_wise_sampling_plugin
 from cfmtoolbox import app
-from cfmtoolbox.models import CFM, Cardinality, Feature, Interval
+from cfmtoolbox.models import CFM, Cardinality, Constraint, Feature, Interval
 from cfmtoolbox.plugins.json_import import import_json
 from cfmtoolbox.plugins.t_wise_sampling import Literal, TWiseSampler, t_wise_sampling
 
@@ -80,6 +80,33 @@ def test_calculate_literal_set(t_wise_sampler: TWiseSampler):
             ),
         ],
     )
+    constraints = [
+        Constraint(
+            False,
+            Feature(
+                "Cheese-mix",
+                Cardinality([]),
+                Cardinality([]),
+                Cardinality([]),
+                None,
+                [],
+            ),
+            Cardinality([Interval(10, 10)]),
+            Feature(
+                "Gouda",
+                Cardinality([]),
+                Cardinality([]),
+                Cardinality([]),
+                None,
+                [],
+            ),
+            Cardinality([Interval(27, 27)]),
+        )
+    ]
+    t_wise_sampler.model.constraints = constraints
+    t_wise_sampler.smt.reset()
+    t_wise_sampler.calculate_smt_model(feature)
+    t_wise_sampler.calculate_smt_constraints()
     t_wise_sampler.calculate_literal_set(feature)
     assert t_wise_sampler.literal_set == {
         ("Cheese-mix", 0),
@@ -92,6 +119,8 @@ def test_calculate_literal_set(t_wise_sampler: TWiseSampler):
         ("Swiss", 0),
         ("Swiss", 20),
         ("Gouda", 0),
+        ("Gouda", 26),
+        ("Gouda", 28),
         ("Gouda", 30),
     }
 

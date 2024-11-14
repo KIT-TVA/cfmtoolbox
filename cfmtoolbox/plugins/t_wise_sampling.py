@@ -76,7 +76,7 @@ class TWiseSampler:
         self.calculate_literal_set(self.model.root)
 
         # Print literal set in json
-        # print(json.dumps([literal for literal in self.literal_set]))
+        print(json.dumps([literal for literal in self.literal_set]))
 
         self.calculate_interactions()
 
@@ -137,23 +137,35 @@ class TWiseSampler:
     def calculate_literal_set(
         self, feature: Feature, lower_factor: int = 1, upper_factor: int = 1
     ):
-        for interval in feature.instance_cardinality.intervals:
-            self.literal_set.add(Literal(feature.name, lower_factor * interval.lower))
-            if interval.upper is not None:
-                self.literal_set.add(
-                    Literal(feature.name, upper_factor * interval.upper)
-                )
+        min_value = feature.instance_cardinality.intervals[0].lower * lower_factor
+        assert feature.instance_cardinality.intervals[-1].upper is not None
+        max_value = feature.instance_cardinality.intervals[-1].upper * upper_factor
+        in_interval = False
+        for i in range(min_value, max_value + 1):
+            if self.check_valid_cardinality(feature, i):
+                if not in_interval:
+                    in_interval = True
+                    self.literal_set.add(Literal(feature.name, i))
+            else:
+                if in_interval:
+                    self.literal_set.add(Literal(feature.name, i - 1))
+                    in_interval = False
+        if in_interval:
+            self.literal_set.add(Literal(feature.name, max_value))
+
         for child in feature.children:
-            upper_bound = feature.instance_cardinality.intervals[
-                len(feature.instance_cardinality.intervals) - 1
-            ].upper
-            assert upper_bound is not None
             self.calculate_literal_set(
                 child,
-                feature.instance_cardinality.intervals[0].lower,
-                upper_bound,
+                min_value,
+                max_value,
             )
-        # TODO: Interval gap search for children
+
+    def check_valid_cardinality(self, feature: Feature, cardinality: int) -> bool:
+        self.smt.push()
+        self.smt.add(Int("%s" % feature.name) == cardinality)
+        result = self.smt.check().r > 0
+        self.smt.pop()
+        return result
 
     def calculate_interactions(self):
         all_interactions = set(
