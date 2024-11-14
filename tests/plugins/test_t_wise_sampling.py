@@ -127,8 +127,92 @@ def test_calculate_smt_model(t_wise_sampler: TWiseSampler):
         [],
     )
     t_wise_sampler.calculate_smt_model(feature)
-    print(t_wise_sampler.smt.sexpr())
+
     assert (
         t_wise_sampler.smt.sexpr()
         == "(declare-fun Cheese-mix () Int)\n(assert (or (and (>= Cheese-mix 0) (<= Cheese-mix 2))\n    (and (>= Cheese-mix 5) (<= Cheese-mix 7))))\n"
     )
+
+
+def test_find_valid_children_distribution(t_wise_sampler: TWiseSampler):
+    multiset = {
+        "cheddar": 4,
+        "bread": 2,
+        "wheat": 2,
+        "onion": 2,
+        "tomato": 0,
+        "sourdough": 0,
+        "cheese-mix": 4,
+        "swiss": 8,
+        "lettuce": 12,
+        "sandwich": 1,
+        "veggies": 1,
+        "gouda": 0,
+    }
+
+    feature = Feature(
+        "cheese-mix",
+        Cardinality([Interval(0, 0), Interval(2, 4)]),
+        Cardinality([Interval(1, 3)]),
+        Cardinality([Interval(3, 3)]),
+        None,
+        [
+            Feature(
+                "cheddar",
+                Cardinality([Interval(0, 1)]),
+                Cardinality([]),
+                Cardinality([]),
+                None,
+                [],
+            ),
+            Feature(
+                "swiss",
+                Cardinality([Interval(0, 2)]),
+                Cardinality([]),
+                Cardinality([]),
+                None,
+                [],
+            ),
+            Feature(
+                "gouda",
+                Cardinality([Interval(0, 3)]),
+                Cardinality([]),
+                Cardinality([]),
+                None,
+                [],
+            ),
+        ],
+    )
+
+    result = [
+        [("cheddar", (0, 1)), ("swiss", (0, 2)), ("gouda", (0, 0))],
+        [("cheddar", (1, 2)), ("swiss", (2, 4)), ("gouda", (0, 0))],
+        [("cheddar", (2, 3)), ("swiss", (4, 6)), ("gouda", (0, 0))],
+        [("cheddar", (3, 4)), ("swiss", (6, 8)), ("gouda", (0, 0))],
+    ]
+
+    assert (
+        t_wise_sampler.find_valid_children_distribution(multiset, feature, (0, 4))
+        == result
+    )
+
+
+def test_convert_multiset_to_one_instance(t_wise_sampler: TWiseSampler):
+    multiset = {
+        "cheddar": 4,
+        "bread": 2,
+        "wheat": 2,
+        "onion": 2,
+        "tomato": 0,
+        "sourdough": 0,
+        "cheese-mix": 4,
+        "swiss": 8,
+        "lettuce": 12,
+        "sandwich": 1,
+        "veggies": 1,
+        "gouda": 0,
+    }
+
+    assert t_wise_sampler.convert_multiset_to_one_instance(
+        multiset, t_wise_sampler.model.root
+    )[0].validate(t_wise_sampler.model)

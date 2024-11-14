@@ -1,12 +1,13 @@
 import itertools
 import json
+from dataclasses import asdict
 from typing import NamedTuple
 
 import typer
 from z3 import And, ArithRef, If, Implies, Int, Not, Or, Solver, Sum  # type: ignore
 
 from cfmtoolbox import app
-from cfmtoolbox.models import CFM, Feature
+from cfmtoolbox.models import CFM, ConfigurationNode, Feature
 
 
 @app.command()
@@ -14,9 +15,23 @@ def t_wise_sampling(model: CFM, t: int = 1) -> CFM:
     if model.is_unbound:
         raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
 
+    sampler = TWiseSampler(model, t)
+    samples = sampler.t_wise_sampling()
+    print("Multiset configurations:")
     print(
         json.dumps(
-            [sample for sample in TWiseSampler(model, t).t_wise_sampling()],
+            [sample for sample in samples],
+            indent=2,
+        )
+    )
+
+    print("Converted Instance configurations:")
+    print(
+        json.dumps(
+            [
+                asdict(sampler.convert_multiset_to_one_instance(sample, model.root)[0])
+                for sample in samples
+            ],
             indent=2,
         )
     )
@@ -29,6 +44,10 @@ Literal = NamedTuple("Literal", [("feature", str), ("cardinality", int)])
 
 # Under the definition of Multi-Set-Based Coverage, a configuration can be modeled with only the number of instances of each feature
 MultiSetConfiguration = dict[str, int]
+
+ChildDistribution = NamedTuple(
+    "ChildDistribution", [("child", str), ("range", tuple[int, int])]
+)
 
 
 # The TWiseSampler class is responsible for generating t-wise samples under the definitions of Multi-Set, Boundary-Interior Coverage and global constraints
@@ -278,3 +297,183 @@ class TWiseSampler:
         # print(new_solver)
         # rint(new_solver.check())
         return res
+
+    def convert_multiset_to_one_instance(
+        self,
+        multiset: MultiSetConfiguration,
+        feature: Feature,
+        local_parent_range: tuple[int, int] = (0, 1),
+    ) -> list[ConfigurationNode]:
+        global_number_of_feature = multiset[feature.name]
+        configurations: list[ConfigurationNode] = []
+        # If the feature has no instances, return an empty list
+        if (
+            global_number_of_feature == 0
+            or local_parent_range[0] == local_parent_range[1]
+        ):
+            return configurations
+
+        # Get valid children distribution for the current parent instance
+        distribution: list[list[ChildDistribution]] = (
+            self.find_valid_children_distribution(multiset, feature, local_parent_range)
+        )
+
+        for i, i_th_parent in enumerate(distribution):
+            # Create a new configuration node for the current parent instance
+            configuration_node = ConfigurationNode(
+                value=f"{feature.name}#{local_parent_range[0] + i}",
+                children=[],
+            )
+
+            for child_distribution in i_th_parent:
+                # If the child has no instances, skip it
+                if child_distribution.range[0] == child_distribution.range[1]:
+                    continue
+
+                # Get the child feature
+                child_feature = next(
+                    child
+                    for child in feature.children
+                    if child.name == child_distribution.child
+                )
+
+                # Convert the child feature to a single instance
+                child_configuration = self.convert_multiset_to_one_instance(
+                    multiset,
+                    child_feature,
+                    (child_distribution.range[0], child_distribution.range[1]),
+                )
+
+                # Add the child configuration to the parent configuration
+                configuration_node.children.extend(child_configuration)
+
+            configurations.append(configuration_node)
+
+        return configurations
+
+    def find_valid_children_distribution(
+        self,
+        multiset: MultiSetConfiguration,
+        feature: Feature,
+        local_parent_range: tuple[int, int] = (0, 1),
+    ) -> list[list[ChildDistribution]]:
+        if local_parent_range[0] == local_parent_range[1] - 1:
+            return [
+                [
+                    ChildDistribution(child.name, (0, multiset[child.name]))
+                    for child in feature.children
+                ]
+            ]
+
+        # We have multiple parent instances, so we need to invoke the SMT solver to find a valid distribution of children instances
+        solver = Solver()
+
+        for child in feature.children:
+            # Children instances should add up to their global number of instances
+            # e.g. gouda#0 + gouda#1 + gouda#2 + gouda#3 = global_gouda
+            solver.add(
+                Sum(
+                    [
+                        Int(f"{child.name}#{i}")
+                        for i in range(local_parent_range[0], local_parent_range[1])
+                    ]
+                )
+                == multiset[child.name]
+            )
+
+            # Children instances should be within the instance cardinality intervals
+            # e.g gouda#0 >= 0, gouda#0 <= 3, gouda#1 >= 0, gouda#1 <= 3, gouda#2 >= 0, gouda#2 <= 3, gouda#3 >= 0, gouda#3 <= 3
+            for i in range(local_parent_range[0], local_parent_range[1]):
+                solver.add(
+                    Or(
+                        [
+                            And(
+                                Int(f"{child.name}#{i}") >= interval.lower,
+                                Int(f"{child.name}#{i}") <= interval.upper
+                                if interval.upper is not None
+                                else True,
+                            )
+                            for interval in child.instance_cardinality.intervals
+                        ]
+                    )
+                )
+
+        for i in range(local_parent_range[0], local_parent_range[1]):
+            # Each parent instance should have a valid number of children instances according to the group instance and type cardinalities
+            # e.g. 3 <= cheddar#0 + swiss#0 + gouda#0 <= 3, 3 <= cheddar#1 + swiss#1 + gouda#1 <= 3,
+            # 3 <= cheddar#2 + swiss#2 + gouda#2 <= 3, 3 <= cheddar#3 + swiss#3 + gouda#3 <= 3
+            if len(feature.group_type_cardinality.intervals) != 0:
+                solver.add(
+                    Or(
+                        [
+                            And(
+                                Sum(
+                                    [
+                                        Int(f"{child.name}#{i}")
+                                        for child in feature.children
+                                    ]
+                                )
+                                >= group_instance_interval.lower,
+                                Sum(
+                                    [
+                                        Int(f"{child.name}#{i}")
+                                        for child in feature.children
+                                    ]
+                                )
+                                <= group_instance_interval.upper
+                                if group_instance_interval.upper is not None
+                                else True,
+                            )
+                            for group_instance_interval in feature.group_instance_cardinality.intervals
+                        ]
+                    )
+                )
+
+            # e.g. 1 <= If(cheddar#0 > 0, 1, 0) + If(swiss#0 > 0, 1, 0) + If(gouda#0 > 0, 1, 0) <= 3, ...
+            if len(feature.group_type_cardinality.intervals) != 0:
+                solver.add(
+                    Or(
+                        [
+                            And(
+                                Sum(
+                                    [
+                                        If(Int(f"{child.name}#{i}") > 0, 1, 0)
+                                        for child in feature.children
+                                    ]
+                                )
+                                >= group_type_interval.lower,
+                                Sum(
+                                    [
+                                        If(Int(f"{child.name}#{i}") > 0, 1, 0)
+                                        for child in feature.children
+                                    ]
+                                )
+                                <= group_type_interval.upper
+                                if group_type_interval.upper is not None
+                                else True,
+                            )
+                            for group_type_interval in feature.group_type_cardinality.intervals
+                        ]
+                    )
+                )
+
+        if solver.check().r <= 0:
+            print(solver)
+
+        model = solver.model()
+        result: list[list[ChildDistribution]] = []
+        for i in range(local_parent_range[0], local_parent_range[1]):
+            distribution: list[ChildDistribution] = []
+            for index, child in enumerate(feature.children):
+                previous_amount = result[-1][index].range[1] if len(result) > 0 else 0
+                distribution.append(
+                    ChildDistribution(
+                        child.name,
+                        (
+                            0 + previous_amount,
+                            model[Int(f"{child.name}#{i}")].as_long() + previous_amount,
+                        ),
+                    )
+                )
+            result.append(distribution)
+        return result
