@@ -20,7 +20,7 @@ def t_wise_sampling(model: CFM, t: int = 1) -> CFM:
     print("Multiset configurations:")
     print(
         json.dumps(
-            [sample for sample in samples],
+            [dict(sorted(sample.items())) for sample in samples],
             indent=2,
         )
     )
@@ -76,7 +76,9 @@ class TWiseSampler:
         self.calculate_literal_set(self.model.root)
 
         # Print literal set in json
-        print(json.dumps([literal for literal in self.literal_set]))
+        literals = [literal for literal in self.literal_set]
+        literals.sort()
+        print(json.dumps(literals, indent=2))
 
         self.calculate_interactions()
 
@@ -198,6 +200,7 @@ class TWiseSampler:
         self,
         feature: Feature,
         parent_f: ArithRef = 1,
+        max_parent: int = 1,
     ):
         f = Int("%s" % feature.name)
 
@@ -214,38 +217,115 @@ class TWiseSampler:
                 )
             )
 
-        fs = [Int("%s" % child.name) for child in feature.children]
+        assert feature.instance_cardinality.intervals[-1].upper is not None
+        new_max_parent = feature.instance_cardinality.intervals[-1].upper * max_parent
 
-        if len(feature.group_instance_cardinality.intervals) != 0:
-            self.smt.add(
-                Or(
-                    [
-                        And(
-                            Sum(fs) >= interval.lower * f,
-                            Sum(fs) <= interval.upper * f,
-                        )
-                        for interval in feature.group_instance_cardinality.intervals
-                    ]
+        # If it is not a leaf node, then it has children
+        if (
+            len(feature.group_instance_cardinality.intervals) != 0
+            or len(feature.group_type_cardinality.intervals) != 0
+        ):
+            # Similar checks to the conversion from multiset to instance set
+            for child in feature.children:
+                cs = [Int(f"{child.name}#{i}") for i in range(new_max_parent)]
+                # Children instances should add up to their global number of instances
+                # e.g. gouda#0 + gouda#1 + gouda#2 + gouda#3 = global_gouda
+                for i in range(new_max_parent):
+                    self.smt.add(
+                        If(f <= i, cs[i] == 0, True),
+                    )
+                self.smt.add(
+                    Sum(cs) == Int(f"{child.name}"),
                 )
-            )
 
-        if len(feature.group_type_cardinality.intervals) != 0:
-            self.smt.add(
-                Or(
-                    [
-                        And(
-                            Sum([If(fi > 0, 1, 0) for fi in fs])
-                            >= interval.lower * If(f > 0, 1, 0),
-                            Sum([If(fi > 0, 1, 0) for fi in fs])
-                            <= interval.upper * If(f > 0, 1, 0),
-                        )
-                        for interval in feature.group_type_cardinality.intervals
-                    ]
+                # Children instances should be within the instance cardinality intervals
+                # e.g gouda#0 >= 0, gouda#0 <= 3, gouda#1 >= 0, gouda#1 <= 3, gouda#2 >= 0, gouda#2 <= 3, gouda#3 >= 0, gouda#3 <= 3
+                for i in range(new_max_parent):
+                    self.smt.add(
+                        If(
+                            f > i,
+                            Or(
+                                [
+                                    And(
+                                        cs[i] >= interval.lower,
+                                        cs[i] <= interval.upper
+                                        if interval.upper is not None
+                                        else True,
+                                    )
+                                    for interval in child.instance_cardinality.intervals
+                                ]
+                            ),
+                            True,
+                        ),
+                    )
+
+            for i in range(new_max_parent):
+                # Each parent instance should have a valid number of children instances according to the group instance and type cardinalities
+                # e.g. 3 <= cheddar#0 + swiss#0 + gouda#0 <= 3, 3 <= cheddar#1 + swiss#1 + gouda#1 <= 3,
+                # 3 <= cheddar#2 + swiss#2 + gouda#2 <= 3, 3 <= cheddar#3 + swiss#3 + gouda#3 <= 3
+                self.smt.add(
+                    If(
+                        f > i,
+                        Or(
+                            [
+                                And(
+                                    Sum(
+                                        [
+                                            Int(f"{child.name}#{i}")
+                                            for child in feature.children
+                                        ]
+                                    )
+                                    >= group_instance_interval.lower,
+                                    Sum(
+                                        [
+                                            Int(f"{child.name}#{i}")
+                                            for child in feature.children
+                                        ]
+                                    )
+                                    <= group_instance_interval.upper
+                                    if group_instance_interval.upper is not None
+                                    else True,
+                                )
+                                for group_instance_interval in feature.group_instance_cardinality.intervals
+                            ]
+                        ),
+                        True,
+                    ),
                 )
-            )
+
+                # e.g. 1 <= If(cheddar#0 > 0, 1, 0) + If(swiss#0 > 0, 1, 0) + If(gouda#0 > 0, 1, 0) <= 3, ...
+                self.smt.add(
+                    If(
+                        f > i,
+                        Or(
+                            [
+                                And(
+                                    Sum(
+                                        [
+                                            If(Int(f"{child.name}#{i}") > 0, 1, 0)
+                                            for child in feature.children
+                                        ]
+                                    )
+                                    >= group_type_interval.lower,
+                                    Sum(
+                                        [
+                                            If(Int(f"{child.name}#{i}") > 0, 1, 0)
+                                            for child in feature.children
+                                        ]
+                                    )
+                                    <= group_type_interval.upper
+                                    if group_type_interval.upper is not None
+                                    else True,
+                                )
+                                for group_type_interval in feature.group_type_cardinality.intervals
+                            ]
+                        ),
+                        True,
+                    ),
+                )
 
         for child in feature.children:
-            self.calculate_smt_model(child, f)
+            self.calculate_smt_model(child, f, new_max_parent)
 
     def calculate_smt_constraints(self):
         for constraint in self.model.constraints:
