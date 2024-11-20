@@ -73,7 +73,7 @@ class TWiseSampler:
         # print(self.smt)
         # print(self.smt.check())
         # print(self.smt.model())
-        self.calculate_literal_set(self.model.root)
+        self.calculate_multiset_literal_set(self.model.root)
 
         # Print literal set in json
         literals = [literal for literal in self.literal_set]
@@ -136,7 +136,7 @@ class TWiseSampler:
                 sample_configuration.update({d.name(): model[d].as_long()})
             self.smt.pop()
 
-    def calculate_literal_set(
+    def calculate_multiset_literal_set(
         self, feature: Feature, lower_factor: int = 1, upper_factor: int = 1
     ):
         min_value = feature.instance_cardinality.intervals[0].lower * lower_factor
@@ -156,7 +156,7 @@ class TWiseSampler:
             self.literal_set.add(Literal(feature.name, max_value))
 
         for child in feature.children:
-            self.calculate_literal_set(
+            self.calculate_multiset_literal_set(
                 child,
                 min_value,
                 max_value,
@@ -406,8 +406,8 @@ class TWiseSampler:
             return configurations
 
         # Get valid children distribution for the current parent instance
-        distribution: list[list[ChildDistribution]] = (
-            self.find_valid_children_distribution(multiset, feature, local_parent_range)
+        distribution: list[list[ChildDistribution]] = self.get_child_distribution(
+            multiset, feature, local_parent_range
         )
 
         for i, i_th_parent in enumerate(distribution):
@@ -443,6 +443,38 @@ class TWiseSampler:
 
         return configurations
 
+    # This uses the instance encoded in the multiset.
+    def get_child_distribution(
+        self,
+        multiset: MultiSetConfiguration,
+        feature: Feature,
+        local_parent_range: tuple[int, int] = (0, 1),
+    ) -> list[list[ChildDistribution]]:
+        if local_parent_range[0] == local_parent_range[1] - 1:
+            return [
+                [
+                    ChildDistribution(child.name, (0, multiset[child.name]))
+                    for child in feature.children
+                ]
+            ]
+        result: list[list[ChildDistribution]] = []
+        for i in range(local_parent_range[0], local_parent_range[1]):
+            distribution: list[ChildDistribution] = []
+            for index, child in enumerate(feature.children):
+                previous_amount = result[-1][index].range[1] if len(result) > 0 else 0
+                distribution.append(
+                    ChildDistribution(
+                        child.name,
+                        (
+                            0 + previous_amount,
+                            multiset[f"{child.name}#{i}"] + previous_amount,
+                        ),
+                    )
+                )
+            result.append(distribution)
+        return result
+
+    # Old function that uses the SMT solver to find a valid instance, in case we get a pure multiset.
     def find_valid_children_distribution(
         self,
         multiset: MultiSetConfiguration,

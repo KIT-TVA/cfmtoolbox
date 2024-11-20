@@ -107,7 +107,7 @@ def test_calculate_literal_set(t_wise_sampler: TWiseSampler):
     t_wise_sampler.smt.reset()
     t_wise_sampler.calculate_smt_model(feature)
     t_wise_sampler.calculate_smt_constraints()
-    t_wise_sampler.calculate_literal_set(feature)
+    t_wise_sampler.calculate_multiset_literal_set(feature)
     assert t_wise_sampler.literal_set == {
         ("Cheese-mix", 0),
         ("Cheese-mix", 2),
@@ -228,18 +228,40 @@ def test_find_valid_children_distribution(t_wise_sampler: TWiseSampler):
 
 def test_convert_multiset_to_one_instance(t_wise_sampler: TWiseSampler):
     multiset = {
-        "cheddar": 4,
         "bread": 2,
-        "wheat": 2,
-        "onion": 2,
-        "tomato": 0,
-        "sourdough": 0,
+        "bread#0": 2,
+        "cheddar": 4,
+        "cheddar#0": 1,
+        "cheddar#1": 1,
+        "cheddar#2": 1,
+        "cheddar#3": 1,
         "cheese-mix": 4,
-        "swiss": 8,
-        "lettuce": 12,
-        "sandwich": 1,
-        "veggies": 1,
+        "cheese-mix#0": 4,
         "gouda": 0,
+        "gouda#0": 0,
+        "gouda#1": 0,
+        "gouda#2": 0,
+        "gouda#3": 0,
+        "lettuce": 12,
+        "lettuce#0": 12,
+        "onion": 2,
+        "onion#0": 2,
+        "sandwich": 1,
+        "sourdough": 0,
+        "sourdough#0": 0,
+        "sourdough#1": 0,
+        "swiss": 8,
+        "swiss#0": 2,
+        "swiss#1": 2,
+        "swiss#2": 2,
+        "swiss#3": 2,
+        "tomato": 0,
+        "tomato#0": 0,
+        "veggies": 1,
+        "veggies#0": 1,
+        "wheat": 2,
+        "wheat#0": 1,
+        "wheat#1": 1,
     }
 
     assert t_wise_sampler.convert_multiset_to_one_instance(
