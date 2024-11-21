@@ -4,7 +4,18 @@ from dataclasses import asdict
 from typing import NamedTuple
 
 import typer
-from z3 import And, ArithRef, If, Implies, Int, Not, Or, Solver, Sum  # type: ignore
+from z3 import (  # type: ignore
+    And,
+    ArithRef,
+    If,
+    Implies,
+    Int,
+    ModelRef,
+    Not,
+    Or,
+    Solver,
+    Sum,
+)
 
 from cfmtoolbox import app
 from cfmtoolbox.models import CFM, ConfigurationNode, Feature
@@ -17,6 +28,35 @@ def t_wise_sampling(model: CFM, t: int = 1) -> CFM:
 
     sampler = TWiseSampler(model, t)
     samples = sampler.t_wise_sampling()
+    print("Multiset configurations:")
+    print(
+        json.dumps(
+            [dict(sorted(sample.items())) for sample in samples],
+            indent=2,
+        )
+    )
+
+    print("Converted Instance configurations:")
+    print(
+        json.dumps(
+            [
+                asdict(sampler.convert_multiset_to_one_instance(sample, model.root)[0])
+                for sample in samples
+            ],
+            indent=2,
+        )
+    )
+
+    return model
+
+
+@app.command()
+def t_wise_sampling_instance_set(model: CFM, t: int = 1) -> CFM:
+    if model.is_unbound:
+        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
+
+    sampler = TWiseSampler(model, t)
+    samples = sampler.t_wise_sampling_instance_set()
     print("Multiset configurations:")
     print(
         json.dumps(
@@ -67,9 +107,26 @@ class TWiseSampler:
         self.model: CFM = model
         self.t: int = t
 
+    def t_wise_sampling_instance_set(self) -> list[MultiSetConfiguration]:
+        self.calculate_full_smt_solver()
+        self.calculate_instance_set_literal_set(self.model.root)
+        # Print literal set in json
+        literals = [literal for literal in self.literal_set]
+        literals.sort()
+        print(json.dumps(literals, indent=2))
+
+        self.calculate_interactions()
+
+        for interaction in self.interactions:
+            # print(f"Covering interaction: {interaction}")
+            self.instance_set_cover(interaction)
+
+        self.autocomplete_sample()
+
+        return self.sample
+
     def t_wise_sampling(self) -> list[MultiSetConfiguration]:
-        self.calculate_smt_model(self.model.root)
-        self.calculate_smt_constraints()
+        self.calculate_full_smt_solver()
         # print(self.smt)
         # print(self.smt.check())
         # print(self.smt.model())
@@ -125,6 +182,63 @@ class TWiseSampler:
                 )
             )
 
+    def instance_set_cover(self, interaction: frozenset[Literal]):
+        if self.check_interaction_covered_instance_set_wise(interaction):
+            # print("Interaction already covered")
+            return
+
+        new_model = self.check_interaction_validity_instance_set_wise(interaction)
+        if new_model is None:
+            # print("Interaction not valid")
+            return
+
+        configuration_model = None
+
+        for configuration in self.sample:
+            configuration_model = (
+                self.check_interaction_validity_in_configuration_instance_set_wise(
+                    interaction, configuration
+                )
+            )
+            if configuration_model is not None:
+                # print("Interaction valid in configuration")
+
+                for literal in interaction:
+                    i = 0
+                    while f"{literal.feature}#{i}" in [
+                        d.name() for d in configuration_model.decls()
+                    ]:
+                        configuration.update(
+                            {
+                                f"{literal.feature}#{i}": configuration_model[
+                                    Int(f"{literal.feature}#{i}")
+                                ].as_long()
+                            }
+                        )
+                        i += 1
+                break
+
+        if configuration_model is None:
+            # print("Interaction not valid in any configuration")
+
+            new_configuration = MultiSetConfiguration()
+            for literal in interaction:
+                i = 0
+                while f"{literal.feature}#{i}" in [d.name() for d in new_model.decls()]:
+                    new_configuration.update(
+                        {
+                            f"{literal.feature}#{i}": new_model[
+                                Int(f"{literal.feature}#{i}")
+                            ].as_long()
+                        }
+                    )
+                    i += 1
+
+            # print("New configuration:")
+            # print(new_configuration)
+
+            self.sample.append(new_configuration)
+
     def autocomplete_sample(self):
         for sample_configuration in self.sample:
             self.smt.push()
@@ -135,6 +249,14 @@ class TWiseSampler:
             for d in model:
                 sample_configuration.update({d.name(): model[d].as_long()})
             self.smt.pop()
+
+    def calculate_instance_set_literal_set(self, feature: Feature):
+        for interval in feature.instance_cardinality.intervals:
+            self.literal_set.add(Literal(feature.name, interval.lower))
+            if interval.upper is not None:
+                self.literal_set.add(Literal(feature.name, interval.upper))
+        for child in feature.children:
+            self.calculate_instance_set_literal_set(child)
 
     def calculate_multiset_literal_set(
         self, feature: Feature, lower_factor: int = 1, upper_factor: int = 1
@@ -195,6 +317,34 @@ class TWiseSampler:
             )
             for configuration in self.sample
         )
+
+    def check_interaction_covered_instance_set_wise(
+        self, interaction: frozenset[Literal]
+    ) -> bool:
+        return any(
+            all(
+                self.check_configuration_instance_covered(configuration, literal)
+                for literal in interaction
+            )
+            for configuration in self.sample
+        )
+
+    def check_configuration_instance_covered(
+        self, configuration: MultiSetConfiguration, literal: Literal
+    ) -> bool:
+        i = 0
+        while f"{literal.feature}#{i}" in configuration:
+            if configuration[f"{literal.feature}#{i}"] == literal.cardinality:
+                return True
+            i += 1
+
+        return False
+
+    def calculate_full_smt_solver(self):
+        self.smt.reset()
+        self.smt.add(Int(f"{self.model.root.name}#0") == 1)
+        self.calculate_smt_model(self.model.root)
+        self.calculate_smt_constraints()
 
     def calculate_smt_model(
         self,
@@ -367,8 +517,6 @@ class TWiseSampler:
 
         self.smt.pop()
 
-        # print(new_solver)
-        # rint(new_solver.check())
         return res
 
     def check_interaction_validity_in_configuration(
@@ -386,9 +534,79 @@ class TWiseSampler:
 
         self.smt.pop()
 
-        # print(new_solver)
-        # rint(new_solver.check())
         return res
+
+    def calculate_max_number_of_parents(self, feature: Feature) -> int:
+        if feature.parent is None:
+            return 1
+        assert feature.parent.instance_cardinality.intervals[-1].upper is not None
+        return feature.parent.instance_cardinality.intervals[
+            -1
+        ].upper * self.calculate_max_number_of_parents(feature.parent)
+
+    # TODO: need to check for feature#i instead of i but max i is unknown at this point, so first we need to find the actual feature and calculate the max amount of parents it can have.
+    # Need a valid model if valid
+    def check_interaction_validity_instance_set_wise(
+        self, interaction: frozenset[Literal]
+    ) -> ModelRef | None:
+        self.smt.push()
+
+        for literal in interaction:
+            feature: Feature = next(
+                feature
+                for feature in self.model.features
+                if feature.name == literal.feature
+            )
+            max_number_of_parents = self.calculate_max_number_of_parents(feature)
+            self.smt.add(
+                Or(
+                    [
+                        Int(f"{literal.feature}#{i}") == literal.cardinality
+                        for i in range(max_number_of_parents)
+                    ]
+                )
+            )
+
+        model = None
+        res = self.smt.check().r > 0
+        if res:
+            model = self.smt.model()
+        self.smt.pop()
+
+        return model
+
+    # TODO: need to check for feature#i instead of i but max i is unknown at this point, so first we need to find the actual feature and calculate the max amount of parents it can have.
+    # Need a valid model if valid
+    def check_interaction_validity_in_configuration_instance_set_wise(
+        self, interaction: frozenset[Literal], configuration: MultiSetConfiguration
+    ) -> ModelRef | None:
+        self.smt.push()
+
+        for literal in interaction:
+            feature: Feature = next(
+                feature
+                for feature in self.model.features
+                if feature.name == literal.feature
+            )
+            self.smt.add(
+                Or(
+                    [
+                        Int(f"{literal.feature}#{i}") == literal.cardinality
+                        for i in range(self.calculate_max_number_of_parents(feature))
+                    ]
+                )
+            )
+
+        for feature_name, cardinality in configuration.items():
+            self.smt.add(Int("%s" % feature_name) == cardinality)
+
+        model = None
+        res = self.smt.check().r > 0
+        if res:
+            model = self.smt.model()
+        self.smt.pop()
+
+        return model
 
     def convert_multiset_to_one_instance(
         self,

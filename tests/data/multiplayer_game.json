@@ -144,6 +144,10 @@
           "intervals": [
             {
               "lower": 2,
+              "upper": 4
+            },
+            {
+              "lower": 6,
               "upper": 8
             }
           ]

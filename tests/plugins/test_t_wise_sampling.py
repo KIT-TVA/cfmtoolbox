@@ -247,6 +247,7 @@ def test_convert_multiset_to_one_instance(t_wise_sampler: TWiseSampler):
         "onion": 2,
         "onion#0": 2,
         "sandwich": 1,
+        "sandwich#0": 1,
         "sourdough": 0,
         "sourdough#0": 0,
         "sourdough#1": 0,
@@ -267,3 +268,12 @@ def test_convert_multiset_to_one_instance(t_wise_sampler: TWiseSampler):
     assert t_wise_sampler.convert_multiset_to_one_instance(
         multiset, t_wise_sampler.model.root
     )[0].validate(t_wise_sampler.model)
+
+
+def test_calculate_max_number_of_parents(t_wise_sampler: TWiseSampler):
+    feature: Feature = next(
+        feature
+        for feature in t_wise_sampler.model.features
+        if feature.name == "cheddar"
+    )
+    assert t_wise_sampler.calculate_max_number_of_parents(feature) == 4
