@@ -109,7 +109,7 @@
           "intervals": [
             {
               "lower": 1,
-              "upper": 3
+              "upper": 2
             }
           ]
         },
@@ -323,6 +323,49 @@
           {
             "lower": 2,
             "upper": null
+          }
+        ]
+      }
+    },
+    {
+      "require": false,
+      "first_feature_name": "sandwich",
+      "first_cardinality": {
+        "intervals": [
+          {
+            "lower": 1,
+            "upper": 1
+          }
+        ]
+      },
+      "second_feature_name": "gouda",
+      "second_cardinality": {
+        "intervals": [
+          {
+            "lower": 12,
+            "upper": 12
+          }
+        ]
+      }
+    },
+    
+    {
+      "require": false,
+      "first_feature_name": "sandwich",
+      "first_cardinality": {
+        "intervals": [
+          {
+            "lower": 1,
+            "upper": 1
+          }
+        ]
+      },
+      "second_feature_name": "swiss",
+      "second_cardinality": {
+        "intervals": [
+          {
+            "lower": 5,
+            "upper": 5
           }
         ]
       }

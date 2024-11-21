@@ -139,4 +139,4 @@ def test_command_prevent_typer_from_including_the_cfm_argument_in_the_cli():
 def test_load_plugins_loads_all_core_plugins():
     app = CFMToolbox()
     plugins = app.load_plugins()
-    assert len(plugins) == 10
+    assert len(plugins) == 11
