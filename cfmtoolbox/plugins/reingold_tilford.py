@@ -46,7 +46,6 @@ class GraphLayout:
 
 
     def set_initial_pos(self) -> None:
-        # TODO: y coords depending on the width of the whole tree
         for y in range(len(self.bfs)):
             for i in range(len(self.bfs[y])):
                 name = self.bfs[y][i]
@@ -106,9 +105,7 @@ class GraphLayout:
                 for j in range(0, min(len(current_right_contour), len(next_left_contour))):
                     sum_left += next_left_contour[j]
                     sum_right += current_right_contour[j]
-                    # TODO: Textlänge berücksichtigen
                     d[i] = max(d[i], sum_right - sum_left)
-                    # d[i] = max(d[i], sum_right - sum_left + self.scale_text * len(children[i - 1]) + self.scale_text * len(children[i]))
                 d[i] += 20
 
                 new_right_contour = children_contours[children[i]][1]
@@ -143,33 +140,11 @@ class GraphLayout:
 
             return left_contour, right_contour
         
-    def shift_when_overlap(self) -> None:
-        '''
-        Iterates through the tree in postorder and checks whether the left contour of the node overlaps with the right contour of the nodes left siblings.
-        If there is an overlap, the node is shifted to the right to avoid the overlap.
-        '''
-        
-        for node in list(nx.dfs_postorder_nodes(G=self.G, source=self.root)):
-            has_left_siblings, left_siblings = self._left_siblings(node)
-            if has_left_siblings:
-                for sibling in left_siblings:
-                    left_contour = self._left_contour(node)
-                    right_contour = self._right_contour(sibling)
-                    difference = [l - r for l, r in zip(right_contour, left_contour)]
-                    shift = max(0, max(difference))
-                    if shift > 0:
-                        shift += len(node) + 5
-                        self.mod[node] += shift
-                        self.pos[node][0] += shift 
-                        self.compute_x(node)
-        
     def _draw_edges(self, ax, height) -> None:
         for edge in self.G.edges():
             start_pos = (self.pos[edge[0]][0], self.pos[edge[0]][1] - height / 2)
             end_pos = (self.pos[edge[1]][0], self.pos[edge[1]][1] + height / 2)
             ax.plot([start_pos[0], end_pos[0]], [start_pos[1], end_pos[1]], color='black', linewidth=1.5, zorder=1)
-            # mid_pos = ((start_pos[0] + end_pos[0]) / 2, (start_pos[1] + end_pos[1]) / 2)
-            # ax.text(mid_pos[0] - 5, mid_pos[1], '<1..1>', horizontalalignment='center', verticalalignment='center', fontsize=10, color='black')
         
     def _draw_rectangles(self, ax, height, width_scale) -> None:
         for node in self.G.nodes:
@@ -190,7 +165,7 @@ class GraphLayout:
                 angle2 = np.degrees(np.arctan2(new_y - (y - height / 2), (x2 - self.pos[node][0]))) % 360
                 ax.add_patch(patches.Wedge((x, y - height/2), 1.5 * height, angle1, angle2, edgecolor='black', facecolor='white', fill=True ,zorder=2))
 
-    def add_cardinality(self, ax, height, cfm: CFM) -> None:
+    def _add_cardinality(self, ax, height, cfm: CFM) -> None:
         for node in cfm.features:
             x, y = self.pos[node.name]
             children = node.children
@@ -223,7 +198,7 @@ class GraphLayout:
             for child in children:
                 self.compute_x(child)
 
-    def set_final_y(self, scale: float) -> None:
+    def _set_final_y(self, scale: float) -> None:
         """
         Because of the different ratios of the x and y positions, the y positions have to be scaled to get a better visualization.
         """
@@ -232,7 +207,6 @@ class GraphLayout:
             self.pos[node][1] *= scale
 
     def _get_width(self) -> float:
-        # bfs = list(nx.bfs_layers(self.G, sources=self.root))
         min = 0
         max = 0
         for level in self.bfs:
@@ -265,13 +239,13 @@ class GraphLayout:
     def display_graph(self, format: str, cfm: CFM, height=20, width=10) -> bytes:
         tree_width = self._get_width()
         scale = tree_width / (2 * len(self.bfs))
-        self.set_final_y(scale)
+        self._set_final_y(scale)
         _, ax = plt.subplots(figsize=(height, width))
         h = scale / 5
         s = scale / 17
         self._draw_edges(ax, h)
         self._draw_rectangles(ax, h, s)
-        self.add_cardinality(ax, h, cfm)
+        self._add_cardinality(ax, h, cfm)
 
         x_values = [self.pos[node][0] for node in self.G.nodes]
         y_values = [self.pos[node][1] for node in self.G.nodes]

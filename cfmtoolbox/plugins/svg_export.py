@@ -9,9 +9,6 @@ def export_jpg(cfm: CFM) -> bytes:
     layout.set_initial_pos()
     layout.compute_shift(root.name)
     layout.compute_x(root.name)
-    # layout.shift_when_overlap()
-    # layout.compute_x(root.name)
-    # layout.set_final_y()
     return layout.display_graph(format='svg', cfm=cfm)
 
 def create_tree(cfm: CFM, root: Feature) -> GraphLayout:
