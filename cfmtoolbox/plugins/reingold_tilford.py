@@ -13,7 +13,7 @@ class GraphLayout:
     An adaption had to be made to account for the different lengths of feature names.
     """
 
-    def __init__(self, G, root):
+    def __init__(self, G: nx.DiGraph, root: str) -> None:
         self.G = G
         self.root = root
         self.pos = nx.random_layout(G)
@@ -22,17 +22,17 @@ class GraphLayout:
         self.bfs = list(nx.bfs_layers(G=self.G,sources=self.root))
         self.contours = {}
 
-    def _get_children(self, node) -> Tuple[bool, List[str]]:
+    def _get_children(self, node: str) -> Tuple[bool, List[str]]:
         child =list(self.G.successors(node))
         has_child = len(child) > 0
         return has_child, child
 
-    def _get_parent(self, node) -> Tuple[bool, List[str]]:
+    def _get_parent(self, node: str) -> Tuple[bool, List[str]]:
         parent = list(self.G.predecessors(node))
         has_parent = len(parent) > 0
         return has_parent, parent
 
-    def _left_siblings(self, node) -> Tuple[bool, List[str]]:
+    def _left_siblings(self, node: str) -> Tuple[bool, List[str]]:
         if self.pos[node][1] == 0:
             return False, []
         has_parent, parent = self._get_parent(node)
@@ -52,7 +52,7 @@ class GraphLayout:
                 self.pos[name][1] = -y
 
 
-    def _right_contour(self, node) -> List[float]:
+    def _right_contour(self, node: str) -> List[float]:
         """
         Calculate the right contour of a node. The right contour is the right boundary of the subtree rooted at the node.
         """
@@ -64,7 +64,7 @@ class GraphLayout:
             right_contour.append(x)
         return right_contour
     
-    def _left_contour(self, node) -> List[float]:
+    def _left_contour(self, node: str) -> List[float]:
         """
         Calculate the left contour of a node. The left contour is the left boundary of the subtree rooted at the node.
         """
@@ -76,7 +76,7 @@ class GraphLayout:
             left_contour.append(x)
         return left_contour
 
-    def compute_shift(self, node) -> Tuple[List[int], List[int]]:
+    def compute_shift(self, node: str) -> Tuple[List[int], List[int]]:
         """
         The shifts are calculated recursively from bottom to top. For each subtree, a contour is calculated that
         describes the left and right boundary of the subtree. These subtrees are then placed as close to each other as
@@ -183,13 +183,13 @@ class GraphLayout:
             ax.text(x + shift, y + 1.5 * height / 2, instance_cardinality, horizontalalignment='center', verticalalignment='center', fontsize=10)
 
 
-    def compute_x(self, node) -> None:
+    def compute_x(self, node: str) -> None:
         """
         Compute the x position of the node. The x position is calculated by adding the mod value of the node and the parents x position to the x value
         """
 
-        has_parent, parent = self._get_parent(node)
-        if not has_parent:
+        _, parent = self._get_parent(node)
+        if node == self.root:
             self.pos[node][0] = 0
         else:
             self.pos[node][0] = self.pos[parent[0]][0] + self.mod[node]
