@@ -53,6 +53,7 @@ one-wise-sampling = "cfmtoolbox.plugins.one_wise_sampling"
 png-export = "cfmtoolbox.plugins.png_export"
 svg-export = "cfmtoolbox.plugins.svg_export"
 subtree = "cfmtoolbox.plugins.subtree"
+level = "cfmtoolbox.plugins.levels"
 
 [tool.ruff.lint]
 extend-select = ["I"]
