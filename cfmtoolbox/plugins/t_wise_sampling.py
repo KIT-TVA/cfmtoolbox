@@ -1,6 +1,10 @@
+# import cProfile
 import itertools
 import json
-from dataclasses import asdict
+import random
+import timeit
+
+# from dataclasses import asdict
 from typing import NamedTuple
 
 import typer
@@ -18,16 +22,19 @@ from z3 import (  # type: ignore
 )
 
 from cfmtoolbox import app
+from cfmtoolbox.dict_cache import DictCache
 from cfmtoolbox.models import CFM, ConfigurationNode, Feature
 
 
 @app.command()
-def t_wise_sampling(model: CFM, t: int = 1) -> CFM:
+def t_wise_sampling(model: CFM, t: int = 1, m: int = 1, cache_size: int = 50) -> CFM:
     if model.is_unbound:
         raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
-
-    sampler = TWiseSampler(model, t)
+    # profiler = cProfile.Profile()
+    sampler = TWiseSampler(model, t, m, cache_size)
+    # profiler.enable()
     samples = sampler.t_wise_sampling()
+    # profiler.disable()
     print("Multiset configurations:")
     print(
         json.dumps(
@@ -36,27 +43,36 @@ def t_wise_sampling(model: CFM, t: int = 1) -> CFM:
         )
     )
 
-    print("Converted Instance configurations:")
-    print(
-        json.dumps(
-            [
-                asdict(sampler.convert_multiset_to_one_instance(sample, model.root)[0])
-                for sample in samples
-            ],
-            indent=2,
-        )
-    )
+    # print("len(samples):", len(samples))
+
+    # print("Converted Instance configurations:")
+    # print(
+    #    json.dumps(
+    #        [
+    #            asdict(sampler.convert_multiset_to_one_instance(sample, model.root)[0])
+    #            for sample in samples
+    #        ],
+    #        indent=2,
+    #    )
+    # )
+    # profiler.print_stats(sort="cumulative")
+    time_taken = timeit.timeit(sampler.t_wise_sampling, number=1)
+    print(f"Time taken: {time_taken} seconds")
 
     return model
 
 
 @app.command()
-def t_wise_sampling_instance_set(model: CFM, t: int = 1) -> CFM:
+def t_wise_sampling_instance_set(
+    model: CFM, t: int = 1, m: int = 1, cache_size: int = 50
+) -> CFM:
     if model.is_unbound:
         raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
-
-    sampler = TWiseSampler(model, t)
+    # profiler = cProfile.Profile()
+    sampler = TWiseSampler(model, t, m, cache_size)
+    # profiler.enable()
     samples = sampler.t_wise_sampling_instance_set()
+    # profiler.disable()
     print("Multiset configurations:")
     print(
         json.dumps(
@@ -65,17 +81,19 @@ def t_wise_sampling_instance_set(model: CFM, t: int = 1) -> CFM:
         )
     )
 
-    print("Converted Instance configurations:")
-    print(
-        json.dumps(
-            [
-                asdict(sampler.convert_multiset_to_one_instance(sample, model.root)[0])
-                for sample in samples
-            ],
-            indent=2,
-        )
-    )
-
+    # print("Converted Instance configurations:")
+    # print(
+    #    json.dumps(
+    #        [
+    #            asdict(sampler.convert_multiset_to_one_instance(sample, model.root)[0])
+    #            for sample in samples
+    #        ],
+    #        indent=2,
+    #    )
+    # )
+    time_taken = timeit.timeit(sampler.t_wise_sampling_instance_set, number=1)
+    print(f"Time taken: {time_taken} seconds")
+    # profiler.print_stats(sort="cumulative")
     return model
 
 
@@ -92,7 +110,7 @@ ChildDistribution = NamedTuple(
 
 # The TWiseSampler class is responsible for generating t-wise samples under the definitions of Multi-Set, Boundary-Interior Coverage and global constraints
 class TWiseSampler:
-    def __init__(self, model: CFM, t: int):
+    def __init__(self, model: CFM, t: int, m: int = 1, cache_size: int = 50):
         # The literal set is the set of literals that need to be t-wise covered by the sample
         self.literal_set: set[Literal] = set()
 
@@ -102,10 +120,16 @@ class TWiseSampler:
         # The sample is the current sample being generated
         self.sample: list[MultiSetConfiguration] = []
 
+        self.smallest_sample: list[MultiSetConfiguration] = []
+
         self.smt: Solver = Solver()
+
+        self.configuration_cache: DictCache = DictCache(max_size=cache_size)
+        # self.configuration_cache: LRUDictCache = LRUDictCache(max_size=cache_size)
 
         self.model: CFM = model
         self.t: int = t
+        self.m: int = m
 
     def t_wise_sampling_instance_set(self) -> list[MultiSetConfiguration]:
         self.calculate_full_smt_solver()
@@ -113,13 +137,27 @@ class TWiseSampler:
         # Print literal set in json
         literals = [literal for literal in self.literal_set]
         literals.sort()
-        print(json.dumps(literals, indent=2))
-
+        # print(json.dumps(literals, indent=2))
         self.calculate_interactions()
+        shuffled_interactions = list(self.interactions)
+        for i in range(self.m):
+            self.save_smallest_sample()
+            self.trim_sample(True)
+            random.shuffle(shuffled_interactions)
+            for interaction in shuffled_interactions:
+                # print(f"Covering interaction: {interaction}")
+                # self.instance_set_cover(interaction)
+                self.instance_set_cover_optimized(interaction)
 
-        for interaction in self.interactions:
-            # print(f"Covering interaction: {interaction}")
-            self.instance_set_cover(interaction)
+        if len(self.smallest_sample) != 0 and len(self.smallest_sample) < len(
+            self.sample
+        ):
+            # print("Returning smallest sample")
+            # print(len(self.smallest_sample))
+            self.sample = self.smallest_sample
+
+        # for configuration in self.sample:
+        #    print(configuration)
 
         self.autocomplete_sample()
 
@@ -135,7 +173,7 @@ class TWiseSampler:
         # Print literal set in json
         literals = [literal for literal in self.literal_set]
         literals.sort()
-        print(json.dumps(literals, indent=2))
+        # print(json.dumps(literals, indent=2))
 
         self.calculate_interactions()
 
@@ -145,13 +183,98 @@ class TWiseSampler:
         #         [list(interaction) for interaction in self.interactions],
         #     )
         # )
+        shuffled_interactions = list(self.interactions)
+        for i in range(self.m):
+            self.save_smallest_sample()
+            self.trim_sample()
+            random.shuffle(shuffled_interactions)
+            for interaction in shuffled_interactions:
+                # print(f"Covering interaction: {interaction}")
+                # self.cover(interaction)
+                self.cover_optimized(interaction)
 
-        for interaction in self.interactions:
-            self.cover(interaction)
+        if len(self.smallest_sample) != 0 and len(self.smallest_sample) < len(
+            self.sample
+        ):
+            self.sample = self.smallest_sample
 
         self.autocomplete_sample()
 
         return self.sample
+
+    def cover_optimized(self, interaction: frozenset[Literal]):
+        # Line 1
+        if self.check_interaction_covered(interaction):
+            # print("Interaction already covered")
+            return
+
+        # Get filtered sample S' (Line 2)
+        filtered_sample_indices: list[int] = []
+        for index, configuration in enumerate(self.sample):
+            if not any(
+                self.check_for_contradicting_literal(configuration, literal)
+                for literal in interaction
+            ):
+                filtered_sample_indices.append(index)
+
+        # print("interaction: ", interaction)
+        # print("original sample: ")
+        # for configuration in self.sample:
+        #    print(configuration)
+        # print("filtered sample: ")
+        # for index in filtered_sample_indices:
+        #    print(self.sample[index])
+        # print("done")
+
+        configuration_found = False
+
+        # Line 3 to 6
+        for index in filtered_sample_indices:
+            configuration = self.sample[index]
+            if self.check_cache_for_interaction_validity_in_configuration(
+                interaction, configuration
+            ):
+                for literal in interaction:
+                    configuration.update({literal.feature: literal.cardinality})
+                configuration_found = True
+                return
+
+        # Line 7
+        if not self.check_cache_for_interaction_validity(interaction):
+            # Line 8 to 9
+            if not self.check_interaction_validity_and_cache(interaction):
+                # print("Interaction not valid")
+                return
+
+        # Line 10 to 14
+        for index in filtered_sample_indices:
+            configuration = self.sample[index]
+            if self.check_interaction_validity_in_configuration_and_cache(
+                interaction, configuration
+            ):
+                # print("Interaction valid in configuration")
+                for literal in interaction:
+                    configuration.update({literal.feature: literal.cardinality})
+                configuration_found = True
+                break
+
+        # Line 15
+        if not configuration_found:
+            # print("Interaction not valid in any configuration")
+            self.sample.append(
+                MultiSetConfiguration(
+                    {literal.feature: literal.cardinality for literal in interaction}
+                )
+            )
+
+    def check_for_contradicting_literal(
+        self, configuration: MultiSetConfiguration, literal: Literal
+    ) -> bool:
+        return (
+            literal.cardinality != configuration[literal.feature]
+            if literal.feature in configuration
+            else False
+        )
 
     def cover(self, interaction: frozenset[Literal]):
         if self.check_interaction_covered(interaction):
@@ -181,6 +304,106 @@ class TWiseSampler:
                     {literal.feature: literal.cardinality for literal in interaction}
                 )
             )
+
+    def instance_set_cover_optimized(self, interaction: frozenset[Literal]):
+        # Line 1
+        if self.check_interaction_covered_instance_set_wise(interaction):
+            # print("Interaction already covered")
+            return
+
+        # Get filtered sample S' (Line 2) doesn't work in concept because another instance could have the wanted cardinality
+
+        configuration_model = None
+
+        # Line 3 to 6
+        for configuration in self.sample:
+            configuration_model = self.check_cache_for_interaction_validity_in_configuration_instance_set_wise(
+                interaction, configuration
+            )
+            if configuration_model is not None:
+                for literal in interaction:
+                    i = 0
+                    while f"{literal.feature}#{i}" in configuration_model:
+                        configuration.update(
+                            {
+                                f"{literal.feature}#{i}": configuration_model[
+                                    f"{literal.feature}#{i}"
+                                ]
+                            }
+                        )
+                        i += 1
+                return
+
+        new_model = None
+        # Line 7
+        new_model = self.check_cache_for_interaction_validity_instance_set_wise(
+            interaction
+        )
+        if new_model is None:
+            # Line 8 to 9
+            new_model = self.check_interaction_validity_instance_set_wise_and_cache(
+                interaction
+            )
+            if new_model is None:
+                # print("Interaction not valid")
+                return
+
+        # Line 10 to 14
+        for configuration in self.sample:
+            configuration_model = self.check_interaction_validity_in_configuration_instance_set_wise_and_cache(
+                interaction, configuration
+            )
+            if configuration_model is not None:
+                # print("Interaction valid in configuration")
+
+                for literal in interaction:
+                    i = 0
+                    while f"{literal.feature}#{i}" in [
+                        d.name() for d in configuration_model.decls()
+                    ]:
+                        configuration.update(
+                            {
+                                f"{literal.feature}#{i}": configuration_model[
+                                    Int(f"{literal.feature}#{i}")
+                                ].as_long()
+                            }
+                        )
+                        i += 1
+                break
+
+        # Line 15
+        if configuration_model is None:
+            # print("Interaction not valid in any configuration")
+
+            new_configuration = MultiSetConfiguration()
+            if isinstance(new_model, ModelRef):
+                for literal in interaction:
+                    i = 0
+                    while f"{literal.feature}#{i}" in [
+                        d.name() for d in new_model.decls()
+                    ]:
+                        new_configuration.update(
+                            {
+                                f"{literal.feature}#{i}": new_model[
+                                    Int(f"{literal.feature}#{i}")
+                                ].as_long()
+                            }
+                        )
+                        i += 1
+            else:
+                for literal in interaction:
+                    i = 0
+                    while f"{literal.feature}#{i}" in new_model:
+                        new_configuration.update(
+                            {
+                                f"{literal.feature}#{i}": new_model[
+                                    f"{literal.feature}#{i}"
+                                ]
+                            }
+                        )
+                        i += 1
+
+            self.sample.append(new_configuration)
 
     def instance_set_cover(self, interaction: frozenset[Literal]):
         if self.check_interaction_covered_instance_set_wise(interaction):
@@ -238,6 +461,75 @@ class TWiseSampler:
             # print(new_configuration)
 
             self.sample.append(new_configuration)
+
+    def trim_sample(self, instance_set_wise: bool = False):
+        if (len(self.sample) == 0) or (len(self.sample) == 1):
+            return
+        interaction_configuration_cover_matrix = []
+        number_of_uniquely_covered_interactions = [0 for _ in self.sample]
+        for interaction in self.interactions:
+            interaction_coverage = []
+            for configuration in self.sample:
+                if instance_set_wise:
+                    if all(
+                        self.check_configuration_instance_covered(
+                            configuration, literal
+                        )
+                        for literal in interaction
+                    ):
+                        interaction_coverage.append(1)
+                    else:
+                        interaction_coverage.append(0)
+                else:
+                    if all(
+                        literal.cardinality == configuration[literal.feature]
+                        if literal.feature in configuration
+                        else False
+                        for literal in interaction
+                    ):
+                        interaction_coverage.append(1)
+                    else:
+                        interaction_coverage.append(0)
+            if sum(interaction_coverage) == 1:
+                interaction_configuration_cover_matrix.append(interaction_coverage)
+                for index, value in enumerate(interaction_coverage):
+                    number_of_uniquely_covered_interactions[index] += value
+        # print(interaction_configuration_cover_matrix)
+        # print(number_of_uniquely_covered_interactions)
+        ranks: list[float] = []
+        for index, configuration in enumerate(self.sample):
+            # print(configuration)
+            number_of_defined_features = self.calculate_number_of_defined_features(
+                configuration
+            )
+            # print(number_of_defined_features)
+            rank = number_of_uniquely_covered_interactions[index] / (
+                number_of_defined_features**self.t
+            )
+            ranks.append(rank)
+        # print(ranks)
+        mean = sum(ranks) / len(ranks)
+        # print(mean)
+        for reverse_index, rank in enumerate(reversed(ranks)):
+            original_index = len(ranks) - 1 - reverse_index
+            if rank < mean:
+                self.sample.pop(original_index)
+        # for configuration in self.sample:
+        # print(configuration)
+
+    def calculate_number_of_defined_features(
+        self, configuration: MultiSetConfiguration
+    ) -> int:
+        features = {feature.split("#")[0] for feature in configuration.keys()}
+        return len(features)
+
+    def save_smallest_sample(self):
+        if len(self.smallest_sample) == 0 or len(self.sample) < len(
+            self.smallest_sample
+        ):
+            self.smallest_sample = self.sample.copy()
+            # print("New smallest sample:")
+            # print(len(self.smallest_sample))
 
     def autocomplete_sample(self):
         for sample_configuration in self.sample:
@@ -536,6 +828,86 @@ class TWiseSampler:
 
         return res
 
+    def check_interaction_validity_and_cache(
+        self, interaction: frozenset[Literal]
+    ) -> bool:
+        self.smt.push()
+
+        for literal in interaction:
+            self.smt.add(Int("%s" % literal.feature) == literal.cardinality)
+
+        model = None
+        res = self.smt.check().r > 0
+        if res:
+            model = self.smt.model()
+            new_configuration = self.convert_model_into_multiset_configuration(model)
+            self.configuration_cache.add(new_configuration)
+
+        self.smt.pop()
+
+        return res
+
+    def check_interaction_validity_in_configuration_and_cache(
+        self, interaction: frozenset[Literal], configuration: MultiSetConfiguration
+    ) -> bool:
+        self.smt.push()
+
+        for literal in interaction:
+            self.smt.add(Int("%s" % literal.feature) == literal.cardinality)
+
+        for feature, cardinality in configuration.items():
+            self.smt.add(Int("%s" % feature) == cardinality)
+
+        model = None
+        res = self.smt.check().r > 0
+        if res:
+            model = self.smt.model()
+            new_configuration = self.convert_model_into_multiset_configuration(model)
+            self.configuration_cache.add(new_configuration)
+
+        self.smt.pop()
+
+        return res
+
+    def check_cache_for_interaction_validity_in_configuration(
+        self, interaction: frozenset[Literal], configuration: MultiSetConfiguration
+    ) -> bool:
+        return self.configuration_cache.contains(
+            lambda x: all(
+                literal.cardinality == x[literal.feature]
+                if literal.feature in x
+                else False
+                for literal in interaction
+            )
+            and all(
+                cardinality == x[feature] if feature in x else False
+                for feature, cardinality in configuration.items()
+            )
+        )
+
+    def check_cache_for_interaction_validity(
+        self, interaction: frozenset[Literal]
+    ) -> bool:
+        return self.configuration_cache.contains(
+            lambda x: all(
+                literal.cardinality == x[literal.feature]
+                if literal.feature in x
+                else False
+                for literal in interaction
+            )
+        )
+
+    def convert_model_into_multiset_configuration(
+        self, model: ModelRef
+    ) -> MultiSetConfiguration:
+        new_configuration = MultiSetConfiguration()
+        for decl in model.decls():
+            feature: str = decl.name()
+            cardinality = model[decl].as_long()
+            if "#" not in feature:
+                new_configuration.update({f"{feature}": cardinality})
+        return new_configuration
+
     def calculate_max_number_of_parents(self, feature: Feature) -> int:
         if feature.parent is None:
             return 1
@@ -544,7 +916,6 @@ class TWiseSampler:
             -1
         ].upper * self.calculate_max_number_of_parents(feature.parent)
 
-    # TODO: need to check for feature#i instead of i but max i is unknown at this point, so first we need to find the actual feature and calculate the max amount of parents it can have.
     # Need a valid model if valid
     def check_interaction_validity_instance_set_wise(
         self, interaction: frozenset[Literal]
@@ -575,7 +946,6 @@ class TWiseSampler:
 
         return model
 
-    # TODO: need to check for feature#i instead of i but max i is unknown at this point, so first we need to find the actual feature and calculate the max amount of parents it can have.
     # Need a valid model if valid
     def check_interaction_validity_in_configuration_instance_set_wise(
         self, interaction: frozenset[Literal], configuration: MultiSetConfiguration
@@ -607,6 +977,105 @@ class TWiseSampler:
         self.smt.pop()
 
         return model
+
+    def check_interaction_validity_instance_set_wise_and_cache(
+        self, interaction: frozenset[Literal]
+    ) -> ModelRef | None:
+        self.smt.push()
+
+        for literal in interaction:
+            feature: Feature = next(
+                feature
+                for feature in self.model.features
+                if feature.name == literal.feature
+            )
+            max_number_of_parents = self.calculate_max_number_of_parents(feature)
+            self.smt.add(
+                Or(
+                    [
+                        Int(f"{literal.feature}#{i}") == literal.cardinality
+                        for i in range(max_number_of_parents)
+                    ]
+                )
+            )
+
+        model = None
+        res = self.smt.check().r > 0
+        if res:
+            model = self.smt.model()
+            new_configuration = self.convert_model_into_instance_set_configuration(
+                model
+            )
+            self.configuration_cache.add(new_configuration)
+        self.smt.pop()
+
+        return model
+
+    def check_interaction_validity_in_configuration_instance_set_wise_and_cache(
+        self, interaction: frozenset[Literal], configuration: MultiSetConfiguration
+    ) -> ModelRef | None:
+        self.smt.push()
+
+        for literal in interaction:
+            feature: Feature = next(
+                feature
+                for feature in self.model.features
+                if feature.name == literal.feature
+            )
+            self.smt.add(
+                Or(
+                    [
+                        Int(f"{literal.feature}#{i}") == literal.cardinality
+                        for i in range(self.calculate_max_number_of_parents(feature))
+                    ]
+                )
+            )
+
+        for feature_name, cardinality in configuration.items():
+            self.smt.add(Int("%s" % feature_name) == cardinality)
+
+        model = None
+        res = self.smt.check().r > 0
+        if res:
+            model = self.smt.model()
+            new_configuration = self.convert_model_into_instance_set_configuration(
+                model
+            )
+            self.configuration_cache.add(new_configuration)
+        self.smt.pop()
+
+        return model
+
+    def convert_model_into_instance_set_configuration(
+        self, model: ModelRef
+    ) -> MultiSetConfiguration:
+        new_configuration = MultiSetConfiguration()
+        for decl in model.decls():
+            feature: str = decl.name()
+            cardinality = model[decl].as_long()
+            new_configuration.update({f"{feature}": cardinality})
+        return new_configuration
+
+    def check_cache_for_interaction_validity_in_configuration_instance_set_wise(
+        self, interaction: frozenset[Literal], configuration: MultiSetConfiguration
+    ) -> MultiSetConfiguration | None:
+        return self.configuration_cache.find(
+            lambda x: all(
+                self.check_configuration_instance_covered(x, literal)
+                for literal in interaction
+            )
+            and all(item in x.items() for item in configuration.items())
+        )
+
+    def check_cache_for_interaction_validity_instance_set_wise(
+        self, interaction: frozenset[Literal]
+    ) -> MultiSetConfiguration | None:
+        return self.configuration_cache.find(
+            lambda x: all(
+                self.check_configuration_instance_covered(x, literal)
+                for literal in interaction
+            )
+        )
 
     def convert_multiset_to_one_instance(
         self,
