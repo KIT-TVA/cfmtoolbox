@@ -32,20 +32,12 @@ class GraphLayout:
         has_parent = len(parent) > 0
         return has_parent, parent
 
-    def _left_siblings(self, node: str) -> Tuple[bool, List[str]]:
-        if self.pos[node][1] == 0:
-            return False, []
-        has_parent, parent = self._get_parent(node)
-        if not has_parent:
-            return False, []
-        _, siblings = self._get_children(parent[0])
-        node_index = siblings.index(node)
-        if node_index == 0:
-            return False, []
-        return True, siblings[:node_index]
-
 
     def set_initial_pos(self) -> None:
+        """
+        Sets the initial positions of the features in the feature model.
+        """
+
         for y in range(len(self.bfs)):
             for i in range(len(self.bfs[y])):
                 name = self.bfs[y][i]
@@ -55,6 +47,7 @@ class GraphLayout:
     def _right_contour(self, node: str) -> List[float]:
         """
         Calculate the right contour of a node. The right contour is the right boundary of the subtree rooted at the node.
+        :param node: The node for which the right contour should be calculated
         """
 
         bfs = list(nx.bfs_layers(self.G, sources=node))
@@ -67,6 +60,7 @@ class GraphLayout:
     def _left_contour(self, node: str) -> List[float]:
         """
         Calculate the left contour of a node. The left contour is the left boundary of the subtree rooted at the node.
+        :param node: The node for which the left contour should be calculated
         """
 
         bfs = list(nx.bfs_layers(self.G, sources=node))
@@ -82,6 +76,7 @@ class GraphLayout:
         describes the left and right boundary of the subtree. These subtrees are then placed as close to each other as
         possible without overlapping. The parent is placed in the middle of the children and the shifts of the children
         are calculated relative to the parent.
+        :param node: The node for which the shift should be calculated
         """
 
         left_contour, right_contour = [- self.scale_text * len(node)], [self.scale_text * len(node)]
@@ -141,12 +136,25 @@ class GraphLayout:
             return left_contour, right_contour
         
     def _draw_edges(self, ax, height) -> None:
+        """
+        Draws the edges between the features in the feature model. 
+        :param ax: The axes object of the plot
+        :param height: The height of the rectangles
+        """
+
         for edge in self.G.edges():
             start_pos = (self.pos[edge[0]][0], self.pos[edge[0]][1] - height / 2)
             end_pos = (self.pos[edge[1]][0], self.pos[edge[1]][1] + height / 2)
             ax.plot([start_pos[0], end_pos[0]], [start_pos[1], end_pos[1]], color='black', linewidth=1.5, zorder=1)
         
     def _draw_rectangles(self, ax, height, width_scale) -> None:
+        """
+        Draws the rectangles for the features in the feature model. The rectangles are centered around the x position of the feature.
+        :param ax: The axes object of the plot
+        :param height: The height of the rectangles
+        :param width_scale: The scaling factor for the width of the rectangles
+        """
+
         for node in self.G.nodes:
             x, y = self.pos[node]
             width = len(str(node)) * width_scale
@@ -166,26 +174,34 @@ class GraphLayout:
                 ax.add_patch(patches.Wedge((x, y - height/2), 1.5 * height, angle1, angle2, edgecolor='black', facecolor='white', fill=True ,zorder=2))
 
     def _add_cardinality(self, ax, height, cfm: CFM) -> None:
+        """
+        Adds the group instance cardinality, group type cardinality and instance cardinality to the plot of the cfm model.
+        :param ax: The axes object of the plot
+        :param height: How high/low the cardinalities should be displayed above/under the features and edges
+        :param cfm: The cfm model that should be displayed
+        """
+
         for node in cfm.features:
             x, y = self.pos[node.name]
             children = node.children
             if len(children) > 0:
                 child = children[-1].name
                 mid_pos = ((x + self.pos[child][0]) / 2, (y + self.pos[child][1]) / 2)
-                group_instance_cardinality = self._cardinality_to_display_str(node.group_instance_cardinality, '<', '>')
-                ax.text(mid_pos[0], mid_pos[1] + height, group_instance_cardinality, horizontalalignment='center', verticalalignment='center', fontsize=10, color='black')
+                group_instance_cardinality = self._cardinality_to_display_str(node.group_instance_cardinality, '⟨', '⟩')
+                ax.text(mid_pos[0] + 0.3 * height, mid_pos[1] + height, group_instance_cardinality, horizontalalignment='center', verticalalignment='center', fontsize=10, color='black')
             if len(children) > 1:
                 group_type_cardinality = self._cardinality_to_display_str(node.group_type_cardinality, '[', ']')
                 ax.text(x, y - 2.5 * height / 2, group_type_cardinality, horizontalalignment='center', verticalalignment='center', fontsize=10)
 
-            instance_cardinality = self._cardinality_to_display_str(node.instance_cardinality, '<', '>')
+            instance_cardinality = self._cardinality_to_display_str(node.instance_cardinality, '⟨', '⟩')
             shift = height if self.mod[node.name] > 0 else -height
-            ax.text(x + shift, y + 1.5 * height / 2, instance_cardinality, horizontalalignment='center', verticalalignment='center', fontsize=10)
+            ax.text(x + 0.5 * shift, y + 1.5 * height / 2, instance_cardinality, horizontalalignment='center', verticalalignment='center', fontsize=10)
 
 
     def compute_x(self, node: str) -> None:
         """
-        Compute the x position of the node. The x position is calculated by adding the mod value of the node and the parents x position to the x value
+        Computes recursively the x position of the node. The x position is calculated by adding the mod value of the node and the parents x position to the x value
+        :param node: The node for which the x position should be calculated
         """
 
         _, parent = self._get_parent(node)
@@ -201,12 +217,17 @@ class GraphLayout:
     def _set_final_y(self, scale: float) -> None:
         """
         Because of the different ratios of the x and y positions, the y positions have to be scaled to get a better visualization.
+        :param scale: The scale factor for the y positions
         """
         
         for node in self.G.nodes:
             self.pos[node][1] *= scale
 
     def _get_width(self) -> float:
+        """
+        helper function to get the width of the tree for the scaling
+        """
+
         min = 0
         max = 0
         for level in self.bfs:
@@ -227,6 +248,7 @@ class GraphLayout:
         :param right_bracket: The right symbol to use for the intervals
         :return: The string representation of the cardinality using the specified brackets
         """
+
         intervals = cardinality.intervals
         if not intervals:
             return f"{left_bracket}{right_bracket}"
@@ -237,6 +259,14 @@ class GraphLayout:
         )
 
     def display_graph(self, format: str, cfm: CFM, height=20, width=10) -> bytes:
+        """
+        Plots the entire feature model and saves the model in the desired format.
+        :param format: The format in which the image should be saved
+        :param cfm: The feature model that should be displayed
+        :param height: The height of the image
+        :param width: The width of the image
+        """
+
         tree_width = self._get_width()
         scale = tree_width / (2 * len(self.bfs))
         self._set_final_y(scale)
