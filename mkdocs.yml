@@ -80,10 +80,13 @@ nav:
           - UVL Export: plugins/uvl-export.md
           - JSON Import: plugins/json-import.md
           - JSON Export: plugins/json-export.md
+          - PNG Export: plugins/png-export.md
+          - SVG Export: plugins/svg-export.md
           - Big M: plugins/big-m.md
           - Random Sampling: plugins/random-sampling.md
           - One Wise Sampling: plugins/one-wise-sampling.md
           - Debugging: plugins/debugging.md
+          - Subtree: plugins/subtree.md
   - Framework:
       - Architecture: framework/index.md
       - Models: framework/models.md
