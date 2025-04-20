@@ -1,0 +1,2738 @@
+{
+  "root": {
+    "name": "TankWar",
+    "instance_cardinality": {
+      "intervals": [
+        {
+          "lower": 1,
+          "upper": 1
+        }
+      ]
+    },
+    "group_type_cardinality": {
+      "intervals": [
+        {
+          "lower": 7,
+          "upper": 10
+        }
+      ]
+    },
+    "group_instance_cardinality": {
+      "intervals": [
+        {
+          "lower": 7,
+          "upper": 10
+        }
+      ]
+    },
+    "children": [
+      {
+        "name": "Tank_Player1",
+        "instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "group_type_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "group_instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "children": [
+          {
+            "name": "Black_P1",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Red_P1",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Red_Tier1_P1",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Yellow_Tier1_P1",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Blue_Tier2_P1",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Green_Tier2_P1",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "Tank_Player2",
+        "instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "group_type_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "group_instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "children": [
+          {
+            "name": "Black_P2",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Red_P2",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Red_Tier1_P2",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Yellow_Tier1_P2",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Blue_Tier2_P2",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Green_Tier2_P2",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "mov",
+        "instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "group_type_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "group_instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "children": [
+          {
+            "name": "mov_0",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "mov_1",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "mov_2",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "mov_3",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "mov_4",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "tar",
+        "instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 0,
+              "upper": 1
+            }
+          ]
+        },
+        "group_type_cardinality": {
+          "intervals": []
+        },
+        "group_instance_cardinality": {
+          "intervals": []
+        },
+        "children": []
+      },
+      {
+        "name": "Hinderniss_Set",
+        "instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 0,
+              "upper": 1
+            }
+          ]
+        },
+        "group_type_cardinality": {
+          "intervals": []
+        },
+        "group_instance_cardinality": {
+          "intervals": []
+        },
+        "children": []
+      },
+      {
+        "name": "Power_Ups",
+        "instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "group_type_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 22
+            }
+          ]
+        },
+        "group_instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 22
+            }
+          ]
+        },
+        "children": [
+          {
+            "name": "Flower",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Blue_Flower",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Copy",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Fire",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Light_Bulb_Round",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Green",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Heart",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Circle",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Cow",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Light_Bulb",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Octagonal",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Mushroom",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Pumpkin_Pie",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Ring",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Ring_2",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Ring_Oval",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Ring_Oval_Small",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Sponge",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Spiral",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Star_Oval",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Star_Oval_Small",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Star_Ring",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "Activate_Power_Up",
+        "instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 0,
+              "upper": 1
+            }
+          ]
+        },
+        "group_type_cardinality": {
+          "intervals": [
+            {
+              "lower": 0,
+              "upper": 8
+            }
+          ]
+        },
+        "group_instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 0,
+              "upper": 8
+            }
+          ]
+        },
+        "children": [
+          {
+            "name": "Nr1",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Nr2",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Nr3",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Nr4",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Nr5",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Nr6",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Nr7",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Nr8",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "Background",
+        "instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "group_type_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "group_instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "children": [
+          {
+            "name": "Default",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Blue_White",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Blue_White_Green",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Purple_White",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Glass",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Lava",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Limba",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Old",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Ov_Paper",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Paper",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Univ",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Water",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Water_2",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "rocketStyle",
+        "instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "group_type_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "group_instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "children": [
+          {
+            "name": "Rectangle",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Oval",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "aa31",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Portal",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "Nino",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "Sounds",
+        "instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "group_type_cardinality": {
+          "intervals": [
+            {
+              "lower": 0,
+              "upper": 4
+            }
+          ]
+        },
+        "group_instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 0,
+              "upper": 4
+            }
+          ]
+        },
+        "children": [
+          {
+            "name": "Player1_Sound_Rotation",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "children": [
+              {
+                "name": "P1_Rot_Beep1",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_Beep2",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_Beep3",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_Bleep1",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_Buzzer",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_Cash_register",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_Cork",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_Game_Win",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_Drip",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_Gorod",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_Horn",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_Laser_Trill",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_Police_Siren",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_Siren_1",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_Siren_2",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Rot_yes",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "PLayer1_Sound_Movement",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "children": [
+              {
+                "name": "P1_Mov_Beep1",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_Beep2",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_Beep3",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_Bleep1",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_Buzzer",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_Cash_Register",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_Cork",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_Game_Win",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_Drip",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_Gorod",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_Horn",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_LaserTrill",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_Police_Siren",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_Siren_1",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_Siren2",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P1_Mov_yes",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "Player2_Sound_Rotation",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "children": [
+              {
+                "name": "P2_Rot_Beep1",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Beep2",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Beep3",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Bleep1",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Buzzer",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Cash_Register",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Cork",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Game_Win",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Drip",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Gorod",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Horn",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Laser_Trill",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Police_Siren",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Siren_1",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Siren_2",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Rot_Yes",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "Player2_Sound_Movement",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 0,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "children": [
+              {
+                "name": "P2_Mov_Beep1",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_Beep2",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_Beep3",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_Bleep1",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_Buzzer",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_Cah_Register",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_cork",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_Game_Win",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_Drip",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_Gorord",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_Horn",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_LaserTrill",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_Police_Siren",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_Siren_1",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_Siren_2",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "P2_Mov_Yes",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": []
+}

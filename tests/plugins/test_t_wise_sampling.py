@@ -7,12 +7,33 @@ import cfmtoolbox.plugins.one_wise_sampling as one_wise_sampling_plugin
 from cfmtoolbox import app
 from cfmtoolbox.models import CFM, Cardinality, Constraint, Feature, Interval
 from cfmtoolbox.plugins.json_import import import_json
-from cfmtoolbox.plugins.t_wise_sampling import Literal, TWiseSampler, t_wise_sampling
+from cfmtoolbox.plugins.t_wise_sampling import (
+    Literal,
+    TWiseSampler,
+    evaluate_t_wise,
+    evaluate_t_wise_cache,
+    evaluate_t_wise_i_set,
+    evaluate_t_wise_l_set,
+    evaluate_t_wise_m,
+    evaluate_t_wise_sample_size,
+    evaluate_t_wise_t,
+    get_i_set,
+    get_l_set,
+    t_wise_sampling,
+    t_wise_sampling_instance_set,
+    t_wise_sampling_instance_set_return_size,
+    t_wise_sampling_return_size,
+)
 
 
 @pytest.fixture
 def model():
     return import_json(Path("tests/data/sandwich_bound.json").read_bytes())
+
+
+@pytest.fixture
+def simple_model():
+    return import_json(Path("tests/eval/2_3.json").read_bytes())
 
 
 @pytest.fixture
@@ -29,21 +50,98 @@ def test_plugin_can_be_loaded():
     assert one_wise_sampling_plugin in app.load_plugins()
 
 
-def test_one_wise_sampling_with_unbound_model(unbound_model: CFM, capsys):
+def test_t_wise_sampling_with_unbound_model(unbound_model: CFM, capsys):
     with pytest.raises(
         typer.Abort, match="Model is unbound. Please apply big-m global bound first."
     ):
         t_wise_sampling(unbound_model)
 
+    with pytest.raises(
+        typer.Abort, match="Model is unbound. Please apply big-m global bound first."
+    ):
+        t_wise_sampling_instance_set(unbound_model)
+
+    with pytest.raises(
+        typer.Abort, match="Model is unbound. Please apply big-m global bound first."
+    ):
+        t_wise_sampling_return_size(unbound_model)
+
+    with pytest.raises(
+        typer.Abort, match="Model is unbound. Please apply big-m global bound first."
+    ):
+        t_wise_sampling_instance_set_return_size(unbound_model)
+
+    with pytest.raises(
+        typer.Abort, match="Model is unbound. Please apply big-m global bound first."
+    ):
+        get_i_set(unbound_model)
+
+    with pytest.raises(
+        typer.Abort, match="Model is unbound. Please apply big-m global bound first."
+    ):
+        get_l_set(unbound_model)
+
 
 def test_plugin_passes_though_model(model: CFM):
     assert t_wise_sampling(model) is model
+    assert t_wise_sampling_instance_set(model) is model
 
 
 def test_plugin_outputs_at_least_one_sample(model: CFM, capsys):
     t_wise_sampling(model)
     captured = capsys.readouterr()
     assert captured.out.count("sandwich") >= 1
+    t_wise_sampling_instance_set(model)
+    captured = capsys.readouterr()
+    assert captured.out.count("sandwich") >= 1
+
+
+def test_evaluate_t_wise(simple_model: CFM, capsys):
+    evaluate_t_wise(simple_model, 1, 1, 50, 1, True)
+    evaluate_t_wise(simple_model, 1, 1, 50, 1, False)
+    captured = capsys.readouterr()
+    assert captured.out.count("Average time taken") == 2
+
+
+def test_evaluate_t_wise_t(simple_model: CFM, capsys):
+    evaluate_t_wise_t(simple_model, 1, 50, 1)
+    captured = capsys.readouterr()
+    assert captured.out.count("Average sample size for") == 6
+    assert captured.out.count("Average time taken") == 6
+
+
+def test_evaluate_t_wise_cache(simple_model: CFM, capsys):
+    evaluate_t_wise_cache(simple_model, 1, 1, 1)
+    captured = capsys.readouterr()
+    assert captured.out.count("Average time taken") == 6
+
+
+def test_evaluate_t_wise_m(simple_model: CFM, capsys):
+    evaluate_t_wise_m(simple_model, 1, 50, 1)
+    captured = capsys.readouterr()
+    assert captured.out.count("Average sample size for") == 10
+    assert captured.out.count("Average time taken") == 10
+
+
+def test_evaluate_t_wise_l_set(simple_model: CFM, capsys):
+    evaluate_t_wise_l_set(simple_model, 1, False)
+    evaluate_t_wise_l_set(simple_model, 1, True)
+    captured = capsys.readouterr()
+    assert captured.out.count("Literal set size:") == 2
+
+
+def test_evaluate_t_wise_i_set(simple_model: CFM, capsys):
+    evaluate_t_wise_i_set(simple_model, 1, 1, False)
+    evaluate_t_wise_i_set(simple_model, 1, 1, True)
+    captured = capsys.readouterr()
+    assert captured.out.count("Interaction set size:") == 2
+
+
+def test_evaluate_t_wise_sample_size(simple_model: CFM, capsys):
+    evaluate_t_wise_sample_size(simple_model, 1, 1, 50, 1, True)
+    evaluate_t_wise_sample_size(simple_model, 1, 1, 50, 1, False)
+    captured = capsys.readouterr()
+    assert captured.out.count("Average sample size:") == 2
 
 
 def test_calculate_literal_set(t_wise_sampler: TWiseSampler):
@@ -277,3 +375,15 @@ def test_calculate_max_number_of_parents(t_wise_sampler: TWiseSampler):
         if feature.name == "cheddar"
     )
     assert t_wise_sampler.calculate_max_number_of_parents(feature) == 4
+
+
+def test_check_for_contradicting_literal(t_wise_sampler: TWiseSampler):
+    config = {"cheese": 2}
+    literal = Literal("cheese", 2)
+    assert t_wise_sampler.check_for_contradicting_literal(config, literal) is False
+    config = {"cheese": 3}
+    literal = Literal("cheese", 2)
+    assert t_wise_sampler.check_for_contradicting_literal(config, literal) is True
+    config = {"lettuce": 1}
+    literal = Literal("cheese", 2)
+    assert t_wise_sampler.check_for_contradicting_literal(config, literal) is False

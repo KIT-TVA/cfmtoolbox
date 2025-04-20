@@ -1,10 +1,7 @@
-# import cProfile
 import itertools
 import json
 import random
 import timeit
-
-# from dataclasses import asdict
 from typing import NamedTuple
 
 import typer
@@ -27,24 +24,229 @@ from cfmtoolbox.models import CFM, ConfigurationNode, Feature
 
 
 @app.command()
-def t_wise_sampling(model: CFM, t: int = 1, m: int = 1, cache_size: int = 50) -> CFM:
-    if model.is_unbound:
-        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
-    # profiler = cProfile.Profile()
-    sampler = TWiseSampler(model, t, m, cache_size)
-    # profiler.enable()
-    samples = sampler.t_wise_sampling()
-    # profiler.disable()
-    print("Multiset configurations:")
-    print(
-        json.dumps(
-            [dict(sorted(sample.items())) for sample in samples],
-            indent=2,
+def evaluate_t_wise_t(
+    model: CFM,
+    m: int = 5,
+    cache_size: int = 50,
+    r: int = 5,
+):
+    get_sample_size(model, 1, cache_size, r, m)
+    get_sample_size(model, 2, cache_size, r, m)
+    get_sample_size(model, 3, cache_size, r, m)
+    get_sampling_time(model, 1, cache_size, r, m)
+    get_sampling_time(model, 2, cache_size, r, m)
+    get_sampling_time(model, 3, cache_size, r, m)
+
+
+@app.command()
+def evaluate_t_wise_cache(
+    model: CFM,
+    t: int = 2,
+    m: int = 5,
+    r: int = 5,
+):
+    get_sampling_time(model, t, 50, r, m)
+    get_sampling_time(model, t, 500, r, m)
+    get_sampling_time(model, t, 5000, r, m)
+
+
+@app.command()
+def evaluate_t_wise_m(
+    model: CFM,
+    t: int = 1,
+    cache_size: int = 50,
+    r: int = 5,
+):
+    get_sample_size(model, t, cache_size, r, 1)
+    get_sample_size(model, t, cache_size, r, 5)
+    get_sample_size(model, t, cache_size, r, 10)
+    get_sample_size(model, t, cache_size, r, 15)
+    get_sample_size(model, t, cache_size, r, 20)
+    get_sampling_time(model, t, cache_size, r, 1)
+    get_sampling_time(model, t, cache_size, r, 5)
+    get_sampling_time(model, t, cache_size, r, 10)
+    get_sampling_time(model, t, cache_size, r, 15)
+    get_sampling_time(model, t, cache_size, r, 20)
+
+
+def get_sample_size(model: CFM, t: int, cache_size: int, r: int = 5, m: int = 1):
+    sum = 0
+    for rr in range(r):
+        sum += t_wise_sampling_instance_set_return_size(
+            model,
+            t,
+            m,
+            cache_size,
         )
+    print(f"Average sample size for m={m}, t={t}: {sum / r} samples instance set wise")
+    sum = 0
+    for rr in range(r):
+        sum += t_wise_sampling_return_size(
+            model,
+            t,
+            m,
+            cache_size,
+        )
+    print(f"Average sample size for m={m}, t={t}: {sum / r} samples multiset wise")
+
+
+def get_sampling_time(model: CFM, t: int, cache_size: int, r: int = 5, m: int = 1):
+    time_taken = timeit.timeit(
+        lambda: t_wise_sampling_instance_set(model, t, m, cache_size, False), number=r
+    )
+    print(
+        f"Average time taken instance set for m={m}, t={t}, cachesize={cache_size}: {time_taken / r} seconds"
+    )
+    time_taken = timeit.timeit(
+        lambda: t_wise_sampling(model, t, m, cache_size, False), number=r
+    )
+    print(
+        f"Average time taken multiset for m={m}, t={t},  cachesize={cache_size}: {time_taken / r} seconds"
     )
 
-    # print("len(samples):", len(samples))
 
+def get_l_set(model: CFM, instance_set: bool = False):
+    if model.is_unbound:
+        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
+    sampler = TWiseSampler(model, 2, 1, 50)
+    literals = sampler.t_wise_l_set(instance_set)
+    print(f"Literal set size: {len(literals)}")
+
+
+@app.command()
+def evaluate_t_wise_l_set(model: CFM, r: int = 1, instance_set: bool = False):
+    time_taken = timeit.timeit(lambda: get_l_set(model, instance_set), number=r)
+    print(
+        f"time taken for literal set: {time_taken / r} seconds for instance_set={instance_set}"
+    )
+
+
+def get_i_set(model: CFM, t: int = 2, instance_set: bool = False):
+    if model.is_unbound:
+        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
+    sampler = TWiseSampler(model, t, 1, 50)
+    interactions = sampler.t_wise_i_set(instance_set)
+    print(f"Interaction set size: {len(interactions)}")
+
+
+@app.command()
+def evaluate_t_wise_i_set(
+    model: CFM, r: int = 1, t: int = 2, instance_set: bool = False
+):
+    time_taken = timeit.timeit(lambda: get_i_set(model, t, instance_set), number=r)
+    print(
+        f"time taken for interaction set: {time_taken / r} seconds for t={t} and instance_set={instance_set}"
+    )
+
+
+@app.command()
+def evaluate_t_wise_sample_size(
+    model: CFM,
+    t: int = 1,
+    m: int = 1,
+    cache_size: int = 50,
+    r: int = 5,
+    instance_set: bool = True,
+):
+    sum = 0
+    if instance_set:
+        for rr in range(0, r):
+            sum += t_wise_sampling_instance_set_return_size(
+                model,
+                t,
+                m,
+                cache_size,
+            )
+
+        print(f"Average sample size: {sum / r} samples")
+    else:
+        for rr in range(0, r):
+            sum += t_wise_sampling_return_size(
+                model,
+                t,
+                m,
+                cache_size,
+            )
+
+        print(f"Average sample size: {sum / r} samples")
+
+
+def t_wise_sampling_return_size(
+    model: CFM, t: int = 1, m: int = 1, cache_size: int = 50
+) -> int:
+    if model.is_unbound:
+        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
+    sampler = TWiseSampler(model, t, m, cache_size)
+    samples = sampler.t_wise_sampling()
+
+    _instances = [
+        sampler.convert_multiset_to_one_instance(sample, model.root)[0]
+        for sample in samples
+    ]
+    return len(samples)
+
+
+def t_wise_sampling_instance_set_return_size(
+    model: CFM, t: int = 1, m: int = 1, cache_size: int = 50
+) -> int:
+    if model.is_unbound:
+        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
+    sampler = TWiseSampler(model, t, m, cache_size)
+    samples = sampler.t_wise_sampling_instance_set()
+
+    _instances = [
+        sampler.convert_multiset_to_one_instance(sample, model.root)[0]
+        for sample in samples
+    ]
+    return len(samples)
+
+
+@app.command()
+def evaluate_t_wise(
+    model: CFM,
+    t: int = 1,
+    m: int = 1,
+    cache_size: int = 50,
+    r: int = 5,
+    instance_set: bool = True,
+    p: bool = False,
+):
+    if instance_set:
+        time_taken = timeit.timeit(
+            lambda: t_wise_sampling_instance_set(model, t, m, cache_size, p), number=r
+        )
+        print(f"Average time taken: {time_taken / r} seconds")
+    else:
+        time_taken = timeit.timeit(
+            lambda: t_wise_sampling(model, t, m, cache_size, p), number=r
+        )
+        print(f"Average time taken: {time_taken / r} seconds")
+
+
+@app.command()
+def t_wise_sampling(
+    model: CFM, t: int = 1, m: int = 1, cache_size: int = 50, p: bool = True
+) -> CFM:
+    if model.is_unbound:
+        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
+    sampler = TWiseSampler(model, t, m, cache_size)
+    samples = sampler.t_wise_sampling()
+    if p:
+        print("Multiset configurations:")
+        print(
+            json.dumps(
+                [dict(sorted(sample.items())) for sample in samples],
+                indent=2,
+            )
+        )
+        print("len(samples):", len(samples))
+
+    _instances = [
+        sampler.convert_multiset_to_one_instance(sample, model.root)[0]
+        for sample in samples
+    ]
+    # for index, instance in enumerate(instances):
+    #     print(instance.validate(model))
     # print("Converted Instance configurations:")
     # print(
     #    json.dumps(
@@ -55,45 +257,46 @@ def t_wise_sampling(model: CFM, t: int = 1, m: int = 1, cache_size: int = 50) ->
     #        indent=2,
     #    )
     # )
-    # profiler.print_stats(sort="cumulative")
-    time_taken = timeit.timeit(sampler.t_wise_sampling, number=1)
-    print(f"Time taken: {time_taken} seconds")
 
     return model
 
 
 @app.command()
 def t_wise_sampling_instance_set(
-    model: CFM, t: int = 1, m: int = 1, cache_size: int = 50
+    model: CFM, t: int = 1, m: int = 1, cache_size: int = 50, p: bool = True
 ) -> CFM:
     if model.is_unbound:
         raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
-    # profiler = cProfile.Profile()
     sampler = TWiseSampler(model, t, m, cache_size)
-    # profiler.enable()
     samples = sampler.t_wise_sampling_instance_set()
-    # profiler.disable()
-    print("Multiset configurations:")
-    print(
-        json.dumps(
-            [dict(sorted(sample.items())) for sample in samples],
-            indent=2,
+    if p:
+        print("Multiset configurations:")
+        print(
+            json.dumps(
+                [dict(sorted(sample.items())) for sample in samples],
+                indent=2,
+            )
         )
-    )
+        print("len(samples):", len(samples))
+
+    _instances = [
+        sampler.convert_multiset_to_one_instance(sample, model.root)[0]
+        for sample in samples
+    ]
+    # for index, instance in enumerate(instances):
+    #     print(instance.validate(model))
+    # if not instance.validate(model):
+    #     print(json.dumps(dict(sorted(samples[index].items())), indent=2))
+    #     print(json.dumps(asdict(instance), indent=2))
+    #     return model
 
     # print("Converted Instance configurations:")
     # print(
-    #    json.dumps(
-    #        [
-    #            asdict(sampler.convert_multiset_to_one_instance(sample, model.root)[0])
-    #            for sample in samples
-    #        ],
-    #        indent=2,
-    #    )
+    #     json.dumps(
+    #         [asdict(instance) for instance in instances],
+    #         indent=2,
+    #     )
     # )
-    time_taken = timeit.timeit(sampler.t_wise_sampling_instance_set, number=1)
-    print(f"Time taken: {time_taken} seconds")
-    # profiler.print_stats(sort="cumulative")
     return model
 
 
@@ -131,6 +334,21 @@ class TWiseSampler:
         self.t: int = t
         self.m: int = m
 
+    def t_wise_l_set(self, instance_set: bool = False):
+        self.calculate_full_smt_solver()
+        if instance_set:
+            self.calculate_instance_set_literal_set(self.model.root)
+        else:
+            self.calculate_multiset_literal_set(self.model.root)
+        literals = [literal for literal in self.literal_set]
+        literals.sort()
+        return literals
+
+    def t_wise_i_set(self, instance_set: bool = False):
+        self.t_wise_l_set(instance_set)
+        self.calculate_interactions()
+        return self.interactions
+
     def t_wise_sampling_instance_set(self) -> list[MultiSetConfiguration]:
         self.calculate_full_smt_solver()
         self.calculate_instance_set_literal_set(self.model.root)
@@ -160,7 +378,7 @@ class TWiseSampler:
         #    print(configuration)
 
         self.autocomplete_sample()
-
+        # print(len(self.sample))
         return self.sample
 
     def t_wise_sampling(self) -> list[MultiSetConfiguration]:
@@ -199,7 +417,7 @@ class TWiseSampler:
             self.sample = self.smallest_sample
 
         self.autocomplete_sample()
-
+        # print(len(self.sample))
         return self.sample
 
     def cover_optimized(self, interaction: frozenset[Literal]):
@@ -276,6 +494,7 @@ class TWiseSampler:
             else False
         )
 
+    # basic (unoptimized) covering strategy
     def cover(self, interaction: frozenset[Literal]):
         if self.check_interaction_covered(interaction):
             # print("Interaction already covered")
@@ -405,6 +624,7 @@ class TWiseSampler:
 
             self.sample.append(new_configuration)
 
+    # basic (unoptimized) covering strategy
     def instance_set_cover(self, interaction: frozenset[Literal]):
         if self.check_interaction_covered_instance_set_wise(interaction):
             # print("Interaction already covered")
@@ -1137,13 +1357,6 @@ class TWiseSampler:
         feature: Feature,
         local_parent_range: tuple[int, int] = (0, 1),
     ) -> list[list[ChildDistribution]]:
-        if local_parent_range[0] == local_parent_range[1] - 1:
-            return [
-                [
-                    ChildDistribution(child.name, (0, multiset[child.name]))
-                    for child in feature.children
-                ]
-            ]
         result: list[list[ChildDistribution]] = []
         for i in range(local_parent_range[0], local_parent_range[1]):
             distribution: list[ChildDistribution] = []
@@ -1168,14 +1381,6 @@ class TWiseSampler:
         feature: Feature,
         local_parent_range: tuple[int, int] = (0, 1),
     ) -> list[list[ChildDistribution]]:
-        if local_parent_range[0] == local_parent_range[1] - 1:
-            return [
-                [
-                    ChildDistribution(child.name, (0, multiset[child.name]))
-                    for child in feature.children
-                ]
-            ]
-
         # We have multiple parent instances, so we need to invoke the SMT solver to find a valid distribution of children instances
         solver = Solver()
 
@@ -1268,8 +1473,7 @@ class TWiseSampler:
                     )
                 )
 
-        if solver.check().r <= 0:
-            print(solver)
+        solver.check().r
 
         model = solver.model()
         result: list[list[ChildDistribution]] = []
