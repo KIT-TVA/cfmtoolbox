@@ -1,0 +1,1494 @@
+import itertools
+import json
+import random
+import timeit
+from typing import NamedTuple
+
+import typer
+from z3 import (  # type: ignore
+    And,
+    ArithRef,
+    If,
+    Implies,
+    Int,
+    ModelRef,
+    Not,
+    Or,
+    Solver,
+    Sum,
+)
+
+from cfmtoolbox import app
+from cfmtoolbox.dict_cache import DictCache
+from cfmtoolbox.models import CFM, ConfigurationNode, Feature
+
+
+@app.command()
+def evaluate_t_wise_t(
+    model: CFM,
+    m: int = 5,
+    cache_size: int = 50,
+    r: int = 5,
+):
+    get_sample_size(model, 1, cache_size, r, m)
+    get_sample_size(model, 2, cache_size, r, m)
+    get_sample_size(model, 3, cache_size, r, m)
+    get_sampling_time(model, 1, cache_size, r, m)
+    get_sampling_time(model, 2, cache_size, r, m)
+    get_sampling_time(model, 3, cache_size, r, m)
+
+
+@app.command()
+def evaluate_t_wise_cache(
+    model: CFM,
+    t: int = 2,
+    m: int = 5,
+    r: int = 5,
+):
+    get_sampling_time(model, t, 50, r, m)
+    get_sampling_time(model, t, 500, r, m)
+    get_sampling_time(model, t, 5000, r, m)
+
+
+@app.command()
+def evaluate_t_wise_m(
+    model: CFM,
+    t: int = 1,
+    cache_size: int = 50,
+    r: int = 5,
+):
+    get_sample_size(model, t, cache_size, r, 1)
+    get_sample_size(model, t, cache_size, r, 5)
+    get_sample_size(model, t, cache_size, r, 10)
+    get_sample_size(model, t, cache_size, r, 15)
+    get_sample_size(model, t, cache_size, r, 20)
+    get_sampling_time(model, t, cache_size, r, 1)
+    get_sampling_time(model, t, cache_size, r, 5)
+    get_sampling_time(model, t, cache_size, r, 10)
+    get_sampling_time(model, t, cache_size, r, 15)
+    get_sampling_time(model, t, cache_size, r, 20)
+
+
+def get_sample_size(model: CFM, t: int, cache_size: int, r: int = 5, m: int = 1):
+    sum = 0
+    for rr in range(r):
+        sum += t_wise_sampling_instance_set_return_size(
+            model,
+            t,
+            m,
+            cache_size,
+        )
+    print(f"Average sample size for m={m}, t={t}: {sum / r} samples instance set wise")
+    sum = 0
+    for rr in range(r):
+        sum += t_wise_sampling_return_size(
+            model,
+            t,
+            m,
+            cache_size,
+        )
+    print(f"Average sample size for m={m}, t={t}: {sum / r} samples multiset wise")
+
+
+def get_sampling_time(model: CFM, t: int, cache_size: int, r: int = 5, m: int = 1):
+    time_taken = timeit.timeit(
+        lambda: t_wise_sampling_instance_set(model, t, m, cache_size, False), number=r
+    )
+    print(
+        f"Average time taken instance set for m={m}, t={t}, cachesize={cache_size}: {time_taken / r} seconds"
+    )
+    time_taken = timeit.timeit(
+        lambda: t_wise_sampling(model, t, m, cache_size, False), number=r
+    )
+    print(
+        f"Average time taken multiset for m={m}, t={t},  cachesize={cache_size}: {time_taken / r} seconds"
+    )
+
+
+def get_l_set(model: CFM, instance_set: bool = False):
+    if model.is_unbound:
+        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
+    sampler = TWiseSampler(model, 2, 1, 50)
+    literals = sampler.t_wise_l_set(instance_set)
+    print(f"Literal set size: {len(literals)}")
+
+
+@app.command()
+def evaluate_t_wise_l_set(model: CFM, r: int = 1, instance_set: bool = False):
+    time_taken = timeit.timeit(lambda: get_l_set(model, instance_set), number=r)
+    print(
+        f"time taken for literal set: {time_taken / r} seconds for instance_set={instance_set}"
+    )
+
+
+def get_i_set(model: CFM, t: int = 2, instance_set: bool = False):
+    if model.is_unbound:
+        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
+    sampler = TWiseSampler(model, t, 1, 50)
+    interactions = sampler.t_wise_i_set(instance_set)
+    print(f"Interaction set size: {len(interactions)}")
+
+
+@app.command()
+def evaluate_t_wise_i_set(
+    model: CFM, r: int = 1, t: int = 2, instance_set: bool = False
+):
+    time_taken = timeit.timeit(lambda: get_i_set(model, t, instance_set), number=r)
+    print(
+        f"time taken for interaction set: {time_taken / r} seconds for t={t} and instance_set={instance_set}"
+    )
+
+
+@app.command()
+def evaluate_t_wise_sample_size(
+    model: CFM,
+    t: int = 1,
+    m: int = 1,
+    cache_size: int = 50,
+    r: int = 5,
+    instance_set: bool = True,
+):
+    sum = 0
+    if instance_set:
+        for rr in range(0, r):
+            sum += t_wise_sampling_instance_set_return_size(
+                model,
+                t,
+                m,
+                cache_size,
+            )
+
+        print(f"Average sample size: {sum / r} samples")
+    else:
+        for rr in range(0, r):
+            sum += t_wise_sampling_return_size(
+                model,
+                t,
+                m,
+                cache_size,
+            )
+
+        print(f"Average sample size: {sum / r} samples")
+
+
+def t_wise_sampling_return_size(
+    model: CFM, t: int = 1, m: int = 1, cache_size: int = 50
+) -> int:
+    if model.is_unbound:
+        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
+    sampler = TWiseSampler(model, t, m, cache_size)
+    samples = sampler.t_wise_sampling()
+
+    _instances = [
+        sampler.convert_multiset_to_one_instance(sample, model.root)[0]
+        for sample in samples
+    ]
+    return len(samples)
+
+
+def t_wise_sampling_instance_set_return_size(
+    model: CFM, t: int = 1, m: int = 1, cache_size: int = 50
+) -> int:
+    if model.is_unbound:
+        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
+    sampler = TWiseSampler(model, t, m, cache_size)
+    samples = sampler.t_wise_sampling_instance_set()
+
+    _instances = [
+        sampler.convert_multiset_to_one_instance(sample, model.root)[0]
+        for sample in samples
+    ]
+    return len(samples)
+
+
+@app.command()
+def evaluate_t_wise(
+    model: CFM,
+    t: int = 1,
+    m: int = 1,
+    cache_size: int = 50,
+    r: int = 5,
+    instance_set: bool = True,
+    p: bool = False,
+):
+    if instance_set:
+        time_taken = timeit.timeit(
+            lambda: t_wise_sampling_instance_set(model, t, m, cache_size, p), number=r
+        )
+        print(f"Average time taken: {time_taken / r} seconds")
+    else:
+        time_taken = timeit.timeit(
+            lambda: t_wise_sampling(model, t, m, cache_size, p), number=r
+        )
+        print(f"Average time taken: {time_taken / r} seconds")
+
+
+@app.command()
+def t_wise_sampling(
+    model: CFM, t: int = 1, m: int = 1, cache_size: int = 50, p: bool = True
+) -> CFM:
+    if model.is_unbound:
+        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
+    sampler = TWiseSampler(model, t, m, cache_size)
+    samples = sampler.t_wise_sampling()
+    if p:
+        print("Multiset configurations:")
+        print(
+            json.dumps(
+                [dict(sorted(sample.items())) for sample in samples],
+                indent=2,
+            )
+        )
+        print("len(samples):", len(samples))
+
+    _instances = [
+        sampler.convert_multiset_to_one_instance(sample, model.root)[0]
+        for sample in samples
+    ]
+    # for index, instance in enumerate(instances):
+    #     print(instance.validate(model))
+    # print("Converted Instance configurations:")
+    # print(
+    #    json.dumps(
+    #        [
+    #            asdict(sampler.convert_multiset_to_one_instance(sample, model.root)[0])
+    #            for sample in samples
+    #        ],
+    #        indent=2,
+    #    )
+    # )
+
+    return model
+
+
+@app.command()
+def t_wise_sampling_instance_set(
+    model: CFM, t: int = 1, m: int = 1, cache_size: int = 50, p: bool = True
+) -> CFM:
+    if model.is_unbound:
+        raise typer.Abort("Model is unbound. Please apply big-m global bound first.")
+    sampler = TWiseSampler(model, t, m, cache_size)
+    samples = sampler.t_wise_sampling_instance_set()
+    if p:
+        print("Multiset configurations:")
+        print(
+            json.dumps(
+                [dict(sorted(sample.items())) for sample in samples],
+                indent=2,
+            )
+        )
+        print("len(samples):", len(samples))
+
+    _instances = [
+        sampler.convert_multiset_to_one_instance(sample, model.root)[0]
+        for sample in samples
+    ]
+    # for index, instance in enumerate(instances):
+    #     print(instance.validate(model))
+    # if not instance.validate(model):
+    #     print(json.dumps(dict(sorted(samples[index].items())), indent=2))
+    #     print(json.dumps(asdict(instance), indent=2))
+    #     return model
+
+    # print("Converted Instance configurations:")
+    # print(
+    #     json.dumps(
+    #         [asdict(instance) for instance in instances],
+    #         indent=2,
+    #     )
+    # )
+    return model
+
+
+# A Literal describes a feature and the number of instances it should have
+Literal = NamedTuple("Literal", [("feature", str), ("cardinality", int)])
+
+# Under the definition of Multi-Set-Based Coverage, a configuration can be modeled with only the number of instances of each feature
+MultiSetConfiguration = dict[str, int]
+
+ChildDistribution = NamedTuple(
+    "ChildDistribution", [("child", str), ("range", tuple[int, int])]
+)
+
+
+# The TWiseSampler class is responsible for generating t-wise samples under the definitions of Multi-Set, Boundary-Interior Coverage and global constraints
+class TWiseSampler:
+    def __init__(self, model: CFM, t: int, m: int = 1, cache_size: int = 50):
+        # The literal set is the set of literals that need to be t-wise covered by the sample
+        self.literal_set: set[Literal] = set()
+
+        # The interactions are the possible subsets of size t of the literal set
+        self.interactions: set[frozenset[Literal]] = set()
+
+        # The sample is the current sample being generated
+        self.sample: list[MultiSetConfiguration] = []
+
+        self.smallest_sample: list[MultiSetConfiguration] = []
+
+        self.smt: Solver = Solver()
+
+        self.configuration_cache: DictCache = DictCache(max_size=cache_size)
+        # self.configuration_cache: LRUDictCache = LRUDictCache(max_size=cache_size)
+
+        self.model: CFM = model
+        self.t: int = t
+        self.m: int = m
+
+    def t_wise_l_set(self, instance_set: bool = False):
+        self.calculate_full_smt_solver()
+        if instance_set:
+            self.calculate_instance_set_literal_set(self.model.root)
+        else:
+            self.calculate_multiset_literal_set(self.model.root)
+        literals = [literal for literal in self.literal_set]
+        literals.sort()
+        return literals
+
+    def t_wise_i_set(self, instance_set: bool = False):
+        self.t_wise_l_set(instance_set)
+        self.calculate_interactions()
+        return self.interactions
+
+    def t_wise_sampling_instance_set(self) -> list[MultiSetConfiguration]:
+        self.calculate_full_smt_solver()
+        self.calculate_instance_set_literal_set(self.model.root)
+        # Print literal set in json
+        literals = [literal for literal in self.literal_set]
+        literals.sort()
+        # print(json.dumps(literals, indent=2))
+        self.calculate_interactions()
+        shuffled_interactions = list(self.interactions)
+        for i in range(self.m):
+            self.save_smallest_sample()
+            self.trim_sample(True)
+            random.shuffle(shuffled_interactions)
+            for interaction in shuffled_interactions:
+                # print(f"Covering interaction: {interaction}")
+                # self.instance_set_cover(interaction)
+                self.instance_set_cover_optimized(interaction)
+
+        if len(self.smallest_sample) != 0 and len(self.smallest_sample) < len(
+            self.sample
+        ):
+            # print("Returning smallest sample")
+            # print(len(self.smallest_sample))
+            self.sample = self.smallest_sample
+
+        # for configuration in self.sample:
+        #    print(configuration)
+
+        self.autocomplete_sample()
+        # print(len(self.sample))
+        return self.sample
+
+    def t_wise_sampling(self) -> list[MultiSetConfiguration]:
+        self.calculate_full_smt_solver()
+        # print(self.smt)
+        # print(self.smt.check())
+        # print(self.smt.model())
+        self.calculate_multiset_literal_set(self.model.root)
+
+        # Print literal set in json
+        literals = [literal for literal in self.literal_set]
+        literals.sort()
+        # print(json.dumps(literals, indent=2))
+
+        self.calculate_interactions()
+
+        # Print interactions in json
+        # print(
+        #     json.dumps(
+        #         [list(interaction) for interaction in self.interactions],
+        #     )
+        # )
+        shuffled_interactions = list(self.interactions)
+        for i in range(self.m):
+            self.save_smallest_sample()
+            self.trim_sample()
+            random.shuffle(shuffled_interactions)
+            for interaction in shuffled_interactions:
+                # print(f"Covering interaction: {interaction}")
+                # self.cover(interaction)
+                self.cover_optimized(interaction)
+
+        if len(self.smallest_sample) != 0 and len(self.smallest_sample) < len(
+            self.sample
+        ):
+            self.sample = self.smallest_sample
+
+        self.autocomplete_sample()
+        # print(len(self.sample))
+        return self.sample
+
+    def cover_optimized(self, interaction: frozenset[Literal]):
+        # Line 1
+        if self.check_interaction_covered(interaction):
+            # print("Interaction already covered")
+            return
+
+        # Get filtered sample S' (Line 2)
+        filtered_sample_indices: list[int] = []
+        for index, configuration in enumerate(self.sample):
+            if not any(
+                self.check_for_contradicting_literal(configuration, literal)
+                for literal in interaction
+            ):
+                filtered_sample_indices.append(index)
+
+        # print("interaction: ", interaction)
+        # print("original sample: ")
+        # for configuration in self.sample:
+        #    print(configuration)
+        # print("filtered sample: ")
+        # for index in filtered_sample_indices:
+        #    print(self.sample[index])
+        # print("done")
+
+        configuration_found = False
+
+        # Line 3 to 6
+        for index in filtered_sample_indices:
+            configuration = self.sample[index]
+            if self.check_cache_for_interaction_validity_in_configuration(
+                interaction, configuration
+            ):
+                for literal in interaction:
+                    configuration.update({literal.feature: literal.cardinality})
+                configuration_found = True
+                return
+
+        # Line 7
+        if not self.check_cache_for_interaction_validity(interaction):
+            # Line 8 to 9
+            if not self.check_interaction_validity_and_cache(interaction):
+                # print("Interaction not valid")
+                return
+
+        # Line 10 to 14
+        for index in filtered_sample_indices:
+            configuration = self.sample[index]
+            if self.check_interaction_validity_in_configuration_and_cache(
+                interaction, configuration
+            ):
+                # print("Interaction valid in configuration")
+                for literal in interaction:
+                    configuration.update({literal.feature: literal.cardinality})
+                configuration_found = True
+                break
+
+        # Line 15
+        if not configuration_found:
+            # print("Interaction not valid in any configuration")
+            self.sample.append(
+                MultiSetConfiguration(
+                    {literal.feature: literal.cardinality for literal in interaction}
+                )
+            )
+
+    def check_for_contradicting_literal(
+        self, configuration: MultiSetConfiguration, literal: Literal
+    ) -> bool:
+        return (
+            literal.cardinality != configuration[literal.feature]
+            if literal.feature in configuration
+            else False
+        )
+
+    # basic (unoptimized) covering strategy
+    def cover(self, interaction: frozenset[Literal]):
+        if self.check_interaction_covered(interaction):
+            # print("Interaction already covered")
+            return
+
+        if not self.check_interaction_validity(interaction):
+            # print("Interaction not valid")
+            return
+
+        configuration_found = False
+
+        for configuration in self.sample:
+            if self.check_interaction_validity_in_configuration(
+                interaction, configuration
+            ):
+                # print("Interaction valid in configuration")
+                for literal in interaction:
+                    configuration.update({literal.feature: literal.cardinality})
+                configuration_found = True
+                break
+
+        if not configuration_found:
+            # print("Interaction not valid in any configuration")
+            self.sample.append(
+                MultiSetConfiguration(
+                    {literal.feature: literal.cardinality for literal in interaction}
+                )
+            )
+
+    def instance_set_cover_optimized(self, interaction: frozenset[Literal]):
+        # Line 1
+        if self.check_interaction_covered_instance_set_wise(interaction):
+            # print("Interaction already covered")
+            return
+
+        # Get filtered sample S' (Line 2) doesn't work in concept because another instance could have the wanted cardinality
+
+        configuration_model = None
+
+        # Line 3 to 6
+        for configuration in self.sample:
+            configuration_model = self.check_cache_for_interaction_validity_in_configuration_instance_set_wise(
+                interaction, configuration
+            )
+            if configuration_model is not None:
+                for literal in interaction:
+                    i = 0
+                    while f"{literal.feature}#{i}" in configuration_model:
+                        configuration.update(
+                            {
+                                f"{literal.feature}#{i}": configuration_model[
+                                    f"{literal.feature}#{i}"
+                                ]
+                            }
+                        )
+                        i += 1
+                return
+
+        new_model = None
+        # Line 7
+        new_model = self.check_cache_for_interaction_validity_instance_set_wise(
+            interaction
+        )
+        if new_model is None:
+            # Line 8 to 9
+            new_model = self.check_interaction_validity_instance_set_wise_and_cache(
+                interaction
+            )
+            if new_model is None:
+                # print("Interaction not valid")
+                return
+
+        # Line 10 to 14
+        for configuration in self.sample:
+            configuration_model = self.check_interaction_validity_in_configuration_instance_set_wise_and_cache(
+                interaction, configuration
+            )
+            if configuration_model is not None:
+                # print("Interaction valid in configuration")
+
+                for literal in interaction:
+                    i = 0
+                    while f"{literal.feature}#{i}" in [
+                        d.name() for d in configuration_model.decls()
+                    ]:
+                        configuration.update(
+                            {
+                                f"{literal.feature}#{i}": configuration_model[
+                                    Int(f"{literal.feature}#{i}")
+                                ].as_long()
+                            }
+                        )
+                        i += 1
+                break
+
+        # Line 15
+        if configuration_model is None:
+            # print("Interaction not valid in any configuration")
+
+            new_configuration = MultiSetConfiguration()
+            if isinstance(new_model, ModelRef):
+                for literal in interaction:
+                    i = 0
+                    while f"{literal.feature}#{i}" in [
+                        d.name() for d in new_model.decls()
+                    ]:
+                        new_configuration.update(
+                            {
+                                f"{literal.feature}#{i}": new_model[
+                                    Int(f"{literal.feature}#{i}")
+                                ].as_long()
+                            }
+                        )
+                        i += 1
+            else:
+                for literal in interaction:
+                    i = 0
+                    while f"{literal.feature}#{i}" in new_model:
+                        new_configuration.update(
+                            {
+                                f"{literal.feature}#{i}": new_model[
+                                    f"{literal.feature}#{i}"
+                                ]
+                            }
+                        )
+                        i += 1
+
+            self.sample.append(new_configuration)
+
+    # basic (unoptimized) covering strategy
+    def instance_set_cover(self, interaction: frozenset[Literal]):
+        if self.check_interaction_covered_instance_set_wise(interaction):
+            # print("Interaction already covered")
+            return
+
+        new_model = self.check_interaction_validity_instance_set_wise(interaction)
+        if new_model is None:
+            # print("Interaction not valid")
+            return
+
+        configuration_model = None
+
+        for configuration in self.sample:
+            configuration_model = (
+                self.check_interaction_validity_in_configuration_instance_set_wise(
+                    interaction, configuration
+                )
+            )
+            if configuration_model is not None:
+                # print("Interaction valid in configuration")
+
+                for literal in interaction:
+                    i = 0
+                    while f"{literal.feature}#{i}" in [
+                        d.name() for d in configuration_model.decls()
+                    ]:
+                        configuration.update(
+                            {
+                                f"{literal.feature}#{i}": configuration_model[
+                                    Int(f"{literal.feature}#{i}")
+                                ].as_long()
+                            }
+                        )
+                        i += 1
+                break
+
+        if configuration_model is None:
+            # print("Interaction not valid in any configuration")
+
+            new_configuration = MultiSetConfiguration()
+            for literal in interaction:
+                i = 0
+                while f"{literal.feature}#{i}" in [d.name() for d in new_model.decls()]:
+                    new_configuration.update(
+                        {
+                            f"{literal.feature}#{i}": new_model[
+                                Int(f"{literal.feature}#{i}")
+                            ].as_long()
+                        }
+                    )
+                    i += 1
+
+            # print("New configuration:")
+            # print(new_configuration)
+
+            self.sample.append(new_configuration)
+
+    def trim_sample(self, instance_set_wise: bool = False):
+        if (len(self.sample) == 0) or (len(self.sample) == 1):
+            return
+        interaction_configuration_cover_matrix = []
+        number_of_uniquely_covered_interactions = [0 for _ in self.sample]
+        for interaction in self.interactions:
+            interaction_coverage = []
+            for configuration in self.sample:
+                if instance_set_wise:
+                    if all(
+                        self.check_configuration_instance_covered(
+                            configuration, literal
+                        )
+                        for literal in interaction
+                    ):
+                        interaction_coverage.append(1)
+                    else:
+                        interaction_coverage.append(0)
+                else:
+                    if all(
+                        literal.cardinality == configuration[literal.feature]
+                        if literal.feature in configuration
+                        else False
+                        for literal in interaction
+                    ):
+                        interaction_coverage.append(1)
+                    else:
+                        interaction_coverage.append(0)
+            if sum(interaction_coverage) == 1:
+                interaction_configuration_cover_matrix.append(interaction_coverage)
+                for index, value in enumerate(interaction_coverage):
+                    number_of_uniquely_covered_interactions[index] += value
+        # print(interaction_configuration_cover_matrix)
+        # print(number_of_uniquely_covered_interactions)
+        ranks: list[float] = []
+        for index, configuration in enumerate(self.sample):
+            # print(configuration)
+            number_of_defined_features = self.calculate_number_of_defined_features(
+                configuration
+            )
+            # print(number_of_defined_features)
+            rank = number_of_uniquely_covered_interactions[index] / (
+                number_of_defined_features**self.t
+            )
+            ranks.append(rank)
+        # print(ranks)
+        mean = sum(ranks) / len(ranks)
+        # print(mean)
+        for reverse_index, rank in enumerate(reversed(ranks)):
+            original_index = len(ranks) - 1 - reverse_index
+            if rank < mean:
+                self.sample.pop(original_index)
+        # for configuration in self.sample:
+        # print(configuration)
+
+    def calculate_number_of_defined_features(
+        self, configuration: MultiSetConfiguration
+    ) -> int:
+        features = {feature.split("#")[0] for feature in configuration.keys()}
+        return len(features)
+
+    def save_smallest_sample(self):
+        if len(self.smallest_sample) == 0 or len(self.sample) < len(
+            self.smallest_sample
+        ):
+            self.smallest_sample = self.sample.copy()
+            # print("New smallest sample:")
+            # print(len(self.smallest_sample))
+
+    def autocomplete_sample(self):
+        for sample_configuration in self.sample:
+            self.smt.push()
+            for feature, cardinality in sample_configuration.items():
+                self.smt.add(Int("%s" % feature) == cardinality)
+            assert self.smt.check().r > 0
+            model = self.smt.model()
+            for d in model:
+                sample_configuration.update({d.name(): model[d].as_long()})
+            self.smt.pop()
+
+    def calculate_instance_set_literal_set(self, feature: Feature):
+        for interval in feature.instance_cardinality.intervals:
+            self.literal_set.add(Literal(feature.name, interval.lower))
+            if interval.upper is not None:
+                self.literal_set.add(Literal(feature.name, interval.upper))
+        for child in feature.children:
+            self.calculate_instance_set_literal_set(child)
+
+    def calculate_multiset_literal_set(
+        self, feature: Feature, lower_factor: int = 1, upper_factor: int = 1
+    ):
+        min_value = feature.instance_cardinality.intervals[0].lower * lower_factor
+        assert feature.instance_cardinality.intervals[-1].upper is not None
+        max_value = feature.instance_cardinality.intervals[-1].upper * upper_factor
+        in_interval = False
+        for i in range(min_value, max_value + 1):
+            if self.check_valid_cardinality(feature, i):
+                if not in_interval:
+                    in_interval = True
+                    self.literal_set.add(Literal(feature.name, i))
+            else:
+                if in_interval:
+                    self.literal_set.add(Literal(feature.name, i - 1))
+                    in_interval = False
+        if in_interval:
+            self.literal_set.add(Literal(feature.name, max_value))
+
+        for child in feature.children:
+            self.calculate_multiset_literal_set(
+                child,
+                min_value,
+                max_value,
+            )
+
+    def check_valid_cardinality(self, feature: Feature, cardinality: int) -> bool:
+        self.smt.push()
+        self.smt.add(Int("%s" % feature.name) == cardinality)
+        result = self.smt.check().r > 0
+        self.smt.pop()
+        return result
+
+    def calculate_interactions(self):
+        all_interactions = set(
+            map(frozenset, itertools.combinations(self.literal_set, self.t))
+        )
+
+        for interaction in all_interactions:
+            if not all(
+                any(
+                    literal.feature == other_literal.feature
+                    and literal.cardinality != other_literal.cardinality
+                    for other_literal in interaction
+                )
+                for literal in interaction
+            ):
+                self.interactions.add(interaction)
+
+    def check_interaction_covered(self, interaction: frozenset[Literal]) -> bool:
+        return any(
+            all(
+                literal.cardinality == configuration[literal.feature]
+                if literal.feature in configuration
+                else False
+                for literal in interaction
+            )
+            for configuration in self.sample
+        )
+
+    def check_interaction_covered_instance_set_wise(
+        self, interaction: frozenset[Literal]
+    ) -> bool:
+        return any(
+            all(
+                self.check_configuration_instance_covered(configuration, literal)
+                for literal in interaction
+            )
+            for configuration in self.sample
+        )
+
+    def check_configuration_instance_covered(
+        self, configuration: MultiSetConfiguration, literal: Literal
+    ) -> bool:
+        i = 0
+        while f"{literal.feature}#{i}" in configuration:
+            if configuration[f"{literal.feature}#{i}"] == literal.cardinality:
+                return True
+            i += 1
+
+        return False
+
+    def calculate_full_smt_solver(self):
+        self.smt.reset()
+        self.smt.add(Int(f"{self.model.root.name}#0") == 1)
+        self.calculate_smt_model(self.model.root)
+        self.calculate_smt_constraints()
+
+    def calculate_smt_model(
+        self,
+        feature: Feature,
+        parent_f: ArithRef = 1,
+        max_parent: int = 1,
+    ):
+        f = Int("%s" % feature.name)
+
+        if len(feature.instance_cardinality.intervals) != 0:
+            self.smt.add(
+                Or(
+                    [
+                        And(
+                            f >= interval.lower * parent_f,
+                            f <= interval.upper * parent_f,
+                        )
+                        for interval in feature.instance_cardinality.intervals
+                    ]
+                )
+            )
+
+        assert feature.instance_cardinality.intervals[-1].upper is not None
+        new_max_parent = feature.instance_cardinality.intervals[-1].upper * max_parent
+
+        # If it is not a leaf node, then it has children
+        if (
+            len(feature.group_instance_cardinality.intervals) != 0
+            or len(feature.group_type_cardinality.intervals) != 0
+        ):
+            # Similar checks to the conversion from multiset to instance set
+            for child in feature.children:
+                cs = [Int(f"{child.name}#{i}") for i in range(new_max_parent)]
+                # Children instances should add up to their global number of instances
+                # e.g. gouda#0 + gouda#1 + gouda#2 + gouda#3 = global_gouda
+                for i in range(new_max_parent):
+                    self.smt.add(
+                        If(f <= i, cs[i] == 0, True),
+                    )
+                self.smt.add(
+                    Sum(cs) == Int(f"{child.name}"),
+                )
+
+                # Children instances should be within the instance cardinality intervals
+                # e.g gouda#0 >= 0, gouda#0 <= 3, gouda#1 >= 0, gouda#1 <= 3, gouda#2 >= 0, gouda#2 <= 3, gouda#3 >= 0, gouda#3 <= 3
+                for i in range(new_max_parent):
+                    self.smt.add(
+                        If(
+                            f > i,
+                            Or(
+                                [
+                                    And(
+                                        cs[i] >= interval.lower,
+                                        cs[i] <= interval.upper
+                                        if interval.upper is not None
+                                        else True,
+                                    )
+                                    for interval in child.instance_cardinality.intervals
+                                ]
+                            ),
+                            True,
+                        ),
+                    )
+
+            for i in range(new_max_parent):
+                # Each parent instance should have a valid number of children instances according to the group instance and type cardinalities
+                # e.g. 3 <= cheddar#0 + swiss#0 + gouda#0 <= 3, 3 <= cheddar#1 + swiss#1 + gouda#1 <= 3,
+                # 3 <= cheddar#2 + swiss#2 + gouda#2 <= 3, 3 <= cheddar#3 + swiss#3 + gouda#3 <= 3
+                self.smt.add(
+                    If(
+                        f > i,
+                        Or(
+                            [
+                                And(
+                                    Sum(
+                                        [
+                                            Int(f"{child.name}#{i}")
+                                            for child in feature.children
+                                        ]
+                                    )
+                                    >= group_instance_interval.lower,
+                                    Sum(
+                                        [
+                                            Int(f"{child.name}#{i}")
+                                            for child in feature.children
+                                        ]
+                                    )
+                                    <= group_instance_interval.upper
+                                    if group_instance_interval.upper is not None
+                                    else True,
+                                )
+                                for group_instance_interval in feature.group_instance_cardinality.intervals
+                            ]
+                        ),
+                        True,
+                    ),
+                )
+
+                # e.g. 1 <= If(cheddar#0 > 0, 1, 0) + If(swiss#0 > 0, 1, 0) + If(gouda#0 > 0, 1, 0) <= 3, ...
+                self.smt.add(
+                    If(
+                        f > i,
+                        Or(
+                            [
+                                And(
+                                    Sum(
+                                        [
+                                            If(Int(f"{child.name}#{i}") > 0, 1, 0)
+                                            for child in feature.children
+                                        ]
+                                    )
+                                    >= group_type_interval.lower,
+                                    Sum(
+                                        [
+                                            If(Int(f"{child.name}#{i}") > 0, 1, 0)
+                                            for child in feature.children
+                                        ]
+                                    )
+                                    <= group_type_interval.upper
+                                    if group_type_interval.upper is not None
+                                    else True,
+                                )
+                                for group_type_interval in feature.group_type_cardinality.intervals
+                            ]
+                        ),
+                        True,
+                    ),
+                )
+
+        for child in feature.children:
+            self.calculate_smt_model(child, f, new_max_parent)
+
+    def calculate_smt_constraints(self):
+        for constraint in self.model.constraints:
+            f1 = Int("%s" % constraint.first_feature.name)
+            f2 = Int("%s" % constraint.second_feature.name)
+
+            c1 = Or(
+                [
+                    And(
+                        f1 >= interval.lower,
+                        f1 <= interval.upper if interval.upper is not None else True,
+                    )
+                    for interval in constraint.first_cardinality.intervals
+                ]
+            )
+
+            c2 = Or(
+                [
+                    And(
+                        f2 >= interval.lower,
+                        f2 <= interval.upper if interval.upper is not None else True,
+                    )
+                    for interval in constraint.second_cardinality.intervals
+                ]
+            )
+
+            if constraint.require:
+                self.smt.add(Implies(c1, c2))
+            else:
+                self.smt.add(Not(And(c1, c2)))
+
+    def check_interaction_validity(self, interaction: frozenset[Literal]) -> bool:
+        self.smt.push()
+
+        for literal in interaction:
+            self.smt.add(Int("%s" % literal.feature) == literal.cardinality)
+
+        res = self.smt.check().r > 0
+
+        self.smt.pop()
+
+        return res
+
+    def check_interaction_validity_in_configuration(
+        self, interaction: frozenset[Literal], configuration: MultiSetConfiguration
+    ) -> bool:
+        self.smt.push()
+
+        for literal in interaction:
+            self.smt.add(Int("%s" % literal.feature) == literal.cardinality)
+
+        for feature, cardinality in configuration.items():
+            self.smt.add(Int("%s" % feature) == cardinality)
+
+        res = self.smt.check().r > 0
+
+        self.smt.pop()
+
+        return res
+
+    def check_interaction_validity_and_cache(
+        self, interaction: frozenset[Literal]
+    ) -> bool:
+        self.smt.push()
+
+        for literal in interaction:
+            self.smt.add(Int("%s" % literal.feature) == literal.cardinality)
+
+        model = None
+        res = self.smt.check().r > 0
+        if res:
+            model = self.smt.model()
+            new_configuration = self.convert_model_into_multiset_configuration(model)
+            self.configuration_cache.add(new_configuration)
+
+        self.smt.pop()
+
+        return res
+
+    def check_interaction_validity_in_configuration_and_cache(
+        self, interaction: frozenset[Literal], configuration: MultiSetConfiguration
+    ) -> bool:
+        self.smt.push()
+
+        for literal in interaction:
+            self.smt.add(Int("%s" % literal.feature) == literal.cardinality)
+
+        for feature, cardinality in configuration.items():
+            self.smt.add(Int("%s" % feature) == cardinality)
+
+        model = None
+        res = self.smt.check().r > 0
+        if res:
+            model = self.smt.model()
+            new_configuration = self.convert_model_into_multiset_configuration(model)
+            self.configuration_cache.add(new_configuration)
+
+        self.smt.pop()
+
+        return res
+
+    def check_cache_for_interaction_validity_in_configuration(
+        self, interaction: frozenset[Literal], configuration: MultiSetConfiguration
+    ) -> bool:
+        return self.configuration_cache.contains(
+            lambda x: all(
+                literal.cardinality == x[literal.feature]
+                if literal.feature in x
+                else False
+                for literal in interaction
+            )
+            and all(
+                cardinality == x[feature] if feature in x else False
+                for feature, cardinality in configuration.items()
+            )
+        )
+
+    def check_cache_for_interaction_validity(
+        self, interaction: frozenset[Literal]
+    ) -> bool:
+        return self.configuration_cache.contains(
+            lambda x: all(
+                literal.cardinality == x[literal.feature]
+                if literal.feature in x
+                else False
+                for literal in interaction
+            )
+        )
+
+    def convert_model_into_multiset_configuration(
+        self, model: ModelRef
+    ) -> MultiSetConfiguration:
+        new_configuration = MultiSetConfiguration()
+        for decl in model.decls():
+            feature: str = decl.name()
+            cardinality = model[decl].as_long()
+            if "#" not in feature:
+                new_configuration.update({f"{feature}": cardinality})
+        return new_configuration
+
+    def calculate_max_number_of_parents(self, feature: Feature) -> int:
+        if feature.parent is None:
+            return 1
+        assert feature.parent.instance_cardinality.intervals[-1].upper is not None
+        return feature.parent.instance_cardinality.intervals[
+            -1
+        ].upper * self.calculate_max_number_of_parents(feature.parent)
+
+    # Need a valid model if valid
+    def check_interaction_validity_instance_set_wise(
+        self, interaction: frozenset[Literal]
+    ) -> ModelRef | None:
+        self.smt.push()
+
+        for literal in interaction:
+            feature: Feature = next(
+                feature
+                for feature in self.model.features
+                if feature.name == literal.feature
+            )
+            max_number_of_parents = self.calculate_max_number_of_parents(feature)
+            self.smt.add(
+                Or(
+                    [
+                        Int(f"{literal.feature}#{i}") == literal.cardinality
+                        for i in range(max_number_of_parents)
+                    ]
+                )
+            )
+
+        model = None
+        res = self.smt.check().r > 0
+        if res:
+            model = self.smt.model()
+        self.smt.pop()
+
+        return model
+
+    # Need a valid model if valid
+    def check_interaction_validity_in_configuration_instance_set_wise(
+        self, interaction: frozenset[Literal], configuration: MultiSetConfiguration
+    ) -> ModelRef | None:
+        self.smt.push()
+
+        for literal in interaction:
+            feature: Feature = next(
+                feature
+                for feature in self.model.features
+                if feature.name == literal.feature
+            )
+            self.smt.add(
+                Or(
+                    [
+                        Int(f"{literal.feature}#{i}") == literal.cardinality
+                        for i in range(self.calculate_max_number_of_parents(feature))
+                    ]
+                )
+            )
+
+        for feature_name, cardinality in configuration.items():
+            self.smt.add(Int("%s" % feature_name) == cardinality)
+
+        model = None
+        res = self.smt.check().r > 0
+        if res:
+            model = self.smt.model()
+        self.smt.pop()
+
+        return model
+
+    def check_interaction_validity_instance_set_wise_and_cache(
+        self, interaction: frozenset[Literal]
+    ) -> ModelRef | None:
+        self.smt.push()
+
+        for literal in interaction:
+            feature: Feature = next(
+                feature
+                for feature in self.model.features
+                if feature.name == literal.feature
+            )
+            max_number_of_parents = self.calculate_max_number_of_parents(feature)
+            self.smt.add(
+                Or(
+                    [
+                        Int(f"{literal.feature}#{i}") == literal.cardinality
+                        for i in range(max_number_of_parents)
+                    ]
+                )
+            )
+
+        model = None
+        res = self.smt.check().r > 0
+        if res:
+            model = self.smt.model()
+            new_configuration = self.convert_model_into_instance_set_configuration(
+                model
+            )
+            self.configuration_cache.add(new_configuration)
+        self.smt.pop()
+
+        return model
+
+    def check_interaction_validity_in_configuration_instance_set_wise_and_cache(
+        self, interaction: frozenset[Literal], configuration: MultiSetConfiguration
+    ) -> ModelRef | None:
+        self.smt.push()
+
+        for literal in interaction:
+            feature: Feature = next(
+                feature
+                for feature in self.model.features
+                if feature.name == literal.feature
+            )
+            self.smt.add(
+                Or(
+                    [
+                        Int(f"{literal.feature}#{i}") == literal.cardinality
+                        for i in range(self.calculate_max_number_of_parents(feature))
+                    ]
+                )
+            )
+
+        for feature_name, cardinality in configuration.items():
+            self.smt.add(Int("%s" % feature_name) == cardinality)
+
+        model = None
+        res = self.smt.check().r > 0
+        if res:
+            model = self.smt.model()
+            new_configuration = self.convert_model_into_instance_set_configuration(
+                model
+            )
+            self.configuration_cache.add(new_configuration)
+        self.smt.pop()
+
+        return model
+
+    def convert_model_into_instance_set_configuration(
+        self, model: ModelRef
+    ) -> MultiSetConfiguration:
+        new_configuration = MultiSetConfiguration()
+        for decl in model.decls():
+            feature: str = decl.name()
+            cardinality = model[decl].as_long()
+            new_configuration.update({f"{feature}": cardinality})
+        return new_configuration
+
+    def check_cache_for_interaction_validity_in_configuration_instance_set_wise(
+        self, interaction: frozenset[Literal], configuration: MultiSetConfiguration
+    ) -> MultiSetConfiguration | None:
+        return self.configuration_cache.find(
+            lambda x: all(
+                self.check_configuration_instance_covered(x, literal)
+                for literal in interaction
+            )
+            and all(item in x.items() for item in configuration.items())
+        )
+
+    def check_cache_for_interaction_validity_instance_set_wise(
+        self, interaction: frozenset[Literal]
+    ) -> MultiSetConfiguration | None:
+        return self.configuration_cache.find(
+            lambda x: all(
+                self.check_configuration_instance_covered(x, literal)
+                for literal in interaction
+            )
+        )
+
+    def convert_multiset_to_one_instance(
+        self,
+        multiset: MultiSetConfiguration,
+        feature: Feature,
+        local_parent_range: tuple[int, int] = (0, 1),
+    ) -> list[ConfigurationNode]:
+        global_number_of_feature = multiset[feature.name]
+        configurations: list[ConfigurationNode] = []
+        # If the feature has no instances, return an empty list
+        if (
+            global_number_of_feature == 0
+            or local_parent_range[0] == local_parent_range[1]
+        ):
+            return configurations
+
+        # Get valid children distribution for the current parent instance
+        distribution: list[list[ChildDistribution]] = self.get_child_distribution(
+            multiset, feature, local_parent_range
+        )
+
+        for i, i_th_parent in enumerate(distribution):
+            # Create a new configuration node for the current parent instance
+            configuration_node = ConfigurationNode(
+                value=f"{feature.name}#{local_parent_range[0] + i}",
+                children=[],
+            )
+
+            for child_distribution in i_th_parent:
+                # If the child has no instances, skip it
+                if child_distribution.range[0] == child_distribution.range[1]:
+                    continue
+
+                # Get the child feature
+                child_feature = next(
+                    child
+                    for child in feature.children
+                    if child.name == child_distribution.child
+                )
+
+                # Convert the child feature to a single instance
+                child_configuration = self.convert_multiset_to_one_instance(
+                    multiset,
+                    child_feature,
+                    (child_distribution.range[0], child_distribution.range[1]),
+                )
+
+                # Add the child configuration to the parent configuration
+                configuration_node.children.extend(child_configuration)
+
+            configurations.append(configuration_node)
+
+        return configurations
+
+    # This uses the instance encoded in the multiset.
+    def get_child_distribution(
+        self,
+        multiset: MultiSetConfiguration,
+        feature: Feature,
+        local_parent_range: tuple[int, int] = (0, 1),
+    ) -> list[list[ChildDistribution]]:
+        result: list[list[ChildDistribution]] = []
+        for i in range(local_parent_range[0], local_parent_range[1]):
+            distribution: list[ChildDistribution] = []
+            for index, child in enumerate(feature.children):
+                previous_amount = result[-1][index].range[1] if len(result) > 0 else 0
+                distribution.append(
+                    ChildDistribution(
+                        child.name,
+                        (
+                            0 + previous_amount,
+                            multiset[f"{child.name}#{i}"] + previous_amount,
+                        ),
+                    )
+                )
+            result.append(distribution)
+        return result
+
+    # Old function that uses the SMT solver to find a valid instance, in case we get a pure multiset.
+    def find_valid_children_distribution(
+        self,
+        multiset: MultiSetConfiguration,
+        feature: Feature,
+        local_parent_range: tuple[int, int] = (0, 1),
+    ) -> list[list[ChildDistribution]]:
+        # We have multiple parent instances, so we need to invoke the SMT solver to find a valid distribution of children instances
+        solver = Solver()
+
+        for child in feature.children:
+            # Children instances should add up to their global number of instances
+            # e.g. gouda#0 + gouda#1 + gouda#2 + gouda#3 = global_gouda
+            solver.add(
+                Sum(
+                    [
+                        Int(f"{child.name}#{i}")
+                        for i in range(local_parent_range[0], local_parent_range[1])
+                    ]
+                )
+                == multiset[child.name]
+            )
+
+            # Children instances should be within the instance cardinality intervals
+            # e.g gouda#0 >= 0, gouda#0 <= 3, gouda#1 >= 0, gouda#1 <= 3, gouda#2 >= 0, gouda#2 <= 3, gouda#3 >= 0, gouda#3 <= 3
+            for i in range(local_parent_range[0], local_parent_range[1]):
+                solver.add(
+                    Or(
+                        [
+                            And(
+                                Int(f"{child.name}#{i}") >= interval.lower,
+                                Int(f"{child.name}#{i}") <= interval.upper
+                                if interval.upper is not None
+                                else True,
+                            )
+                            for interval in child.instance_cardinality.intervals
+                        ]
+                    )
+                )
+
+        for i in range(local_parent_range[0], local_parent_range[1]):
+            # Each parent instance should have a valid number of children instances according to the group instance and type cardinalities
+            # e.g. 3 <= cheddar#0 + swiss#0 + gouda#0 <= 3, 3 <= cheddar#1 + swiss#1 + gouda#1 <= 3,
+            # 3 <= cheddar#2 + swiss#2 + gouda#2 <= 3, 3 <= cheddar#3 + swiss#3 + gouda#3 <= 3
+            if len(feature.group_type_cardinality.intervals) != 0:
+                solver.add(
+                    Or(
+                        [
+                            And(
+                                Sum(
+                                    [
+                                        Int(f"{child.name}#{i}")
+                                        for child in feature.children
+                                    ]
+                                )
+                                >= group_instance_interval.lower,
+                                Sum(
+                                    [
+                                        Int(f"{child.name}#{i}")
+                                        for child in feature.children
+                                    ]
+                                )
+                                <= group_instance_interval.upper
+                                if group_instance_interval.upper is not None
+                                else True,
+                            )
+                            for group_instance_interval in feature.group_instance_cardinality.intervals
+                        ]
+                    )
+                )
+
+            # e.g. 1 <= If(cheddar#0 > 0, 1, 0) + If(swiss#0 > 0, 1, 0) + If(gouda#0 > 0, 1, 0) <= 3, ...
+            if len(feature.group_type_cardinality.intervals) != 0:
+                solver.add(
+                    Or(
+                        [
+                            And(
+                                Sum(
+                                    [
+                                        If(Int(f"{child.name}#{i}") > 0, 1, 0)
+                                        for child in feature.children
+                                    ]
+                                )
+                                >= group_type_interval.lower,
+                                Sum(
+                                    [
+                                        If(Int(f"{child.name}#{i}") > 0, 1, 0)
+                                        for child in feature.children
+                                    ]
+                                )
+                                <= group_type_interval.upper
+                                if group_type_interval.upper is not None
+                                else True,
+                            )
+                            for group_type_interval in feature.group_type_cardinality.intervals
+                        ]
+                    )
+                )
+
+        solver.check().r
+
+        model = solver.model()
+        result: list[list[ChildDistribution]] = []
+        for i in range(local_parent_range[0], local_parent_range[1]):
+            distribution: list[ChildDistribution] = []
+            for index, child in enumerate(feature.children):
+                previous_amount = result[-1][index].range[1] if len(result) > 0 else 0
+                distribution.append(
+                    ChildDistribution(
+                        child.name,
+                        (
+                            0 + previous_amount,
+                            model[Int(f"{child.name}#{i}")].as_long() + previous_amount,
+                        ),
+                    )
+                )
+            result.append(distribution)
+        return result

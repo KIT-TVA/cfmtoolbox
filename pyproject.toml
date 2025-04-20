@@ -23,6 +23,7 @@ classifiers = [
 python = "^3.11"
 typer = {extras = ["all"], version = "^0.12.3"}
 uvlparser = "^2.0.1"
+z3-solver = "^4.13.3.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.4"
@@ -33,6 +34,7 @@ pytest-cov = "^5.0.0"
 mkdocs = "^1.6.1"
 mkdocs-material = "^9.5.34"
 mkdocstrings-python = "^1.11.1"
+scipy = "^1.15.2"
 
 [tool.poetry.scripts]
 cfmtoolbox = "cfmtoolbox.__main__:__name__"
@@ -48,6 +50,7 @@ featureide-import = "cfmtoolbox.plugins.featureide_import"
 debugging = "cfmtoolbox.plugins.debugging"
 big-m = "cfmtoolbox.plugins.big_m"
 one-wise-sampling = "cfmtoolbox.plugins.one_wise_sampling"
+t-wise-sampling = "cfmtoolbox.plugins.t_wise_sampling"
 
 [tool.ruff.lint]
 extend-select = ["I"]

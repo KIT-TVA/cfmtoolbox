@@ -1,0 +1,460 @@
+{
+  "root": {
+    "name": "multiplayer-game",
+    "instance_cardinality": {
+      "intervals": [
+        {
+          "lower": 1,
+          "upper": 1
+        }
+      ]
+    },
+    "group_type_cardinality": {
+      "intervals": [
+        {
+          "lower": 2,
+          "upper": 2
+        }
+      ]
+    },
+    "group_instance_cardinality": {
+      "intervals": [
+        {
+          "lower": 3,
+          "upper": 9
+        }
+      ]
+    },
+    "children": [
+      {
+        "name": "central-node",
+        "instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "group_type_cardinality": {
+          "intervals": [
+            {
+              "lower": 2,
+              "upper": 2
+            }
+          ]
+        },
+        "group_instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 2,
+              "upper": 2
+            }
+          ]
+        },
+        "children": [
+          {
+            "name": "display",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": []
+            },
+            "group_instance_cardinality": {
+              "intervals": []
+            },
+            "children": []
+          },
+          {
+            "name": "inter-team-communication",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "children": [
+              {
+                "name": "broadcast",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "unicast",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "team",
+        "instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 2,
+              "upper": 4
+            },
+            {
+              "lower": 6,
+              "upper": 8
+            }
+          ]
+        },
+        "group_type_cardinality": {
+          "intervals": [
+            {
+              "lower": 2,
+              "upper": 2
+            }
+          ]
+        },
+        "group_instance_cardinality": {
+          "intervals": [
+            {
+              "lower": 2,
+              "upper": 2
+            }
+          ]
+        },
+        "children": [
+          {
+            "name": "intra-team-communication",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "children": [
+              {
+                "name": "wifi",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "bluetooth",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "name": "members",
+            "instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 1
+                }
+              ]
+            },
+            "group_type_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 2
+                }
+              ]
+            },
+            "group_instance_cardinality": {
+              "intervals": [
+                {
+                  "lower": 1,
+                  "upper": 9
+                }
+              ]
+            },
+            "children": [
+              {
+                "name": "player",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 0,
+                      "upper": 8
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": []
+                },
+                "group_instance_cardinality": {
+                  "intervals": []
+                },
+                "children": []
+              },
+              {
+                "name": "leader",
+                "instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 1,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_type_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 1,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "group_instance_cardinality": {
+                  "intervals": [
+                    {
+                      "lower": 1,
+                      "upper": 1
+                    }
+                  ]
+                },
+                "children": [
+                  {
+                    "name": "scattered-strategy",
+                    "instance_cardinality": {
+                      "intervals": [
+                        {
+                          "lower": 0,
+                          "upper": 1
+                        }
+                      ]
+                    },
+                    "group_type_cardinality": {
+                      "intervals": []
+                    },
+                    "group_instance_cardinality": {
+                      "intervals": []
+                    },
+                    "children": []
+                  },
+                  {
+                    "name": "specific-strategy",
+                    "instance_cardinality": {
+                      "intervals": [
+                        {
+                          "lower": 0,
+                          "upper": 1
+                        }
+                      ]
+                    },
+                    "group_type_cardinality": {
+                      "intervals": []
+                    },
+                    "group_instance_cardinality": {
+                      "intervals": []
+                    },
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "require": true,
+      "first_feature_name": "scattered-strategy",
+      "first_cardinality": {
+        "intervals": [
+          {
+            "lower": 1,
+            "upper": 8
+          }
+        ]
+      },
+      "second_feature_name": "broadcast",
+      "second_cardinality": {
+        "intervals": [
+          {
+            "lower": 1,
+            "upper": 1
+          }
+        ]
+      }
+    },
+    {
+      "require": true,
+      "first_feature_name": "specific-strategy",
+      "first_cardinality": {
+        "intervals": [
+          {
+            "lower": 1,
+            "upper": 8
+          }
+        ]
+      },
+      "second_feature_name": "team",
+      "second_cardinality": {
+        "intervals": [
+          {
+            "lower": 6,
+            "upper": 8
+          }
+        ]
+      }
+    },
+    {
+      "require": false,
+      "first_feature_name": "scattered-strategy",
+      "first_cardinality": {
+        "intervals": [
+          {
+            "lower": 1,
+            "upper": 8
+          }
+        ]
+      },
+      "second_feature_name": "team",
+      "second_cardinality": {
+        "intervals": [
+          {
+            "lower": 5,
+            "upper": 5
+          }
+        ]
+      }
+    },
+    {
+      "require": false,
+      "first_feature_name": "wifi",
+      "first_cardinality": {
+        "intervals": [
+          {
+            "lower": 1,
+            "upper": null
+          }
+        ]
+      },
+      "second_feature_name": "player",
+      "second_cardinality": {
+        "intervals": [
+          {
+            "lower": 0,
+            "upper": 5
+          }
+        ]
+      }
+    },
+    {
+      "require": false,
+      "first_feature_name": "bluetooth",
+      "first_cardinality": {
+        "intervals": [
+          {
+            "lower": 1,
+            "upper": null
+          }
+        ]
+      },
+      "second_feature_name": "player",
+      "second_cardinality": {
+        "intervals": [
+          {
+            "lower": 5,
+            "upper": null
+          }
+        ]
+      }
+    }
+  ]
+}
