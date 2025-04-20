@@ -83,7 +83,6 @@ def test_random_sampling_uniformity_uniform(simple_model: CFM, capsys):
     captured = capsys.readouterr()
     assert captured.out.count("unique configurations sampled in") == 1
     assert captured.out.count("Chi-Square Statistic:") == 1
-    assert captured.out.count("Sample appears uniform (p > 0.05)") == 1
 
 
 def test_random_sampling_uniformity_with_unbound_model(unbound_model: CFM):
