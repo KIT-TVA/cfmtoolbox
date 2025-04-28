@@ -1,13 +1,17 @@
-[tool.poetry]
+[project]
 name = "cfmtoolbox"
 version = "0.4.0"
 description = "A plugin-based toolbox for working with cardinality-based feature models"
-authors = ["Jonathan Ehwald <github@ehwald.info>", "Daniel-Delong Zhang <danielzhang728@gmail.com>", "Anna Chen <chenxanna@gmail.com>", "Valentin Kaczmarek <valentinkaczmarek@yahoo.de>"]
-license = "MIT"
+authors = [
+    { name = "Jonathan Ehwald", email = "github@ehwald.info" },
+    { name = "Daniel-Delong Zhang", email = "danielzhang728@gmail.com" },
+    { name = "Anna Chen", email = "chenxanna@gmail.com" },
+    { name = "Valentin Kaczmarek", email = "valentinkaczmarek@yahoo.de" },
+]
+license = { text = "MIT" }
 readme = "README.md"
-homepage = "https://github.com/KIT-TVA/cfmtoolbox/"
-repository = "https://github.com/KIT-TVA/cfmtoolbox/"
-documentation = "https://kit-tva.github.io/cfmtoolbox/"
+requires-python = ">=3.11,<4.0"
+dependencies = ["typer (>=0.12.3,<1.0.0)", "uvlparser (>=2.0.1,<3.0.0)"]
 classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
@@ -19,25 +23,15 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-typer = "^0.12.3"
-uvlparser = "^2.0.1"
+[project.urls]
+homepage = "https://github.com/KIT-TVA/cfmtoolbox/"
+repository = "https://github.com/KIT-TVA/cfmtoolbox/"
+documentation = "https://kit-tva.github.io/cfmtoolbox/"
 
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.11.7"
-pre-commit = "^4.2.0"
-mypy = "^1.10.0"
-pytest = "^8.2.0"
-pytest-cov = "^6.1.1"
-mkdocs = "^1.6.1"
-mkdocs-material = "^9.5.34"
-mkdocstrings-python = "^1.11.1"
-
-[tool.poetry.scripts]
+[project.scripts]
 cfmtoolbox = "cfmtoolbox.__main__:__name__"
 
-[tool.poetry.plugins."cfmtoolbox.plugins"]
+[project.entry-points."cfmtoolbox.plugins"]
 conversion = "cfmtoolbox.plugins.conversion"
 random-sampling = "cfmtoolbox.plugins.random_sampling"
 uvl-export = "cfmtoolbox.plugins.uvl_export"
@@ -48,6 +42,16 @@ featureide-import = "cfmtoolbox.plugins.featureide_import"
 debugging = "cfmtoolbox.plugins.debugging"
 big-m = "cfmtoolbox.plugins.big_m"
 one-wise-sampling = "cfmtoolbox.plugins.one_wise_sampling"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.7"
+pre-commit = "^4.2.0"
+mypy = "^1.10.0"
+pytest = "^8.2.0"
+pytest-cov = "^6.1.1"
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.5.34"
+mkdocstrings-python = "^1.11.1"
 
 [tool.ruff.lint]
 extend-select = ["I"]

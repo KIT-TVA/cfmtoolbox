@@ -1,4 +1,4 @@
-CFM Toolbox plugins are Python packages with entry point metadata, installed in the same environment as the toolbox, and discovered and loaded at runtime.
+CFM Toolbox plugins are Python packages with [entry point metadata](https://packaging.python.org/en/latest/specifications/pyproject-toml/#entry-points), installed in the same environment as the toolbox, and discovered and loaded at runtime.
 Each Python package can contain multiple plugins, which can be used to extend the toolbox with new functionality.
 
 Generally, there are three types of plugins: **importers**, **commands**, and **exporters**.
@@ -35,7 +35,7 @@ Below you'll find guides on how to write each type of plugin using `python-poetr
 5. To enable the CFM Toolbox to discover and automatically load your plugin, add the following to your `pyproject.toml` file:
 
     ```toml
-    [tool.poetry.plugins."cfmtoolbox.plugins"]
+    [project.entry-points."cfmtoolbox.plugins"]
     example-importer = "cfmtoolbox_example_importer"
     ```
 
@@ -63,7 +63,7 @@ This plugin would allow the CFM Toolbox to import feature models from a `.exampl
 5. To enable the CFM Toolbox to discover and automatically load your plugin, add the following to your `pyproject.toml` file:
 
     ```toml
-    [tool.poetry.plugins."cfmtoolbox.plugins"]
+    [project.entry-points."cfmtoolbox.plugins"]
     example-command = "cfmtoolbox_example_command"
     ```
 
@@ -91,7 +91,7 @@ This plugin would add a new `example-command` command to the CFM Toolbox, which 
 5. To enable the CFM Toolbox to discover and automatically load your plugin, add the following to your `pyproject.toml` file:
 
     ```toml
-    [tool.poetry.plugins."cfmtoolbox.plugins"]
+    [project.entry-points."cfmtoolbox.plugins"]
     summary-exporter = "cfmtoolbox_summary_exporter"
     ```
 
