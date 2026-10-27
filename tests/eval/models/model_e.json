@@ -1,0 +1,206 @@
+{
+    "root": {
+      "name": "Root",
+      "instance_cardinality": {
+        "intervals": [
+          {
+            "lower": 1,
+            "upper": 1
+          }
+        ]
+      },
+      "group_type_cardinality": {
+        "intervals": [
+          {
+            "lower": 2,
+            "upper": 3
+          }
+        ]
+      },
+      "group_instance_cardinality": {
+        "intervals": [
+          {
+            "lower": 2,
+            "upper": 7
+          }
+        ]
+      },
+      "children": [
+        {
+          "name": "A",
+          "instance_cardinality": {
+            "intervals": [
+              {
+                "lower": 1,
+                "upper": 3
+              }
+            ]
+          },
+          "group_type_cardinality": {
+            "intervals": [
+              {
+                "lower": 1,
+                "upper": 2
+              }
+            ]
+          },
+          "group_instance_cardinality": {
+            "intervals": [
+              {
+                "lower": 1,
+                "upper": 3
+              }
+            ]
+          },
+          "children": [
+            {
+              "name": "A1",
+              "instance_cardinality": {
+                "intervals": [
+                  {
+                    "lower": 0,
+                    "upper": 1
+                  }
+                ]
+              },
+              "group_type_cardinality": {
+                "intervals": []
+              },
+              "group_instance_cardinality": {
+                "intervals": []
+              },
+              "children": []
+            },
+            {
+              "name": "A2",
+              "instance_cardinality": {
+                "intervals": [
+                  {
+                    "lower": 1,
+                    "upper": 2
+                  }
+                ]
+              },
+              "group_type_cardinality": {
+                "intervals": []
+              },
+              "group_instance_cardinality": {
+                "intervals": []
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "B",
+          "instance_cardinality": {
+            "intervals": [
+              {
+                "lower": 0,
+                "upper": 2
+              }
+            ]
+          },
+          "group_type_cardinality": {
+            "intervals": [
+              {
+                "lower": 1,
+                "upper": 1
+              }
+            ]
+          },
+          "group_instance_cardinality": {
+            "intervals": [
+              {
+                "lower": 1,
+                "upper": 3
+              }
+            ]
+          },
+          "children": [
+            {
+              "name": "B1",
+              "instance_cardinality": {
+                "intervals": [
+                  {
+                    "lower": 1,
+                    "upper": 3
+                  }
+                ]
+              },
+              "group_type_cardinality": {
+                "intervals": []
+              },
+              "group_instance_cardinality": {
+                "intervals": []
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "C",
+          "instance_cardinality": {
+            "intervals": [
+              {
+                "lower": 1,
+                "upper": 2
+              }
+            ]
+          },
+          "group_type_cardinality": {
+            "intervals": []
+          },
+          "group_instance_cardinality": {
+            "intervals": []
+          },
+          "children": []
+        }
+      ]
+    },
+    "constraints": [
+      {
+        "require": true,
+        "first_feature_name": "A",
+        "first_cardinality": {
+          "intervals": [
+            {
+              "lower": 2,
+              "upper": 2
+            }
+          ]
+        },
+        "second_feature_name": "B",
+        "second_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 2
+            }
+          ]
+        }
+      },
+      {
+        "require": false,
+        "first_feature_name": "C",
+        "first_cardinality": {
+          "intervals": [
+            {
+              "lower": 1,
+              "upper": 1
+            }
+          ]
+        },
+        "second_feature_name": "B1",
+        "second_cardinality": {
+          "intervals": [
+            {
+              "lower": 6,
+              "upper": 6
+            }
+          ]
+        }
+      }
+    ]
+  }
+  

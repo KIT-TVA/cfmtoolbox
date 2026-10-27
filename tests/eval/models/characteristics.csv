@@ -1,0 +1,7 @@
+model,file,features,cfm_depth,max_multiplicative_upper,unbounded_cardinality
+Model A,model_a.json,15,5,25,False
+Model B,model_b.json,18,6,24,False
+Model C,model_c.json,11,4,20,False
+Model D,model_d.json,11,5,33,False
+Model E,model_e.json,7,3,7,False
+multiplayer_game,multiplayer_game.json,15,5,9,False
