@@ -3,7 +3,7 @@
 All scripts are run from the repository root via `poetry run` inside (or they
 call it themselves). Instance-set variant only throughout.
 
-## Scaling evaluation (RQ1 depth, RQ2 interval size)
+## Scaling evaluation (RQ1.1 depth, RQ1.2 interval size)
 
 - `run_parameter_eval.sh` — see below.
 - `results/run_batch.sh` — the batch runner used for the depth × interval
@@ -12,7 +12,7 @@ call it themselves). Instance-set variant only throughout.
 - `make_figures.py` — generates the TikZ/pgfplots figures from `results.csv`
   into `figures/` (see `results/README.md`).
 
-## Parameter-influence evaluation (RQ3: t, m, c)
+## Parameter-influence evaluation (RQ2: t, m, c)
 
 - `run_parameter_eval.sh` — for each model runs, averaged over `--r` repetitions
   (default 10), instance-set variant:
